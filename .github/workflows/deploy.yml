@@ -22,15 +22,20 @@ jobs:
         uses: 'google-github-actions/setup-gcloud@v2'
 
       - name: Build and Push Container
-        # We use Mumbai (asia-south1) for better speed in Bangalore
+        # Compiling securely on the GitHub runner explicitly to bake inside the Public variables 
         run: |-
-          gcloud builds submit --tag gcr.io/${{ secrets.GCP_PROJECT_ID }}/nextjs-app .
+          gcloud auth configure-docker -q
+          docker build \
+            --build-arg NEXT_PUBLIC_SUPABASE_URL=${{ secrets.SUPABASE_URL }} \
+            --build-arg NEXT_PUBLIC_SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }} \
+            -t gcr.io/${{ secrets.GCP_PROJECT_ID }}/nextjs-app .
+          docker push gcr.io/${{ secrets.GCP_PROJECT_ID }}/nextjs-app
 
       - name: Deploy to Cloud Run
         run: |-
           gcloud run deploy nextjs-app \
             --image gcr.io/${{ secrets.GCP_PROJECT_ID }}/nextjs-app \
-            --region asia-south1 \
+            --region us-central1 \
             --platform managed \
             --allow-unauthenticated \
             --set-env-vars NEXT_PUBLIC_SUPABASE_URL=${{ secrets.SUPABASE_URL }},NEXT_PUBLIC_SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }}
