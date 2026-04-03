@@ -38,4 +38,7 @@ jobs:
             --region us-central1 \
             --platform managed \
             --allow-unauthenticated \
-            --set-env-vars HOSTNAME=0.0.0.0,NEXT_PUBLIC_SUPABASE_URL=${{ secrets.SUPABASE_URL }},NEXT_PUBLIC_SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }}
+            --update-env-vars HOSTNAME=0.0.0.0 \
+            --update-env-vars NEXT_PUBLIC_SUPABASE_URL=${{ secrets.SUPABASE_URL }} \
+            --update-env-vars NEXT_PUBLIC_SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }} \
+            --update-env-vars SUPABASE_SERVICE_ROLE_KEY=${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}

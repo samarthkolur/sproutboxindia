@@ -34,7 +34,6 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
 USER nextjs
 EXPOSE 8080
-ENV PORT 8080
-# STRICTLY REQUIRED FOR CLOUD RUN! If omitted, Node defaults to localized 127.0.0.1 shielding it internally.
-ENV HOSTNAME="0.0.0.0" 
-CMD ["sh", "-c", "HOSTNAME=0.0.0.0 PORT=8080 node server.js"]
+ENV HOSTNAME="0.0.0.0"
+# Cloud Run injects PORT. standalone server.js respects it.
+CMD ["node", "server.js"]
