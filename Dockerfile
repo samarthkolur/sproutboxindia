@@ -1,30 +1,39 @@
 FROM node:20-alpine AS base
 
-# Install dependencies only when needed
+# Install dependencies
 FROM base AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 COPY package.json yarn.lock* package-lock.json* pnpm-lock.yaml* ./
 RUN npm ci
 
-# Rebuild the source code only when needed
+# Build stage
 FROM base AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Capture the GitHub Action variables securely to bake them deeply into the Next.js static Client components
 ARG NEXT_PUBLIC_SUPABASE_URL
 ARG NEXT_PUBLIC_SUPABASE_ANON_KEY
+
 ENV NEXT_PUBLIC_SUPABASE_URL=$NEXT_PUBLIC_SUPABASE_URL
 ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=$NEXT_PUBLIC_SUPABASE_ANON_KEY
 
 RUN npm run build
 
-# Production image, copy all the files and run next
+# Runner stage (FINAL FIX HERE)
 FROM base AS runner
 WORKDIR /app
+
 ENV NODE_ENV production
+
+# 👇 CRITICAL FIX
+ARG NEXT_PUBLIC_SUPABASE_URL
+ARG NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+ENV NEXT_PUBLIC_SUPABASE_URL=$NEXT_PUBLIC_SUPABASE_URL
+ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=$NEXT_PUBLIC_SUPABASE_ANON_KEY
+
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
@@ -33,7 +42,8 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
 USER nextjs
+
 EXPOSE 8080
 ENV HOSTNAME="0.0.0.0"
-# Cloud Run injects PORT. standalone server.js respects it.
+
 CMD ["node", "server.js"]
