@@ -38,11 +38,24 @@ export async function updateSession(request: NextRequest) {
     request.nextUrl.pathname.startsWith("/restaurant") ||
     request.nextUrl.pathname.startsWith("/admin")
 
+  // Helper for safe redirects on Cloud Run / Proxies
+  const getRedirectUrl = (path: string) => {
+    const host = request.headers.get("x-forwarded-host") || request.headers.get("host")
+    const proto = request.headers.get("x-forwarded-proto") || "https"
+    
+    // Fallback to request.nextUrl if no host header (local dev)
+    if (!host || host.includes("0.0.0.0")) {
+      const url = request.nextUrl.clone()
+      url.pathname = path
+      return url
+    }
+    
+    return new URL(path, `${proto}://${host}`)
+  }
+
   if (!user && isDashboardPage) {
     console.log("middleware: no user, redirecting dashboard access to /login");
-    const url = request.nextUrl.clone()
-    url.pathname = "/login"
-    return NextResponse.redirect(url)
+    return NextResponse.redirect(getRedirectUrl("/login"))
   }
 
   // If logged in and on auth page, redirect to dashboard based on role
@@ -56,10 +69,8 @@ export async function updateSession(request: NextRequest) {
     console.log("middleware: logged in user accessing auth page. Fetched role:", profile?.role);
 
     if (profile?.role) {
-      const url = request.nextUrl.clone()
-      url.pathname = `/${profile.role}`
-      console.log("middleware: redirecting from auth page to", url.pathname);
-      return NextResponse.redirect(url)
+      console.log("middleware: redirecting from auth page to", profile.role);
+      return NextResponse.redirect(getRedirectUrl(`/${profile.role}`))
     }
     // No profile yet — let them stay on auth page
     console.log("middleware: user has no profile role, allowing load of auth page");
