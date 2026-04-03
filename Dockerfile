@@ -37,4 +37,4 @@ EXPOSE 8080
 ENV PORT 8080
 # STRICTLY REQUIRED FOR CLOUD RUN! If omitted, Node defaults to localized 127.0.0.1 shielding it internally.
 ENV HOSTNAME="0.0.0.0" 
-CMD ["node", "server.js"]
+CMD ["sh", "-c", "HOSTNAME=0.0.0.0 PORT=8080 node server.js"]
