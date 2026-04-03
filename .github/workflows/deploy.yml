@@ -1,0 +1,36 @@
+name: Deploy Next.js to Cloud Run
+on:
+  push:
+    branches: [ main ] # This triggers the CI/CD on every push to main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    # This matches the "Environment" name in your GitHub settings
+    environment: GCP_PROJECT_ID 
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Google Auth
+        uses: 'google-github-actions/auth@v2'
+        with:
+          credentials_json: '${{ secrets.GCP_SA_KEY }}'
+
+      - name: Set up Cloud SDK
+        uses: 'google-github-actions/setup-gcloud@v2'
+
+      - name: Build and Push Container
+        # We use Mumbai (asia-south1) for better speed in Bangalore
+        run: |-
+          gcloud builds submit --tag gcr.io/${{ secrets.GCP_PROJECT_ID }}/nextjs-app .
+
+      - name: Deploy to Cloud Run
+        run: |-
+          gcloud run deploy nextjs-app \
+            --image gcr.io/${{ secrets.GCP_PROJECT_ID }}/nextjs-app \
+            --region asia-south1 \
+            --platform managed \
+            --allow-unauthenticated \
+            --set-env-vars NEXT_PUBLIC_SUPABASE_URL=${{ secrets.SUPABASE_URL }},NEXT_PUBLIC_SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }}
