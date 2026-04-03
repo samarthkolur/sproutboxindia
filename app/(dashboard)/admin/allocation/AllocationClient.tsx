@@ -9,10 +9,13 @@ import { Layers, CheckCircle2, AlertTriangle, Users, PlayCircle, Loader2 } from 
 export default function AllocationClient({ orders, trays, growers }: { orders: any[], trays: any[], growers: any[] }) {
   const [isAllocating, setIsAllocating] = useState(false)
   const [allocationSuccess, setAllocationSuccess] = useState(false)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
   // MACRO computations
-  const pendingOrders = orders.filter(o => o.status === "pending")
-  const requiredTrays = orders.reduce((sum, o) => sum + o.total_trays, 0)
+  const pendingOrders = orders.filter(o => o.status === "assigned_to_growers")
+  // Only consider orders that have actively passed Demand approval into the Allocation phase
+  const actionableOrders = orders.filter(o => o.status !== "pending" && o.status !== "rejected")
+  const requiredTrays = actionableOrders.reduce((sum, o) => sum + o.total_trays, 0)
   const assignedTrays = trays.length
   const unassignedTrays = Math.max(0, requiredTrays - assignedTrays)
 
@@ -31,92 +34,46 @@ export default function AllocationClient({ orders, trays, growers }: { orders: a
     return Object.values(map).sort((a,b) => b.assigned - a.assigned)
   }, [trays])
 
-  // THE FULL ALLOCATION ENGINE -> order -> split to growers -> assign -> update status
+  // API-Bound Allocation Executor
   async function runAllocation() {
-    if (pendingOrders.length === 0 || growers.length === 0) return
+    console.log("Run Allocation Clicked")
+    setErrorMessage(null)
+    
+    if (pendingOrders.length === 0) {
+      setErrorMessage("No unassigned orders exist to allocate.")
+      return
+    }
+    if (growers.length === 0) {
+      setErrorMessage("System Failure: No active Growers found in the network.")
+      return
+    }
+
     setIsAllocating(true)
     setAllocationSuccess(false)
 
     try {
-      const supabase = createClient()
-      const newAssignments = []
-      const newAllocations = []
-      
-      let currentGrowerIndex = 0
+      // 1. Point to dedicated backend API to bypass implicit UI RLS blocks
+      const response = await fetch("/api/allocation", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" }
+      })
 
-      for (const order of pendingOrders) {
-        // Distribute order total trays across round-robin growers
-        const numTrays = order.total_trays
-        const items = order.items as any[] 
-        const primaryCrop = items.length > 0 ? items[0].crop_name : "Mixed Greens"
-        
-        for (let i = 0; i < numTrays; i++) {
-          const grower = growers[currentGrowerIndex]
-          
-          // Generate unique tray logic code
-          const trayCode = `SB-${Math.random().toString(36).substr(2, 6).toUpperCase()}`
-          
-          // Harvest happens 7 days from allocation assuming default rules
-          const harvestDate = new Date()
-          harvestDate.setDate(harvestDate.getDate() + 7)
+      const result = await response.json()
 
-          // 1. Prepare TrayAssignment insertion payload
-          const trayPayload = {
-            id: crypto.randomUUID(), // we need UUID back, but supabase generates it. So we pre-gen to link.
-            grower_id: grower.id,
-            tray_code: trayCode,
-            crop_name: primaryCrop,
-            start_date: new Date().toISOString(),
-            expected_harvest_date: harvestDate.toISOString(),
-            status: "assigned",
-            current_day: 1,
-            total_days: 7,
-            seed_type: primaryCrop,
-            seed_batch_id: `BAT-${Math.floor(Math.random() * 9999)}`,
-            seed_quantity_grams: 50 // baseline mock tracking for seeds
-          }
-          
-          newAssignments.push(trayPayload)
-
-          // 2. Prepare Allocation insertion payload
-          const allocationPayload = {
-            order_id: order.id,
-            tray_id: trayPayload.id,
-            grower_id: grower.id
-          }
-          
-          newAllocations.push(allocationPayload)
-
-          // Round-robin distribution increment
-          currentGrowerIndex = (currentGrowerIndex + 1) % growers.length
-        }
-
-        // 3. Update Order Status
-        await supabase
-          .from("orders")
-          .update({ status: "assigned_to_growers" })
-          .eq("id", order.id)
-      }
-
-      // Execute Bulk DB Insertions
-      if (newAssignments.length > 0) {
-        const { error: trayError } = await supabase.from("tray_assignments").insert(newAssignments)
-        if (trayError) throw trayError
-        
-        const { error: allocError } = await supabase.from("allocations").insert(newAllocations)
-        if (allocError) throw allocError
+      if (!response.ok) {
+        throw new Error(result.error || "Execution Request Failed")
       }
 
       setAllocationSuccess(true)
       
-      // Auto reload after success to re-fetch
+      // Auto reload after success to re-fetch Server payload
       setTimeout(() => {
         window.location.reload()
       }, 1500)
 
     } catch (err: any) {
       console.error(err)
-      alert("Allocation Sequence Failed: " + err.message)
+      setErrorMessage("Allocation Sequence Failed: " + err.message)
     } finally {
       setIsAllocating(false)
     }
@@ -158,13 +115,24 @@ export default function AllocationClient({ orders, trays, growers }: { orders: a
               <button 
                 onClick={runAllocation}
                 disabled={isAllocating || allocationSuccess}
-                className={`w-full py-2.5 px-4 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all ${allocationSuccess ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/20" : "bg-sprout-500 hover:bg-sprout-400 text-black"}`}
+                className={`w-full py-2.5 px-4 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all cursor-pointer disabled:cursor-not-allowed ${allocationSuccess ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/20" : "bg-sprout-500 hover:bg-sprout-400 text-black"}`}
               >
                 {isAllocating ? <><Loader2 className="h-4 w-4 animate-spin" /> Distributing...</> : 
                  allocationSuccess ? <><CheckCircle2 className="h-4 w-4" /> Allocated</> :
                  <><PlayCircle className="h-4 w-4" /> Run Allocation</>}
               </button>
             </>
+          )}
+          
+          {/* Dynamic feedback error message block */}
+          {errorMessage && (
+            <motion.p 
+              initial={{ opacity: 0, y: 5 }} 
+              animate={{ opacity: 1, y: 0 }} 
+              className="absolute bottom-1 left-2 right-2 text-center text-[10px] text-red-400 font-medium leading-tight"
+            >
+              {errorMessage}
+            </motion.p>
           )}
         </div>
       </div>

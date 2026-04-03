@@ -79,6 +79,12 @@ CREATE POLICY "Admins can manage trays"
     EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin')
   );
 
+CREATE POLICY "Admins can insert trays"
+  ON public.tray_assignments FOR INSERT
+  WITH CHECK (
+    EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin')
+  );
+
 -- ════════════════════════════════════════════════
 -- 3. Daily Instructions
 -- ════════════════════════════════════════════════
@@ -271,3 +277,25 @@ CREATE POLICY "Admins can manage all allocations"
   USING (
     EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin')
   );
+
+CREATE POLICY "Admins can insert allocations"
+  ON public.allocations FOR INSERT
+  WITH CHECK (
+    EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin')
+  );
+
+-- ════════════════════════════════════════════════
+-- 12. Fix Core Profile Select Loops (Admin Override)
+-- ════════════════════════════════════════════════
+CREATE OR REPLACE FUNCTION public.is_sprout_admin() RETURNS boolean AS $$
+BEGIN
+  RETURN EXISTS (
+    SELECT 1 FROM auth.users
+    WHERE id = auth.uid() AND raw_user_meta_data->>'role' = 'admin'
+  );
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+CREATE POLICY "Admins can view all profiles bypass"
+  ON public.profiles FOR SELECT
+  USING (public.is_sprout_admin());
