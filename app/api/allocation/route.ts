@@ -82,6 +82,7 @@ export async function POST(req: Request) {
         
         currentGrowerIndex = (currentGrowerIndex + 1) % growers.length
       }
+    } // <-- Missing brace closing the order mapping loop
 
     // Execute Bulk Insertions FIRST to ensure atomic safety
     if (newAssignments.length > 0) {
