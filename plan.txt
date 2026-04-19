@@ -1,0 +1,1543 @@
+================================================================================
+SPROUTBOX 2.0 — COMPLETE PROJECT BUILD PLAN
+For AI IDE Context (Cursor / Windsurf / Copilot)
+================================================================================
+
+This file is the single source of truth for building SproutBox 2.0 — a
+demand-driven, decentralized microgreen production and supply platform.
+Feed this entire file to your IDE AI at project start.
+
+--------------------------------------------------------------------------------
+TABLE OF CONTENTS
+--------------------------------------------------------------------------------
+1.  Project Overview & Business Logic
+2.  Tech Stack (exact packages + versions)
+3.  Folder Structure
+4.  Database Schema (Prisma)
+5.  Auth & Roles
+6.  Design System (colors, glass, grain, components)
+7.  Day-by-Day Build Plan (Days 1–10)
+8.  All Pages — Complete Inventory
+9.  API Routes
+10. Key Business Logic Functions
+11. Environment Variables
+12. Deployment Checklist
+
+================================================================================
+1. PROJECT OVERVIEW & BUSINESS LOGIC
+================================================================================
+
+SproutBox is a B2B food-tech SaaS platform with 3 user roles:
+  - RESTAURANT: Places orders for microgreens, receives deliveries, gives feedback
+  - GROWER: Home-based grower who receives tray tasks, grows, uploads progress
+  - ADMIN: Platform operator who runs demand engine, allocates tasks, reviews QC
+
+CORE FLOW:
+  Restaurant places order
+    → Admin demand engine converts kg → trays (with 20-40% buffer)
+    → Allocation engine scores growers and distributes tray tasks
+    → Growers receive day-by-day instructions and upload milestone images
+    → Admin reviews images via digital QC (Pass / Risk / Reject)
+    → Growers harvest approved batches and drop off at hub
+    → Hub operator does physical QC and aggregates
+    → Delivery to restaurant
+    → Restaurant gives feedback
+    → Feedback updates grower scores → better allocation next cycle
+
+KEY CALCULATIONS:
+  Tray yield standard: 1 tray = 200g harvest
+  Buffer: Add 25% extra trays to production plan (configurable per crop)
+  Grower score = (yieldAccuracy * 0.4) + (qualityPassRate * 0.4) + (timeliness * 0.2)
+  Allocation: trays distributed proportional to grower score within same cluster
+  Growth cycle: 7-10 days depending on crop type
+
+CROP TYPES SUPPORTED (MVP):
+  - Sunflower shoots (9 days)
+  - Pea shoots (8 days)
+  - Radish (7 days)
+  - Wheat grass (10 days)
+  - Mustard (7 days)
+  - Fenugreek (8 days)
+
+================================================================================
+2. TECH STACK
+================================================================================
+
+FRAMEWORK:
+  next@14.2.x                  — App Router, React Server Components
+  react@18.x
+  react-dom@18.x
+  typescript@5.x
+
+STYLING:
+  tailwindcss@3.4.x
+  @tailwindcss/typography
+  tailwindcss-animate            — for entrance animations
+  postcss
+  autoprefixer
+  clsx                           — conditional classnames
+  tailwind-merge                 — merge tailwind classes safely
+
+UI COMPONENTS:
+  shadcn/ui (init with --style default --base-color zinc)
+    Components to install:
+      button, input, label, form, select, checkbox, radio-group,
+      dialog, sheet, dropdown-menu, popover, calendar, date-picker,
+      table, badge, card, avatar, progress, slider, switch,
+      tabs, accordion, toast, sonner, skeleton, separator,
+      command, tooltip, scroll-area, aspect-ratio
+
+  lucide-react@0.400.x           — icons
+  @radix-ui/* (installed via shadcn)
+
+FORMS & VALIDATION:
+  react-hook-form@7.x
+  zod@3.x
+  @hookform/resolvers@3.x
+
+AUTH:
+  next-auth@5.x (beta — use "npm install next-auth@beta")
+  @auth/prisma-adapter
+
+DATABASE:
+  prisma@5.x
+  @prisma/client@5.x
+  PostgreSQL (Neon serverless — https://neon.tech)
+
+FILE UPLOADS:
+  uploadthing@6.x                — simpler than Cloudinary for Next.js App Router
+  @uploadthing/react
+  @uploadthing/next
+
+PAYMENTS:
+  stripe@15.x
+  @stripe/stripe-js@3.x
+  @stripe/react-stripe-js@2.x
+
+DATA FETCHING / STATE:
+  swr@2.x                        — client-side data fetching
+  zustand@4.x                    — global client state
+
+CHARTS:
+  recharts@2.x
+
+NOTIFICATIONS:
+  sonner@1.x                     — toast notifications
+
+UTILITIES:
+  date-fns@3.x                   — date manipulation
+  nanoid@5.x                     — ID generation
+  sharp@0.33.x                   — image optimization (server)
+  nodemailer@6.x                 — transactional email (optional for MVP)
+
+DEV TOOLS:
+  eslint
+  prettier
+  @types/node
+  @types/react
+  @types/react-dom
+  prisma studio (built in)
+
+================================================================================
+3. FOLDER STRUCTURE
+================================================================================
+
+sproutbox/
+├── prisma/
+│   ├── schema.prisma
+│   └── seed.ts
+├── public/
+│   ├── fonts/
+│   └── images/
+├── src/
+│   ├── app/
+│   │   ├── (auth)/
+│   │   │   ├── layout.tsx
+│   │   │   ├── login/
+│   │   │   │   └── page.tsx
+│   │   │   └── register/
+│   │   │       └── page.tsx
+│   │   ├── (marketing)/
+│   │   │   ├── layout.tsx
+│   │   │   ├── page.tsx                    ← Landing page /
+│   │   │   ├── join/
+│   │   │   │   ├── grower/
+│   │   │   │   │   └── page.tsx            ← Grower onboarding
+│   │   │   │   └── restaurant/
+│   │   │   │       └── page.tsx            ← Restaurant onboarding
+│   │   │   └── about/
+│   │   │       └── page.tsx
+│   │   ├── (dashboard)/
+│   │   │   ├── layout.tsx                  ← Shared dashboard shell
+│   │   │   ├── grower/
+│   │   │   │   ├── layout.tsx
+│   │   │   │   ├── dashboard/
+│   │   │   │   │   └── page.tsx
+│   │   │   │   ├── tasks/
+│   │   │   │   │   ├── page.tsx
+│   │   │   │   │   └── [taskId]/
+│   │   │   │   │       └── page.tsx
+│   │   │   │   ├── earnings/
+│   │   │   │   │   └── page.tsx
+│   │   │   │   └── profile/
+│   │   │   │       └── page.tsx
+│   │   │   ├── restaurant/
+│   │   │   │   ├── layout.tsx
+│   │   │   │   ├── dashboard/
+│   │   │   │   │   └── page.tsx
+│   │   │   │   ├── order/
+│   │   │   │   │   ├── new/
+│   │   │   │   │   │   └── page.tsx
+│   │   │   │   │   └── [orderId]/
+│   │   │   │   │       └── page.tsx
+│   │   │   │   ├── orders/
+│   │   │   │   │   └── page.tsx
+│   │   │   │   ├── subscriptions/
+│   │   │   │   │   └── page.tsx
+│   │   │   │   └── feedback/
+│   │   │   │       └── [orderId]/
+│   │   │   │           └── page.tsx
+│   │   │   └── admin/
+│   │   │       ├── layout.tsx
+│   │   │       ├── dashboard/
+│   │   │       │   └── page.tsx
+│   │   │       ├── demand/
+│   │   │       │   └── page.tsx
+│   │   │       ├── allocate/
+│   │   │       │   └── page.tsx
+│   │   │       ├── qc/
+│   │   │       │   ├── page.tsx
+│   │   │       │   └── [batchId]/
+│   │   │       │       └── page.tsx
+│   │   │       ├── hubs/
+│   │   │       │   ├── page.tsx
+│   │   │       │   └── [hubId]/
+│   │   │       │       └── page.tsx
+│   │   │       ├── growers/
+│   │   │       │   ├── page.tsx
+│   │   │       │   └── [growerId]/
+│   │   │       │       └── page.tsx
+│   │   │       ├── restaurants/
+│   │   │       │   └── page.tsx
+│   │   │       ├── deliveries/
+│   │   │       │   └── page.tsx
+│   │   │       └── analytics/
+│   │   │           └── page.tsx
+│   │   ├── api/
+│   │   │   ├── auth/
+│   │   │   │   └── [...nextauth]/
+│   │   │   │       └── route.ts
+│   │   │   ├── grower/
+│   │   │   │   ├── register/route.ts
+│   │   │   │   ├── checkin/route.ts
+│   │   │   │   └── harvest/route.ts
+│   │   │   ├── restaurant/
+│   │   │   │   ├── register/route.ts
+│   │   │   │   └── order/route.ts
+│   │   │   ├── admin/
+│   │   │   │   ├── demand/route.ts
+│   │   │   │   ├── allocate/route.ts
+│   │   │   │   ├── qc/route.ts
+│   │   │   │   └── delivery/route.ts
+│   │   │   ├── uploadthing/
+│   │   │   │   └── route.ts
+│   │   │   └── webhooks/
+│   │   │       └── stripe/route.ts
+│   │   ├── globals.css
+│   │   └── layout.tsx                      ← Root layout
+│   ├── components/
+│   │   ├── ui/                             ← shadcn generated components
+│   │   ├── layout/
+│   │   │   ├── Navbar.tsx
+│   │   │   ├── Footer.tsx
+│   │   │   ├── Sidebar.tsx
+│   │   │   ├── MobileNav.tsx
+│   │   │   └── DashboardShell.tsx
+│   │   ├── marketing/
+│   │   │   ├── HeroSection.tsx
+│   │   │   ├── HowItWorks.tsx
+│   │   │   ├── StatsBar.tsx
+│   │   │   ├── ForGrowers.tsx
+│   │   │   ├── ForRestaurants.tsx
+│   │   │   └── CTABanner.tsx
+│   │   ├── onboarding/
+│   │   │   ├── StepProgress.tsx
+│   │   │   ├── GrowerOnboardingForm.tsx
+│   │   │   └── RestaurantOnboardingForm.tsx
+│   │   ├── grower/
+│   │   │   ├── TaskCard.tsx
+│   │   │   ├── TrayStatusBoard.tsx
+│   │   │   ├── DayInstructions.tsx
+│   │   │   ├── CheckinModal.tsx
+│   │   │   ├── PerformanceRadar.tsx
+│   │   │   └── EarningsChart.tsx
+│   │   ├── restaurant/
+│   │   │   ├── OrderBuilder.tsx
+│   │   │   ├── CropCatalog.tsx
+│   │   │   ├── DeliveryTracker.tsx
+│   │   │   ├── FeedbackForm.tsx
+│   │   │   └── SubscriptionCard.tsx
+│   │   ├── admin/
+│   │   │   ├── DemandCalculator.tsx
+│   │   │   ├── AllocationTable.tsx
+│   │   │   ├── QCReviewPanel.tsx
+│   │   │   ├── HubAggregator.tsx
+│   │   │   ├── KPIGrid.tsx
+│   │   │   └── ActivityFeed.tsx
+│   │   └── shared/
+│   │       ├── GlassCard.tsx
+│   │       ├── StatCard.tsx
+│   │       ├── StatusBadge.tsx
+│   │       ├── ImageUploader.tsx
+│   │       ├── EmptyState.tsx
+│   │       └── LoadingSkeleton.tsx
+│   ├── lib/
+│   │   ├── prisma.ts                       ← Prisma client singleton
+│   │   ├── auth.ts                         ← NextAuth config
+│   │   ├── stripe.ts                       ← Stripe client
+│   │   ├── uploadthing.ts                  ← UploadThing config
+│   │   ├── utils.ts                        ← cn(), formatCurrency(), etc.
+│   │   └── constants.ts                    ← CROP_TYPES, CYCLE_DAYS, BUFFER_RATE
+│   ├── hooks/
+│   │   ├── useCurrentUser.ts
+│   │   ├── useGrowerTasks.ts
+│   │   └── useAdminStats.ts
+│   ├── actions/
+│   │   ├── grower.actions.ts               ← Server actions for grower flows
+│   │   ├── restaurant.actions.ts
+│   │   └── admin.actions.ts
+│   └── types/
+│       └── index.ts                        ← Shared TypeScript types
+
+================================================================================
+4. DATABASE SCHEMA (PRISMA)
+================================================================================
+
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  GROWER
+  RESTAURANT
+}
+
+enum OrderStatus {
+  PENDING_PAYMENT
+  CONFIRMED
+  IN_PRODUCTION
+  AT_HUB
+  IN_TRANSIT
+  DELIVERED
+  CANCELLED
+}
+
+enum TaskStatus {
+  ASSIGNED
+  IN_PROGRESS
+  HARVEST_READY
+  HARVESTED
+  CANCELLED
+}
+
+enum BatchStatus {
+  SOWING
+  GROWING
+  PRE_HARVEST
+  QC_PENDING
+  QC_PASSED
+  QC_FAILED
+  HARVESTED
+  REJECTED
+}
+
+enum QCResult {
+  PASS
+  RISK
+  REJECT
+}
+
+enum PayoutStatus {
+  PENDING
+  PROCESSING
+  PAID
+  FAILED
+}
+
+enum DeliveryStatus {
+  PREPARING
+  PACKED
+  IN_TRANSIT
+  DELIVERED
+  FAILED
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  emailVerified DateTime?
+  passwordHash  String?
+  name          String?
+  image         String?
+  role          Role      @default(GROWER)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  grower        Grower?
+  restaurant    Restaurant?
+  accounts      Account[]
+  sessions      Session[]
+}
+
+model Grower {
+  id              String    @id @default(cuid())
+  userId          String    @unique
+  user            User      @relation(fields: [userId], references: [id])
+  phone           String
+  address         String
+  city            String
+  pincode         String
+  lat             Float?
+  lng             Float?
+  clusterId       String?
+  cluster         Cluster?  @relation(fields: [clusterId], references: [id])
+  kitSize         Int       @default(5)   // number of trays in kit
+  spaceAvailable  Int?      // sqft
+  spacePhotoUrl   String?
+  bankAccount     String?
+  bankIFSC        String?
+  upiId           String?
+  // Performance scores (0.0 to 1.0)
+  yieldScore      Float     @default(0.5)
+  qualityScore    Float     @default(0.5)
+  timelinessScore Float     @default(0.5)
+  compositeScore  Float     @default(0.5)
+  totalEarnings   Float     @default(0)
+  isActive        Boolean   @default(true)
+  joinedAt        DateTime  @default(now())
+  tasks           Task[]
+  payouts         Payout[]
+}
+
+model Restaurant {
+  id               String    @id @default(cuid())
+  userId           String    @unique
+  user             User      @relation(fields: [userId], references: [id])
+  businessName     String
+  gstin            String?
+  address          String
+  city             String
+  pincode          String
+  contactName      String
+  phone            String
+  cuisineType      String?
+  stripeCustomerId String?
+  isActive         Boolean   @default(true)
+  orders           Order[]
+  feedbacks        Feedback[]
+}
+
+model Order {
+  id              String        @id @default(cuid())
+  restaurantId    String
+  restaurant      Restaurant    @relation(fields: [restaurantId], references: [id])
+  cropType        String
+  quantityKg      Float
+  deliveryDate    DateTime
+  recurrence      String?       // "weekly", "biweekly", null for one-time
+  status          OrderStatus   @default(PENDING_PAYMENT)
+  totalPrice      Float
+  stripePaymentId String?
+  notes           String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  productionPlan  ProductionPlan?
+  delivery        Delivery?
+  feedback        Feedback?
+}
+
+model ProductionPlan {
+  id            String    @id @default(cuid())
+  orderId       String    @unique
+  order         Order     @relation(fields: [orderId], references: [id])
+  totalKg       Float
+  totalTrays    Int
+  bufferTrays   Int
+  bufferPercent Float     @default(0.25)
+  sowDate       DateTime
+  harvestDate   DateTime
+  status        String    @default("DRAFT")  // DRAFT, ACTIVE, COMPLETE
+  createdAt     DateTime  @default(now())
+  tasks         Task[]
+}
+
+model Task {
+  id           String        @id @default(cuid())
+  planId       String
+  plan         ProductionPlan @relation(fields: [planId], references: [id])
+  growerId     String
+  grower       Grower        @relation(fields: [growerId], references: [id])
+  cropType     String
+  trayCount    Int
+  sowDate      DateTime
+  harvestDate  DateTime
+  status       TaskStatus    @default(ASSIGNED)
+  allocatedAt  DateTime      @default(now())
+  batches      Batch[]
+}
+
+model Batch {
+  id              String       @id @default(cuid())
+  taskId          String
+  task            Task         @relation(fields: [taskId], references: [id])
+  trayNumber      Int          // tray index within task
+  currentDay      Int          @default(0)
+  status          BatchStatus  @default(SOWING)
+  actualYieldGrams Int?
+  harvestImageUrl String?
+  harvestedAt     DateTime?
+  createdAt       DateTime     @default(now())
+  checkIns        CheckIn[]
+  payout          Payout?
+}
+
+model CheckIn {
+  id           String    @id @default(cuid())
+  batchId      String
+  batch        Batch     @relation(fields: [batchId], references: [id])
+  day          Int
+  imageTopUrl  String?
+  imageSideUrl String?
+  notes        String?
+  qcResult     QCResult?
+  qcNotes      String?
+  qcReviewedAt DateTime?
+  qcReviewedBy String?   // admin userId
+  createdAt    DateTime  @default(now())
+}
+
+model Cluster {
+  id         String    @id @default(cuid())
+  name       String
+  city       String
+  lat        Float
+  lng        Float
+  radiusKm   Float     @default(3.0)
+  growers    Grower[]
+  hubs       Hub[]
+}
+
+model Hub {
+  id           String     @id @default(cuid())
+  name         String
+  address      String
+  clusterId    String
+  cluster      Cluster    @relation(fields: [clusterId], references: [id])
+  lat          Float
+  lng          Float
+  dropoffStart String     // "08:00"
+  dropoffEnd   String     // "11:00"
+  isActive     Boolean    @default(true)
+  deliveries   Delivery[]
+}
+
+model Delivery {
+  id           String         @id @default(cuid())
+  orderId      String         @unique
+  order        Order          @relation(fields: [orderId], references: [id])
+  hubId        String
+  hub          Hub            @relation(fields: [hubId], references: [id])
+  status       DeliveryStatus @default(PREPARING)
+  driverName   String?
+  driverPhone  String?
+  packedAt     DateTime?
+  dispatchedAt DateTime?
+  deliveredAt  DateTime?
+  createdAt    DateTime       @default(now())
+}
+
+model Feedback {
+  id           String     @id @default(cuid())
+  orderId      String     @unique
+  order        Order      @relation(fields: [orderId], references: [id])
+  restaurantId String
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
+  rating       Int        // 1-5
+  notes        String?
+  imageUrl     String?
+  createdAt    DateTime   @default(now())
+}
+
+model Payout {
+  id        String       @id @default(cuid())
+  growerId  String
+  grower    Grower       @relation(fields: [growerId], references: [id])
+  batchId   String       @unique
+  batch     Batch        @relation(fields: [batchId], references: [id])
+  amount    Float
+  status    PayoutStatus @default(PENDING)
+  paidAt    DateTime?
+  createdAt DateTime     @default(now())
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String
+  message   String
+  type      String   // "QC_RESULT" | "TASK_ASSIGNED" | "PAYOUT" | "DELIVERY"
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+// NextAuth required models
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+  @@unique([identifier, token])
+}
+
+================================================================================
+5. AUTH & ROLES
+================================================================================
+
+// src/lib/auth.ts
+// Use next-auth v5 with Prisma adapter
+// Session includes: id, email, name, role, image
+// Role-based middleware in src/middleware.ts
+
+PROTECTED ROUTES:
+  /grower/*     → requires role: GROWER
+  /restaurant/* → requires role: RESTAURANT
+  /admin/*      → requires role: ADMIN
+
+MIDDLEWARE (src/middleware.ts):
+  - Check session on all /(dashboard)/* routes
+  - Redirect to /login if no session
+  - Redirect to role-appropriate dashboard on wrong role access
+  - e.g., grower visiting /admin → redirect to /grower/dashboard
+
+================================================================================
+6. DESIGN SYSTEM
+================================================================================
+
+--- COLORS ---
+
+Base white (page background): #F8FAF7  (NOT pure white — has green warmth)
+Green ramp:
+  sprout-950: #1B4332
+  sprout-900: #1A3A2E
+  sprout-800: #2D6A4F   ← primary brand, buttons, active states
+  sprout-700: #40916C
+  sprout-600: #52B788   ← progress, success, icons
+  sprout-500: #74C69D   ← hover states, badge bg
+  sprout-400: #95D5B2
+  sprout-300: #B7E4C7   ← glass card tints
+  sprout-200: #D8F3DC   ← blob shapes, soft areas
+  sprout-100: #EAFBEF   ← very light fills
+  sprout-50:  #F4FCF6   ← near-white green tint
+
+Text:
+  Primary:    #1B1F1D
+  Secondary:  #4A5250
+  Muted:      #8A9490
+  Inverse:    #FFFFFF
+
+Status:
+  Success:    #52B788
+  Warning:    #F59E0B
+  Error:      #EF4444
+  Info:       #3B82F6
+
+--- TAILWIND CONFIG (tailwind.config.ts) ---
+
+extend colors with sprout ramp above.
+Add custom backgroundImage for grain:
+  'grain': "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E\")"
+
+--- GLOBALS.CSS ---
+
+:root {
+  --background: #F8FAF7;
+  --foreground: #1B1F1D;
+  --glass-bg: rgba(255, 255, 255, 0.55);
+  --glass-border: rgba(255, 255, 255, 0.65);
+  --glass-blur: 16px;
+  --sprout-primary: #2D6A4F;
+  --sprout-mid: #52B788;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: 'Inter', sans-serif;
+}
+
+/* Grain texture overlay */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url('/grain.svg');  /* or inline SVG data URI */
+  background-size: 300px 300px;
+  opacity: 0.035;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* Global glass utility */
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur)) saturate(180%);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(180%);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+}
+
+/* Blob background decoration */
+.blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+--- COMPONENT PATTERNS ---
+
+GlassCard component:
+  <div className="glass p-6 relative overflow-hidden">
+    {/* optional inner shine */}
+    <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent rounded-[20px]" />
+    {children}
+  </div>
+
+StatCard:
+  Glass card with: small muted label (text-sm text-muted), large number (text-3xl font-semibold), optional trend arrow
+
+StatusBadge:
+  Variants: "sowing" (amber), "growing" (blue), "pre-harvest" (purple),
+            "passed" (green), "failed" (red), "harvested" (teal), "pending" (gray)
+
+Buttons:
+  Primary:   bg-sprout-800 text-white hover:bg-sprout-900 rounded-xl px-5 py-2.5
+  Secondary: bg-transparent border border-sprout-800 text-sprout-800 hover:bg-sprout-100
+  Ghost:     bg-transparent text-sprout-700 hover:bg-sprout-50
+
+Form inputs:
+  bg-white/70 border border-sprout-800/20 rounded-xl
+  focus:ring-2 focus:ring-sprout-500/30 focus:border-sprout-600
+  placeholder:text-muted-foreground
+
+Sidebar nav:
+  Width: 240px fixed
+  Background: glass (rgba(255,255,255,0.55) blur)
+  Border-right: 1px solid rgba(255,255,255,0.4)
+  Active item: bg-sprout-800/10 text-sprout-800 rounded-lg font-medium
+  Inactive item: text-muted hover:bg-sprout-50 rounded-lg
+
+Section blobs (for depth on landing page):
+  Position 2-3 divs per section absolutely:
+  className="blob w-[400px] h-[400px] bg-sprout-200 -top-20 -left-20"
+  className="blob w-[300px] h-[300px] bg-sprout-300/60 bottom-0 right-0"
+
+================================================================================
+7. DAY-BY-DAY BUILD PLAN
+================================================================================
+
+--- DAY 1 — Foundation (~8h) ---
+
+MORNING (0-4h):
+  1. Scaffold project:
+     npx create-next-app@latest sproutbox --typescript --tailwind --app --src-dir --import-alias "@/*"
+
+  2. Install all dependencies (see Section 2 above)
+
+  3. Initialize shadcn/ui:
+     npx shadcn-ui@latest init
+     (choose: style=default, baseColor=zinc, cssVariables=yes)
+     Install all components listed in Section 2
+
+  4. Configure tailwind.config.ts:
+     - Add sprout color ramp
+     - Add grain backgroundImage
+     - Add custom borderRadius, fontFamily
+
+  5. Set up globals.css:
+     - CSS variables
+     - Grain overlay pseudo-element
+     - .glass utility class
+     - Base typography
+
+  6. Create src/lib/prisma.ts (singleton client)
+
+AFTERNOON (4-8h):
+  7. Create prisma/schema.prisma (full schema from Section 4)
+
+  8. Set up Neon PostgreSQL:
+     - Create project at neon.tech
+     - Copy DATABASE_URL to .env.local
+
+  9. Run: npx prisma migrate dev --name init
+
+  10. Set up NextAuth v5:
+      - Create src/auth.ts with PrismaAdapter
+      - Add Credentials provider (email/password with bcrypt)
+      - Create src/app/api/auth/[...nextauth]/route.ts
+      - Create src/middleware.ts with role-based protection
+
+  11. Create layout shells:
+      - src/app/(auth)/layout.tsx       — centered, glass card, grain bg
+      - src/app/(marketing)/layout.tsx  — navbar + footer
+      - src/app/(dashboard)/layout.tsx  — sidebar + main content area
+
+  12. Build login/register pages with shadcn Form
+
+DELIVERABLE: Repo live, DB migrated, auth working, 3 layout shells render correctly.
+
+--- DAY 2 — Landing Page + Onboarding (~8h) ---
+
+MORNING (0-4h):
+  1. Build Navbar.tsx:
+     - Logo (sprout SVG icon + "SproutBox" text)
+     - Nav links (How it works, For Growers, For Restaurants)
+     - Sign In button + Get Started CTA
+     - Sticky with backdrop-blur on scroll (use useScrolled hook)
+     - Glass style on scroll
+
+  2. Build HeroSection.tsx:
+     - Large headline: "Farm-to-fork, door to door." with green gradient on key words
+     - Subheadline explaining value prop
+     - Two CTA buttons: "Join as Grower" and "Partner as Restaurant"
+     - Background: 3 blob divs positioned absolutely + grain
+     - Centered glass card showing a mini dashboard preview screenshot
+
+  3. Build StatsBar.tsx:
+     - 4 animated counters: use useCountUp hook or simple interval
+     - Stats: "200+ Active Growers", "3 Cities", "500kg Delivered/week", "12 Restaurants"
+     - Glass card, horizontal row
+
+  4. Build HowItWorks.tsx:
+     - 3 glass cards in a row with step number, icon, title, description
+     - Step 1: Restaurant places order
+     - Step 2: Demand engine distributes to growers
+     - Step 3: Fresh produce delivered
+
+AFTERNOON (4-8h):
+  5. Build GrowerOnboardingForm.tsx (multi-step):
+     Step 1 — Personal: name, phone, email, password (with show/hide)
+     Step 2 — Location: address fields, city, pincode
+     Step 3 — Space: available sqft, indoor/outdoor toggle, space photo upload
+     Step 4 — Kit: 3 kit cards (Starter 5 trays ₹0, Standard 15 trays ₹999, Pro 40 trays ₹2499)
+     Step 5 — Review: summary of all inputs, submit button
+
+     Use react-hook-form with zod schema per step.
+     StepProgress component shows current step with green active indicator.
+
+  6. Build RestaurantOnboardingForm.tsx (multi-step):
+     Step 1 — Business: restaurant name, GSTIN, address, contact name, cuisine type
+     Step 2 — Crops: grid of crop cards (checkboxes), quantity slider per selected crop
+     Step 3 — Schedule: day picker (Mon-Sun), time window, frequency dropdown
+     Step 4 — Payment: Stripe Elements card input, order preview with total
+
+  7. Create API routes:
+     POST /api/grower/register   — validate zod, hash password, create User+Grower in DB
+     POST /api/restaurant/register — validate, create User+Restaurant+StripeCustomer
+
+  8. Build Footer.tsx
+
+DELIVERABLE: Landing page live at /, both onboarding flows functional with DB persistence.
+
+--- DAY 3 — Admin Dashboard Core (~8h) ---
+
+MORNING (0-4h):
+  1. Build admin Sidebar.tsx:
+     Items: Dashboard, Demand Engine, Allocation, QC Review, Hubs, Growers, Restaurants, Deliveries, Analytics
+     Each item: icon (lucide) + label + active indicator (green left border + bg tint)
+     Bottom: user avatar + role badge + sign out
+
+  2. Build Admin Dashboard page (/admin/dashboard):
+     - KPIGrid component: 6 StatCards in 3-col grid
+       * Active Orders (count, link to demand page)
+       * Trays in Production (count)
+       * QC Pending (count, red if >0)
+       * Deliveries Today (count)
+       * Revenue MTD (₹ formatted)
+       * Growers Active (count)
+     - ActivityFeed: last 20 events from Notification model
+     - Alerts panel: batches overdue, QC needing review (fetched server-side)
+
+  3. Build demand overview table:
+     - All orders with: restaurant name, crop, kg, delivery date, status badge, created date
+     - Sortable columns, status filter dropdown
+     - Paginated (20 per page)
+
+AFTERNOON (4-8h):
+  4. Build DemandCalculator.tsx:
+     - Select orders checkboxes → auto-sum quantities by crop type
+     - Live calculation display:
+       * Total kg ordered: X
+       * Buffer (25%): +Y kg
+       * Total with buffer: Z kg
+       * Trays required: Z / 0.2 = N trays (200g per tray)
+       * Sow date: [today's date picker]
+       * Harvest date: [auto-calculated from sow date + crop cycle days]
+     - "Create Production Plan" button → POST /api/admin/demand
+
+  5. Build POST /api/admin/demand:
+     - Body: { orderIds[], bufferPercent, sowDate }
+     - Logic: sum quantities, calculate trays, create ProductionPlan record, update Order status to IN_PRODUCTION
+
+  6. Build AllocationTable.tsx:
+     - Fetch growers in same cluster sorted by compositeScore desc
+     - Table columns: name, cluster, composite score bar, available capacity, assigned trays (editable input)
+     - Running total at top: X of N trays assigned
+     - "Auto-Allocate" button: distributes proportional to score (see Section 10 for algorithm)
+     - "Dispatch Tasks" button → POST /api/admin/allocate
+
+  7. Build POST /api/admin/allocate:
+     - Creates Task records per grower with assigned tray counts
+     - Creates Notification for each grower: "You have N new trays to sow"
+
+DELIVERABLE: Admin can view demand, run demand engine, allocate tasks to growers.
+
+--- DAY 4 — Grower OS (~8h) ---
+
+MORNING (0-4h):
+  1. Build Grower Dashboard (/grower/dashboard):
+     - Welcome header with grower name + today's date
+     - "Today's Action" card: what needs to be done today (water/photo/nothing)
+     - TrayStatusBoard: Kanban columns (Sowing | Growing | Pre-harvest | Harvest Ready)
+       Each tray as a mini card showing: batch ID, day X/N, status dot
+     - EarningsWidget: this week ₹X, pending ₹Y
+     - PerformanceRadar: 3-metric spider chart using recharts RadarChart
+
+  2. Build Grower Tasks page (/grower/tasks):
+     Fetch all tasks for current grower with their batches.
+     For each task: TaskCard showing crop type, tray count, sow/harvest dates, status.
+     Expand task to see day-by-day DayInstructions accordion.
+
+  3. Build DayInstructions component:
+     For each day (1 through crop cycle length):
+       - Day number + label (e.g., "Day 3 — First Water")
+       - Exact instruction text (sourced from CROP_INSTRUCTIONS constant)
+       - Water quantity: "Water each tray with 150ml"
+       - Image required: indicator if photo upload needed today
+       - Status: completed ✓ / today (CTA button) / future (locked)
+
+AFTERNOON (4-8h):
+  4. Build CheckinModal component:
+     - Opens when grower clicks "Complete Today's Step"
+     - Shows today's instruction summary
+     - ImageUploader: drag-drop or click to upload, shows preview
+       Top view required + Side view required indicators
+     - Notes textarea (optional)
+     - Submit → POST /api/grower/checkin
+
+  5. Build ImageUploader.tsx:
+     - Uses UploadThing React component
+     - Shows upload progress bar
+     - Preview thumbnails of uploaded images
+     - Separate slots for "Top View" and "Side View"
+
+  6. Build POST /api/grower/checkin:
+     - Body: { batchId, day, imageTopUrl, imageSideUrl, notes }
+     - Update Batch currentDay, create CheckIn record
+     - If day === harvestDay - 1: update batch status to QC_PENDING
+     - Create notification for admin: "Batch X ready for QC review"
+
+  7. Build UploadThing file router (src/app/api/uploadthing/route.ts):
+     - Define "growerCheckin" route: accept images, max 4MB each, max 2 files
+     - Define "growerSpace" route: accept images for onboarding
+     - Define "harvestPhoto" route: accept images for harvest report
+
+DELIVERABLE: Grower can see tasks, follow instructions, upload milestone images.
+
+--- DAY 5 — QC Engine + Harvest (~8h) ---
+
+MORNING (0-4h):
+  1. Build QC Review page (/admin/qc):
+     - Queue: batches with status QC_PENDING, sorted by harvestDate ASC (most urgent first)
+     - Queue count badge in sidebar nav
+     - Batch list cards: grower name, crop, batch ID, days until harvest, last image thumbnail
+
+  2. Build QCReviewPanel component:
+     - Left: two image panels (top view + side view), click to zoom in dialog
+     - Batch metadata: grower name, cluster, crop type, current day, sow date
+     - CheckIn history timeline: all previous days with image thumbnails + status
+     - Right: QC Checklist form:
+       * Color check: ✓ Uniformly green / ✗ Yellow patches / ✗ Discolored
+       * Density check: ✓ Dense coverage / ✗ Sparse / ✗ Gaps visible
+       * Height check: ✓ Within range (5-10cm) / ✗ Too short / ✗ Too tall
+       * Free text notes
+       * Result radio: PASS (green) / RISK (amber) / REJECT (red)
+     - Submit button → POST /api/admin/qc
+
+  3. Build POST /api/admin/qc:
+     - Body: { batchId, checkInId, result, notes }
+     - Update CheckIn with qcResult, qcNotes, qcReviewedAt
+     - If PASS: update Batch status to QC_PASSED
+     - If RISK: keep QC_PENDING, create admin alert
+     - If REJECT: update Batch to REJECTED, create Grower notification
+     - If PASS: create Grower notification: "Batch X passed QC — ready to harvest"
+
+AFTERNOON (4-8h):
+  4. Build Harvest Report flow:
+     - Grower sees "Ready to Harvest" badge on passed batch
+     - Click → opens HarvestReportModal
+     - Fields: actual yield in grams (input), harvest timestamp (auto), harvest photos (upload)
+     - Submit → POST /api/grower/harvest
+
+  5. Build POST /api/grower/harvest:
+     - Body: { batchId, actualYieldGrams, harvestImageUrl }
+     - Update Batch: status=HARVESTED, actualYieldGrams, harvestImageUrl, harvestedAt
+     - Calculate yield accuracy: actualYieldGrams / (trayCount * 200)
+     - Create Payout record: amount = trayCount * PRICE_PER_TRAY (configurable, default ₹50/tray)
+     - Update Grower scores (recalculate rolling average of last 10 batches)
+     - Create Grower notification: "Payout of ₹X queued for batch Y"
+
+  6. Build Grower Performance Score updater (util function):
+     - yieldScore = avg(actualYield / expectedYield) over last 10 batches
+     - qualityScore = passedBatches / totalBatches over last 20 batches
+     - timelinessScore = batches submitted on time / total batches
+     - compositeScore = (yieldScore * 0.4) + (qualityScore * 0.4) + (timelinessScore * 0.2)
+     - Update Grower record
+
+  7. Build Notification system:
+     - NotificationBell component in dashboard header
+     - Unread count badge (red dot)
+     - Dropdown showing last 10 notifications
+     - Mark as read on open → PATCH /api/notifications/read-all
+
+DELIVERABLE: Full QC workflow, scores update, notifications flow.
+
+--- DAY 6 — Hub Aggregation + Delivery (~8h) ---
+
+MORNING (0-4h):
+  1. Build Hub Management page (/admin/hubs):
+     - List of hubs with: name, cluster, address, drop-off window, grower count
+     - Create Hub dialog: name, address fields, cluster assignment, drop-off time range
+     - Hub detail page: assigned growers list, today's expected arrivals
+
+  2. Build Hub Aggregation Dashboard (/admin/hubs/[hubId]):
+     - "Today's Expected Arrivals" card: list of growers expected with estimated kg
+     - Grower check-in: mark growers as arrived, enter actual kg delivered
+     - Running total: X of Y kg received, Z% complete
+     - Physical QC form per arriving grower:
+       * Visual inspection pass/fail
+       * Actual weight (scale reading)
+       * Random sampling: flag any trays for deep inspection
+       * Approve / Reject batch from hub
+
+  3. Build hub aggregation API:
+     POST /api/admin/hub/checkin  — record grower drop-off, actual weight
+     POST /api/admin/hub/qc       — hub-level QC result per grower batch
+
+AFTERNOON (4-8h):
+  4. Build Delivery Planning page (/admin/deliveries):
+     - Ready orders: orders with sufficient hub-approved produce
+     - Assign hub + driver per order
+     - Generate delivery list: restaurant name, address, items, kg
+     - "Dispatch" button sets delivery status to IN_TRANSIT
+
+  5. Build delivery status pipeline component:
+     Steps: Packed → Dispatched → In Transit → Delivered
+     Visual step indicator, timestamp each stage
+
+  6. Build Restaurant delivery tracking view:
+     /restaurant/dashboard shows: next delivery card with status pipeline
+     Status updates via SWR polling every 30s (or use simple manual refresh)
+
+  7. Build delivery received confirmation:
+     Restaurant clicks "Confirm Receipt" → delivery status → DELIVERED
+     Opens FeedbackForm immediately after confirmation
+
+DELIVERABLE: Hub ops, aggregation check-ins, delivery pipeline fully functional.
+
+--- DAY 7 — Restaurant Portal (~8h) ---
+
+MORNING (0-4h):
+  1. Build Restaurant Dashboard (/restaurant/dashboard):
+     - Next Delivery card: ETA, crop list, kg, driver info
+     - Active orders: status pipeline for each order in-progress
+     - Quick reorder button: copies last order, opens pre-filled order form
+     - Recent quality scores: last 5 deliveries rated, avg score display
+     - Subscription summary table
+
+  2. Build Crop Catalog component:
+     - Grid of crop cards (2-3 per row on desktop)
+     - Each card: crop photo, name, price per kg, days to deliver (crop cycle), availability
+     - Click to select, shows quantity input
+     - Selected crops shown in sidebar cart
+
+  3. Build OrderBuilder component (sidebar):
+     - Selected crops list with editable quantities
+     - Total weight, estimated price
+     - Earliest delivery date (calculated: today + max crop cycle + 1 day)
+     - Recurring order toggle + frequency selector
+
+AFTERNOON (4-8h):
+  4. Build order placement flow:
+     /restaurant/order/new — crop catalog + order builder sidebar
+     /restaurant/order/new/schedule — date picker + recurring options
+     /restaurant/order/new/checkout — order summary + Stripe payment
+
+  5. Build Stripe checkout integration:
+     - Create payment intent on order submit
+     - Stripe Elements card form embedded
+     - On payment success: update order status to CONFIRMED, send confirmation
+
+  6. Build Order History page (/restaurant/orders):
+     - Table: order ID, crop, kg, delivery date, status badge, total, actions
+     - Filter by status, date range
+     - Click order → order detail page with full timeline
+
+  7. Build FeedbackForm component:
+     - 5-star rating (clickable stars)
+     - Text notes (optional)
+     - Photo upload (show us what you received)
+     - Submit → PATCH /api/restaurant/feedback
+
+DELIVERABLE: Full restaurant portal — order, track, receive, feedback.
+
+--- DAY 8 — Payments + Analytics (~8h) ---
+
+MORNING (0-4h):
+  1. Build Grower Wallet page (/grower/earnings):
+     - Summary cards: Total Earned (all time), This Month, Pending Payout, Paid Out
+     - Earnings bar chart: last 8 weeks (Recharts BarChart)
+     - Payout history table: batch ID, crop, trays accepted, amount, date, status badge
+     - Bank details form with save functionality
+
+  2. Build admin payout management:
+     - /admin/payouts: list of PENDING payouts, bulk approve
+     - Mark as PAID → update Payout status, send grower notification
+
+  3. Build Stripe subscription handling:
+     - For recurring orders: create Stripe Subscription with correct interval
+     - Webhook handler (/api/webhooks/stripe):
+       * invoice.payment_succeeded → create new Order record
+       * invoice.payment_failed → notify restaurant + pause subscription
+       * customer.subscription.deleted → update Restaurant
+
+AFTERNOON (4-8h):
+  4. Build Analytics Dashboard (/admin/analytics):
+     - Revenue chart: Recharts LineChart, weekly data, this vs last period comparison
+     - Production volume: Recharts BarChart stacked by crop type per week
+     - QC pass rate trend: Recharts AreaChart (pass/risk/reject as 3 areas, green/amber/red)
+     - Grower leaderboard: top 10 by compositeScore, with score bars
+     - Restaurant satisfaction: avg feedback rating per restaurant, last 30 days
+
+  5. Build data aggregation queries (server actions):
+     - getRevenueByWeek(weeks: number): sum of confirmed order amounts grouped by week
+     - getProductionVolume(weeks: number): tray counts by crop type by week
+     - getQCTrend(weeks: number): pass/risk/reject counts by week
+     - getGrowerLeaderboard(): top 10 growers by compositeScore with stats
+     - getRestaurantSatisfaction(): avg rating per restaurant last 30 days
+
+  6. Build feedback → allocation feedback loop:
+     After restaurant submits feedback, update relevant grower(s) qualityScore:
+     - Find batches that contributed to that order's delivery
+     - Weight restaurant rating into those growers' qualityScore
+     - Recalculate compositeScore
+
+DELIVERABLE: Payments live, earnings tracked, analytics charts rendering.
+
+--- DAY 9 — Polish + Mobile (~8h) ---
+
+MORNING (0-4h):
+  1. Mobile responsiveness pass:
+     - All pages responsive at 375px, 768px, 1024px breakpoints
+     - Build MobileNav.tsx: bottom tab bar for grower portal
+       Tabs: Home, Tasks, Earnings, Profile — with icons, active indicator
+     - Replace sidebar with mobile bottom nav for grower role on mobile
+     - Ensure all tables scroll horizontally on mobile (overflow-x-auto)
+     - Touch targets minimum 44px height for all interactive elements
+
+  2. Loading states:
+     - Build LoadingSkeleton.tsx: pulse shimmer skeleton for cards, tables, charts
+     - Add Suspense boundaries with skeleton fallbacks to all data-heavy pages
+     - Add loading.tsx files in key route segments
+
+  3. Error handling:
+     - Build error.tsx for each major route group
+     - API error responses use consistent format: { error: string, code: string }
+     - Form validation shows field-level errors via react-hook-form
+     - Network errors show Sonner toast: "Something went wrong. Please try again."
+
+AFTERNOON (4-8h):
+  4. Empty states:
+     - Build EmptyState.tsx with: illustration (simple SVG), title, description, optional CTA button
+     - Add to: no tasks page, no orders, no growers, no QC items
+     - Empty state messages should be contextual and encouraging
+
+  5. Seed data (prisma/seed.ts):
+     - 1 admin user: admin@sproutbox.com / admin123
+     - 2 demo restaurants: "The Green Bowl", "Fresh Fare Kitchen"
+     - 5 demo growers in Bangalore cluster
+     - 1 hub: "Koramangala Hub"
+     - 3 active orders with matching production plans and tasks
+     - Several completed batches with check-ins and QC results (for analytics)
+     Run: npx prisma db seed
+
+  6. Final polish:
+     - Consistent page transitions (use Framer Motion or CSS animations)
+     - Ensure all modals have keyboard accessibility (Radix handles this via shadcn)
+     - Add meta tags and SEO in root layout
+     - Add favicon + PWA manifest
+
+DELIVERABLE: Production-ready, mobile-responsive, demo-able with seed data.
+
+--- DAY 10 — Deploy + QA (~6h) ---
+
+MORNING (0-3h):
+  1. Vercel deployment:
+     - Connect GitHub repo to Vercel
+     - Add all environment variables (see Section 11)
+     - Set Node.js version to 20.x
+     - Ensure Prisma generates client in build step (add to package.json scripts:
+       "postinstall": "prisma generate")
+
+  2. Production database:
+     - Create production Neon project
+     - Run: npx prisma migrate deploy (on production DATABASE_URL)
+     - Run seed script on production
+
+  3. Stripe production:
+     - Switch to live Stripe keys
+     - Add production webhook endpoint in Stripe dashboard
+     - Verify webhook signature validation in /api/webhooks/stripe
+
+AFTERNOON (3-6h):
+  4. QA pass — test all 3 user roles end to end:
+     - Restaurant: register → place order → track order → receive → give feedback
+     - Grower: register → receive task → complete daily check-ins → upload harvest → receive payout
+     - Admin: view demand → create plan → allocate → review QC → manage delivery → view analytics
+
+  5. Custom domain (optional):
+     - Add custom domain in Vercel
+     - SSL is automatic
+
+  6. Loom demo recording for pilot outreach
+
+DELIVERABLE: Live at production URL, all flows working, ready for first pilot.
+
+================================================================================
+8. ALL PAGES — COMPLETE INVENTORY
+================================================================================
+
+PUBLIC / MARKETING PAGES:
+  /                           Landing page
+  /join/grower                Grower multi-step onboarding
+  /join/restaurant            Restaurant multi-step onboarding
+  /about                      About SproutBox
+  /login                      Login (email/password + Google)
+  /register                   Basic register (redirects to role onboarding)
+
+GROWER PORTAL (/grower/*):
+  /grower/dashboard           Home: today's tasks, tray board, earnings, performance
+  /grower/tasks               All active + past task batches
+  /grower/tasks/[taskId]      Task detail: day-by-day instructions + check-in
+  /grower/earnings            Wallet: payout history, bank details, earnings chart
+  /grower/profile             Edit personal details, space info, kit upgrade
+
+RESTAURANT PORTAL (/restaurant/*):
+  /restaurant/dashboard       Home: next delivery, active orders, quick reorder
+  /restaurant/order/new       Place new order: crop catalog + order builder
+  /restaurant/orders          Order history: all past and active orders
+  /restaurant/orders/[id]     Order detail with full status timeline
+  /restaurant/subscriptions   Manage recurring orders
+  /restaurant/feedback/[id]   Post-delivery feedback form
+
+ADMIN PORTAL (/admin/*):
+  /admin/dashboard            Command center: KPIs, activity feed, alerts
+  /admin/demand               Incoming orders + demand engine + production plan creator
+  /admin/allocate             Grower ranking + tray allocation + dispatch
+  /admin/qc                   QC review queue
+  /admin/qc/[batchId]         Individual batch QC review
+  /admin/hubs                 Hub list + create hub
+  /admin/hubs/[hubId]         Hub aggregation dashboard: arrivals + check-ins
+  /admin/growers              All growers: list, scores, status
+  /admin/growers/[growerId]   Grower detail: history, scores, tasks, payouts
+  /admin/restaurants          All restaurants: list, status
+  /admin/deliveries           Delivery planning and tracking
+  /admin/analytics            Charts: revenue, production, QC trends, leaderboard
+  /admin/payouts              Payout management: pending → approve → paid
+
+================================================================================
+9. API ROUTES
+================================================================================
+
+AUTH:
+  POST   /api/auth/[...nextauth]   — NextAuth handler (login, register, OAuth)
+
+GROWER:
+  POST   /api/grower/register      — Create User + Grower record
+  POST   /api/grower/checkin       — Submit daily milestone check-in with images
+  POST   /api/grower/harvest       — Submit harvest report (yield + photos)
+  GET    /api/grower/tasks         — Get all tasks for current grower
+  PATCH  /api/grower/profile       — Update grower profile + bank details
+
+RESTAURANT:
+  POST   /api/restaurant/register  — Create User + Restaurant + Stripe customer
+  POST   /api/restaurant/order     — Place new order, create payment intent
+  GET    /api/restaurant/orders    — Get order history
+  PATCH  /api/restaurant/feedback  — Submit post-delivery feedback
+
+ADMIN:
+  GET    /api/admin/dashboard      — KPI stats, recent activity
+  POST   /api/admin/demand         — Create production plan from selected orders
+  POST   /api/admin/allocate       — Assign tasks to growers, dispatch notifications
+  GET    /api/admin/qc             — Get QC queue (batches pending review)
+  POST   /api/admin/qc             — Submit QC result for a batch
+  POST   /api/admin/hub/checkin    — Record grower drop-off at hub
+  POST   /api/admin/hub/qc         — Hub-level physical QC result
+  POST   /api/admin/delivery/dispatch — Set delivery in transit
+  PATCH  /api/admin/delivery/[id]  — Update delivery status
+  POST   /api/admin/payouts/approve — Bulk approve pending payouts
+  GET    /api/admin/analytics      — Aggregated data for charts
+
+UPLOADS:
+  POST   /api/uploadthing          — UploadThing handler (file uploads)
+
+WEBHOOKS:
+  POST   /api/webhooks/stripe      — Stripe events (payment, subscription)
+
+NOTIFICATIONS:
+  GET    /api/notifications        — Get notifications for current user
+  PATCH  /api/notifications/read   — Mark notifications as read
+
+================================================================================
+10. KEY BUSINESS LOGIC FUNCTIONS
+================================================================================
+
+--- DEMAND ENGINE CALCULATION ---
+
+function calculateProductionPlan(orders: Order[], bufferPercent = 0.25) {
+  // Group by crop type
+  const grouped = orders.reduce((acc, order) => {
+    acc[order.cropType] = (acc[order.cropType] || 0) + order.quantityKg;
+    return acc;
+  }, {} as Record<string, number>);
+
+  return Object.entries(grouped).map(([cropType, totalKg]) => {
+    const baseTrays = Math.ceil((totalKg * 1000) / 200); // 200g per tray
+    const bufferTrays = Math.ceil(baseTrays * bufferPercent);
+    const totalTrays = baseTrays + bufferTrays;
+    const cycleDays = CROP_CYCLE_DAYS[cropType] || 9;
+    const sowDate = new Date(); // sow today
+    const harvestDate = addDays(sowDate, cycleDays);
+
+    return { cropType, totalKg, baseTrays, bufferTrays, totalTrays, sowDate, harvestDate };
+  });
+}
+
+--- ALLOCATION ALGORITHM ---
+
+function allocateTrays(growers: Grower[], totalTrays: number, clusterId: string) {
+  // Filter to same cluster, active growers with capacity
+  const eligible = growers
+    .filter(g => g.clusterId === clusterId && g.isActive)
+    .sort((a, b) => b.compositeScore - a.compositeScore);
+
+  const totalScore = eligible.reduce((sum, g) => sum + g.compositeScore, 0);
+
+  let assigned = 0;
+  const allocations = eligible.map((grower, i) => {
+    // Last grower gets remainder
+    const trays = i === eligible.length - 1
+      ? totalTrays - assigned
+      : Math.round((grower.compositeScore / totalScore) * totalTrays);
+    assigned += trays;
+    return { growerId: grower.id, trayCount: trays };
+  });
+
+  return allocations.filter(a => a.trayCount > 0);
+}
+
+--- GROWER SCORE UPDATER ---
+
+async function updateGrowerScores(growerId: string) {
+  const recentBatches = await prisma.batch.findMany({
+    where: { task: { growerId }, status: { in: ['HARVESTED', 'REJECTED'] } },
+    include: { task: true },
+    orderBy: { harvestedAt: 'desc' },
+    take: 20,
+  });
+
+  const harvested = recentBatches.filter(b => b.status === 'HARVESTED');
+
+  // Yield accuracy: actual vs expected
+  const yieldScore = harvested.length > 0
+    ? harvested.reduce((sum, b) => {
+        const expected = b.task.trayCount * 200; // grams
+        return sum + Math.min((b.actualYieldGrams || 0) / expected, 1.0);
+      }, 0) / harvested.length
+    : 0.5;
+
+  // Quality: pass rate
+  const qualityScore = recentBatches.length > 0
+    ? harvested.length / recentBatches.length
+    : 0.5;
+
+  // Timeliness: harvested on or before target date
+  const timelinessScore = harvested.length > 0
+    ? harvested.filter(b =>
+        b.harvestedAt && b.harvestedAt <= b.task.harvestDate
+      ).length / harvested.length
+    : 0.5;
+
+  const compositeScore = (yieldScore * 0.4) + (qualityScore * 0.4) + (timelinessScore * 0.2);
+
+  await prisma.grower.update({
+    where: { id: growerId },
+    data: { yieldScore, qualityScore, timelinessScore, compositeScore },
+  });
+}
+
+--- CROP CONSTANTS ---
+
+// src/lib/constants.ts
+
+export const CROP_TYPES = [
+  'sunflower', 'pea-shoots', 'radish', 'wheatgrass', 'mustard', 'fenugreek'
+] as const;
+
+export const CROP_CYCLE_DAYS: Record<string, number> = {
+  'sunflower':   9,
+  'pea-shoots':  8,
+  'radish':      7,
+  'wheatgrass':  10,
+  'mustard':     7,
+  'fenugreek':   8,
+};
+
+export const CROP_PRICE_PER_KG: Record<string, number> = {
+  'sunflower':   450,
+  'pea-shoots':  380,
+  'radish':      320,
+  'wheatgrass':  400,
+  'mustard':     350,
+  'fenugreek':   360,
+};
+
+export const PAYOUT_PER_TRAY = 50; // ₹50 per accepted tray
+export const TRAY_YIELD_GRAMS = 200;
+export const DEFAULT_BUFFER_PERCENT = 0.25;
+
+export const CROP_INSTRUCTIONS: Record<string, Record<number, string>> = {
+  'sunflower': {
+    1: 'Spread seeds evenly on moistened cocopeat. Cover with another tray for darkness.',
+    2: 'Keep covered. Mist lightly if surface looks dry.',
+    3: 'Check germination. Seeds should show white sprouts. Upload photo.',
+    4: 'Remove cover tray. Expose to indirect light. Water 150ml.',
+    5: 'Water 150ml. Ensure good airflow.',
+    6: 'Check density and height. Upload photo for QC.',
+    7: 'Water 150ml.',
+    8: 'Pre-harvest check. Upload top + side photo.',
+    9: 'Harvest when 5-10cm tall. Cut at base, wash gently.',
+  },
+  // ... similar for other crops
+};
+
+================================================================================
+11. ENVIRONMENT VARIABLES
+================================================================================
+
+Create .env.local file (NEVER commit this to git):
+
+# Database
+DATABASE_URL="postgresql://user:password@host/sproutbox?sslmode=require"
+
+# NextAuth
+NEXTAUTH_URL="http://localhost:3000"
+NEXTAUTH_SECRET="generate-with: openssl rand -base64 32"
+
+# Google OAuth (optional)
+GOOGLE_CLIENT_ID=""
+GOOGLE_CLIENT_SECRET=""
+
+# UploadThing
+UPLOADTHING_SECRET=""
+UPLOADTHING_APP_ID=""
+
+# Stripe
+STRIPE_PUBLIC_KEY="pk_test_..."
+STRIPE_SECRET_KEY="sk_test_..."
+STRIPE_WEBHOOK_SECRET="whsec_..."
+
+# App
+NEXT_PUBLIC_APP_URL="http://localhost:3000"
+
+For production on Vercel, add all the same variables in:
+Vercel Dashboard → Project → Settings → Environment Variables
+
+================================================================================
+12. DEPLOYMENT CHECKLIST
+================================================================================
+
+PRE-DEPLOYMENT:
+  [ ] All environment variables set in Vercel
+  [ ] "postinstall": "prisma generate" in package.json scripts
+  [ ] Production DATABASE_URL pointing to Neon production project
+  [ ] Stripe webhook endpoint updated to production URL
+  [ ] NEXTAUTH_URL updated to production domain
+  [ ] NEXT_PUBLIC_APP_URL updated to production domain
+
+VERCEL SETTINGS:
+  [ ] Framework preset: Next.js
+  [ ] Node.js version: 20.x
+  [ ] Build command: npm run build
+  [ ] Output directory: .next (default)
+  [ ] Install command: npm install
+
+POST-DEPLOYMENT:
+  [ ] Run: npx prisma migrate deploy (via Vercel deploy hook or manual)
+  [ ] Run seed script if needed
+  [ ] Test all 3 user roles end-to-end on production
+  [ ] Verify Stripe webhooks are firing correctly
+  [ ] Verify file uploads working via UploadThing
+  [ ] Check mobile responsiveness on real device
+
+MONITORING:
+  [ ] Add Sentry for error tracking (optional but recommended):
+      npx @sentry/wizard@latest -i nextjs
+  [ ] Vercel Analytics: enable in Vercel dashboard (free)
+
+================================================================================
+END OF SPROUTBOX BUILD PLAN
+Version: 2.0 | Stack: Next.js 14 + Prisma + PostgreSQL + Stripe + UploadThing
+================================================================================
