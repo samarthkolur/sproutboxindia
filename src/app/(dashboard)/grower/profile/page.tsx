@@ -1,0 +1,80 @@
+import { GlassCard } from "@/components/shared/GlassCard";
+import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { UserCircle, MapPin, CreditCard, Phone } from "lucide-react";
+
+async function getGrowerProfile(userId: string) {
+  try {
+    const grower = await prisma.grower.findUnique({
+      where: { userId },
+      include: { user: { select: { name: true, email: true } } },
+    });
+    return grower;
+  } catch {
+    return null;
+  }
+}
+
+export default async function GrowerProfilePage() {
+  const session = await auth();
+  const userId = session?.user?.id || "";
+  const grower = await getGrowerProfile(userId);
+
+  const fields = [
+    { label: "Name", value: grower?.user.name || "—", icon: UserCircle },
+    { label: "Email", value: session?.user?.email || "—", icon: UserCircle },
+    { label: "Phone", value: grower?.phone || "—", icon: Phone },
+    { label: "Address", value: grower?.address || "—", icon: MapPin },
+    { label: "City", value: grower?.city || "—", icon: MapPin },
+    { label: "Pincode", value: grower?.pincode || "—", icon: MapPin },
+    { label: "Kit Size", value: grower?.kitSize ? `${grower.kitSize} trays` : "—", icon: CreditCard },
+    { label: "UPI ID", value: grower?.upiId || "—", icon: CreditCard },
+    { label: "Bank Account", value: grower?.bankAccount || "—", icon: CreditCard },
+    { label: "IFSC", value: grower?.bankIFSC || "—", icon: CreditCard },
+  ];
+
+  return (
+    <div>
+      <div className="mb-8">
+        <h1 className="text-3xl font-black text-text-primary tracking-tight">Profile</h1>
+        <p className="text-text-secondary mt-1">Your account and payment details</p>
+      </div>
+
+      {/* Score cards */}
+      {grower && (
+        <div className="grid grid-cols-3 gap-4 mb-6">
+          {[
+            { label: "Yield Score", value: Math.round(grower.yieldScore * 100) },
+            { label: "Quality Score", value: Math.round(grower.qualityScore * 100) },
+            { label: "Timeliness", value: Math.round(grower.timelinessScore * 100) },
+          ].map((s) => (
+            <GlassCard key={s.label} padding="sm">
+              <p className="text-[11px] font-semibold text-text-muted uppercase tracking-wider mb-1">{s.label}</p>
+              <p className="text-2xl font-black text-sprout-800">{s.value}%</p>
+            </GlassCard>
+          ))}
+        </div>
+      )}
+
+      <GlassCard>
+        <h2 className="text-lg font-bold text-text-primary mb-5">Account Details</h2>
+        <div className="space-y-4">
+          {fields.map((field) => {
+            const Icon = field.icon;
+            return (
+              <div key={field.label} className="flex items-center gap-4 bg-white/50 rounded-xl p-4 border border-white/40">
+                <div className="w-10 h-10 bg-sprout-50 rounded-xl flex items-center justify-center">
+                  <Icon className="w-5 h-5 text-sprout-600" />
+                </div>
+                <div>
+                  <p className="text-[11px] font-semibold text-text-muted uppercase tracking-wider">{field.label}</p>
+                  <p className="text-sm font-medium text-text-primary">{field.value}</p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </GlassCard>
+    </div>
+  );
+}

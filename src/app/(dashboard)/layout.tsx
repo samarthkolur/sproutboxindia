@@ -1,0 +1,43 @@
+import { auth } from "@/lib/auth";
+import { redirect } from "next/navigation";
+import { Sidebar } from "@/components/layout/Sidebar";
+import { ScrollProgress } from "./scroll-progress";
+
+export default async function DashboardLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const session = await auth();
+
+  if (!session?.user) {
+    redirect("/login");
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const userRole = (session.user as any).role || "GROWER";
+  const userName = session.user.name || "User";
+
+  return (
+    <div className="min-h-screen flex relative">
+      {/* Scroll progress indicator */}
+      <ScrollProgress />
+
+      {/* Background layers */}
+      <div className="fixed inset-0 bg-grid bg-grid-fade opacity-30 pointer-events-none" />
+      <div className="fixed inset-0 pointer-events-none" style={{
+        background: "radial-gradient(ellipse 50% 50% at 80% 20%, rgba(82, 183, 136, 0.06), transparent)"
+      }} />
+      <div className="blob blob-animated w-[400px] h-[400px] bg-sprout-100/40 -top-20 right-0 fixed" />
+      <div className="blob blob-animated-alt w-[300px] h-[300px] bg-sprout-200/30 bottom-0 left-1/2 fixed" />
+
+      {/* Sidebar */}
+      <Sidebar userName={userName} userRole={userRole} />
+
+      {/* Main content */}
+      <main className="flex-1 lg:ml-[260px] relative z-10">
+        <div className="p-6 lg:p-8 max-w-7xl mx-auto pt-14 lg:pt-8">{children}</div>
+      </main>
+    </div>
+  );
+}
