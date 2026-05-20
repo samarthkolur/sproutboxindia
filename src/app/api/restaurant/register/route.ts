@@ -1,62 +1,56 @@
-import { NextResponse } from "next/server";
 import { hash } from "bcryptjs";
 import { prisma } from "@/lib/prisma";
+import { fail, ok, parseError } from "@/lib/api";
+import { restaurantRegisterSchema } from "@/lib/schemas";
+import { stripe } from "@/lib/stripe";
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { name, email, password, businessName, phone, address, city, gstNumber } = body;
-
-    if (!name || !email || !password) {
-      return NextResponse.json(
-        { error: "Name, email, and password are required" },
-        { status: 400 }
-      );
-    }
+    const input = restaurantRegisterSchema.parse(body);
 
     const existingUser = await prisma.user.findUnique({
-      where: { email },
+      where: { email: input.email },
     });
 
     if (existingUser) {
-      return NextResponse.json(
-        { error: "A user with this email already exists" },
-        { status: 409 }
-      );
+      return fail("A user with this email already exists", "EMAIL_EXISTS", 409);
     }
 
-    const hashedPassword = await hash(password, 12);
+    const hashedPassword = await hash(input.password, 12);
+    const customer = stripe
+      ? await stripe.customers.create({
+          email: input.email,
+          name: input.businessName,
+          phone: input.phone,
+        })
+      : null;
 
     const user = await prisma.user.create({
       data: {
-        name,
-        email,
+        name: input.name,
+        email: input.email,
         passwordHash: hashedPassword,
         role: "RESTAURANT",
         restaurant: {
           create: {
-            businessName: businessName || name,
-            contactName: name,
-            phone: phone || "",
-            address: address || "",
-            city: city || "",
-            pincode: "",
-            gstin: gstNumber || null,
+            businessName: input.businessName,
+            contactName: input.name,
+            phone: input.phone,
+            address: input.address,
+            city: input.city,
+            pincode: input.pincode,
+            gstin: input.gstin || input.gstNumber || null,
+            cuisineType: input.cuisineType || null,
+            stripeCustomerId: customer?.id || null,
           },
         },
       },
       include: { restaurant: true },
     });
 
-    return NextResponse.json(
-      { message: "Restaurant registered successfully", userId: user.id },
-      { status: 201 }
-    );
+    return ok({ message: "Restaurant registered successfully", userId: user.id }, 201);
   } catch (error) {
-    console.error("Restaurant registration error:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return parseError(error);
   }
 }

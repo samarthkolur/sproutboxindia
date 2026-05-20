@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "@/app/globals.css";
+import { GlobalLoadingIndicator } from "@/components/shared/GlobalLoadingIndicator";
 
 export const metadata: Metadata = {
   title: "SproutBox — Farm-to-Fork Microgreen Platform",
@@ -15,7 +16,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="min-h-screen antialiased">{children}</body>
+      <body className="min-h-screen antialiased">
+        {children}
+        <GlobalLoadingIndicator />
+      </body>
     </html>
   );
 }

@@ -1,7 +1,7 @@
 import { GlassCard } from "@/components/shared/GlassCard";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { Wallet, ArrowDownLeft, ArrowUpRight, Clock } from "lucide-react";
+import { Wallet, ArrowDownLeft, Clock } from "lucide-react";
 
 async function getGrowerEarnings(userId: string) {
   try {

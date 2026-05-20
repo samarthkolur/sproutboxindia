@@ -1,6 +1,6 @@
 import { GlassCard } from "@/components/shared/GlassCard";
 import { CROP_TYPES, CROP_DISPLAY_NAMES, CROP_PRICE_PER_KG } from "@/lib/constants";
-import { ShoppingCart, Leaf, ArrowRight } from "lucide-react";
+import { ShoppingCart, Leaf } from "lucide-react";
 
 export default function NewOrderPage() {
   return (

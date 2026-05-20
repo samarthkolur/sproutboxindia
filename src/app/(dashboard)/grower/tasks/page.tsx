@@ -5,11 +5,8 @@ import { CROP_DISPLAY_NAMES, CROP_INSTRUCTIONS, type CropType } from "@/lib/cons
 import { prisma } from "@/lib/prisma";
 import {
   ClipboardList,
-  ChevronRight,
-  Sprout,
   Calendar,
 } from "lucide-react";
-import Link from "next/link";
 
 async function getGrowerTasks(userId: string) {
   try {

@@ -12,8 +12,7 @@ const protectedPrefixes = ["/grower", "/restaurant", "/admin"];
 export default auth((req) => {
   const { nextUrl } = req;
   const isLoggedIn = !!req.auth;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const userRole = (req.auth?.user as any)?.role;
+  const userRole = req.auth?.user?.role;
 
   const isProtected = protectedPrefixes.some((prefix) =>
     nextUrl.pathname.startsWith(prefix)
