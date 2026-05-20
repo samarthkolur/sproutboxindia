@@ -49,7 +49,10 @@ export default async function RestaurantOrdersPage() {
             };
             return (
               <GlassCard key={order.id} padding="sm">
-                <div className="flex items-center gap-4 cursor-pointer group row-hover rounded-xl">
+                <Link
+                  href={`/restaurant/orders/${order.id}`}
+                  className="flex items-center gap-4 cursor-pointer group row-hover rounded-xl w-full block"
+                >
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
                       <h3 className="text-sm font-semibold text-text-primary">
@@ -64,7 +67,7 @@ export default async function RestaurantOrdersPage() {
                   </div>
                   <p className="text-sm font-bold text-text-primary">₹{order.totalPrice.toLocaleString("en-IN")}</p>
                   <ChevronRight className="w-4 h-4 text-text-muted group-hover:text-sprout-800 transition-all" />
-                </div>
+                </Link>
               </GlassCard>
             );
           })}

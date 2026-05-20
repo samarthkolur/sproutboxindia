@@ -1,5 +1,3 @@
-import { GlassCard } from "@/components/shared/GlassCard";
-import { StatusBadge } from "@/components/shared/StatusBadge";
 import { prisma } from "@/lib/prisma";
 import { Settings2 } from "lucide-react";
 import { DemandClient } from "./DemandClient";
@@ -27,7 +25,7 @@ export default async function DemandEnginePage() {
         <p className="text-text-secondary">Convert confirmed orders into production plans</p>
       </div>
 
-      <DemandClient initialOrders={orders as any} />
+      <DemandClient initialOrders={orders} />
     </div>
   );
 }

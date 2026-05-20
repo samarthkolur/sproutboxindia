@@ -1,6 +1,5 @@
-import { GlassCard } from "@/components/shared/GlassCard";
 import { prisma } from "@/lib/prisma";
-import { CheckCircle2, XCircle, AlertTriangle } from "lucide-react";
+import { CheckCircle2 } from "lucide-react";
 import { QCClient } from "./QCClient";
 
 async function getQCQueue() {
@@ -27,7 +26,7 @@ export default async function QCReviewPage() {
         <p className="text-text-secondary">Review grower check-in photos and approve quality</p>
       </div>
 
-      <QCClient initialQueue={queue as any} />
+      <QCClient initialQueue={queue} />
     </div>
   );
 }

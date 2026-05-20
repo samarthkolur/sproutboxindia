@@ -47,8 +47,9 @@ export async function processQCCheckIn(
 
     revalidatePath("/admin/qc");
     return { success: true };
-  } catch (error: any) {
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Failed to process QC";
     console.error("Failed to process QC:", error);
-    return { error: error.message || "Failed to process QC" };
+    return { error: message };
   }
 }

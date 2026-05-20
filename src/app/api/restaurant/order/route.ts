@@ -5,6 +5,7 @@ import { CROP_PRICE_PER_KG } from "@/lib/constants";
 import { prisma } from "@/lib/prisma";
 import { createOrderSchema } from "@/lib/schemas";
 import { stripe } from "@/lib/stripe";
+import { revalidatePath } from "next/cache";
 
 export async function POST(request: Request) {
   try {
@@ -44,6 +45,9 @@ export async function POST(request: Request) {
         status: paymentIntent ? OrderStatus.PENDING_PAYMENT : OrderStatus.CONFIRMED,
       },
     });
+
+    revalidatePath("/restaurant/orders");
+    revalidatePath("/restaurant/dashboard");
 
     return ok({ order, clientSecret: paymentIntent?.client_secret || null }, 201);
   } catch (error) {

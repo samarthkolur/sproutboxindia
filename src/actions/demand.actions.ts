@@ -51,8 +51,9 @@ export async function createProductionPlan(orderId: string) {
 
     revalidatePath("/admin/demand");
     return { success: true };
-  } catch (error: any) {
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Failed to create production plan";
     console.error("Failed to create production plan:", error);
-    return { error: error.message || "Failed to create production plan" };
+    return { error: message };
   }
 }

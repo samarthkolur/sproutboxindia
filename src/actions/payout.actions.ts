@@ -38,8 +38,9 @@ export async function markPayoutAsPaid(payoutId: string) {
 
     revalidatePath("/admin/payouts");
     return { success: true };
-  } catch (error: any) {
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Failed to mark payout as paid";
     console.error("Failed to mark payout as paid:", error);
-    return { error: error.message || "Failed to mark payout as paid" };
+    return { error: message };
   }
 }

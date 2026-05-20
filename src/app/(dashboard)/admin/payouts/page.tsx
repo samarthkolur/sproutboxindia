@@ -54,7 +54,7 @@ export default async function PayoutsPage() {
         </GlassCard>
       </div>
 
-      <PayoutClient initialPayouts={payouts as any} />
+      <PayoutClient initialPayouts={payouts} />
     </div>
   );
 }
