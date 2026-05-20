@@ -1,6 +1,6 @@
 import { GlassCard } from "@/components/shared/GlassCard";
 import { prisma } from "@/lib/prisma";
-import { Truck, MapPin, Clock } from "lucide-react";
+import { Truck, MapPin } from "lucide-react";
 
 async function getDeliveries() {
   try {

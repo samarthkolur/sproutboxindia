@@ -1,17 +1,40 @@
-import { Role } from "@prisma/client";
+import type {
+  BatchStatus,
+  DeliveryStatus,
+  OrderStatus,
+  PayoutStatus,
+  Prisma,
+  QCResult,
+  Role,
+  TaskStatus,
+} from "@prisma/client";
 
 // ── Extended session types ──────────────────────────────────────────────────
 declare module "next-auth" {
+  interface User {
+    role: Role;
+  }
+
   interface Session {
     user: {
       id: string;
-      email: string;
+      email?: string | null;
       name: string | null;
       image: string | null;
       role: Role;
     };
   }
 }
+
+// ── Prisma payload helpers ──────────────────────────────────────────────────
+export type UserSessionRole = Role;
+export type OrderWithRestaurant = Prisma.OrderGetPayload<{
+  include: { restaurant: true; productionPlan: true; delivery: true; feedback: true };
+}>;
+export type TaskWithBatches = Prisma.TaskGetPayload<{ include: { batches: true } }>;
+export type BatchWithTask = Prisma.BatchGetPayload<{
+  include: { task: { include: { grower: { include: { user: true; cluster: true } } } }; checkIns: true };
+}>;
 
 // ── Grower types ────────────────────────────────────────────────────────────
 export interface GrowerWithUser {
@@ -52,17 +75,34 @@ export interface DemandSummary {
 
 export interface AllocationResult {
   growerId: string;
-  growerName: string;
-  compositeScore: number;
   trayCount: number;
+  growerName?: string;
+  compositeScore?: number;
 }
 
 // ── QC types ────────────────────────────────────────────────────────────────
 export interface QCSubmission {
   batchId: string;
   checkInId: string;
-  result: "PASS" | "RISK" | "REJECT";
+  result: QCResult;
   notes: string;
+}
+
+export interface ProductionPlanInputOrder {
+  cropType: string;
+  quantityKg: number;
+}
+
+export interface GrowerAllocationInput {
+  id: string;
+  clusterId: string | null;
+  isActive: boolean;
+  compositeScore: number;
+}
+
+export interface ApiError {
+  error: string;
+  code: string;
 }
 
 // ── Dashboard stat types ────────────────────────────────────────────────────
@@ -90,3 +130,13 @@ export type NotificationType =
   | "DELIVERY"
   | "FEEDBACK"
   | "SYSTEM";
+
+export type {
+  BatchStatus,
+  DeliveryStatus,
+  OrderStatus,
+  PayoutStatus,
+  QCResult,
+  Role,
+  TaskStatus,
+};
