@@ -5,6 +5,7 @@ import { LanguageProvider } from "@/components/i18n/LanguageProvider";
 import { FloatingLanguageToggle } from "@/components/i18n/LanguageToggle";
 import { GlobalLoadingIndicator } from "@/components/shared/GlobalLoadingIndicator";
 import { GoogleAnalytics } from "@/components/shared/GoogleAnalytics";
+import { Analytics } from "@vercel/analytics/next";
 
 export const metadata: Metadata = {
   title: {
@@ -36,6 +37,7 @@ export default function RootLayout({
           <FloatingLanguageToggle />
           <GlobalLoadingIndicator />
         </LanguageProvider>
+        <Analytics />
       </body>
     </html>
   );
