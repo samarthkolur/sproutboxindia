@@ -40,6 +40,8 @@ export async function POST(request: Request) {
             address: input.address,
             city: input.city,
             pincode: input.pincode,
+            lat: input.lat ?? null,
+            lng: input.lng ?? null,
             gstin: input.gstin || input.gstNumber || null,
             cuisineType: input.cuisineType || null,
             stripeCustomerId: customer?.id || null,

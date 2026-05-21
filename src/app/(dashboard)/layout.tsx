@@ -2,6 +2,7 @@ import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { ScrollProgress } from "./scroll-progress";
+import { Toaster } from "sonner";
 
 export default async function DashboardLayout({
   children,
@@ -33,6 +34,18 @@ export default async function DashboardLayout({
 
       {/* Sidebar */}
       <Sidebar userName={userName} userRole={userRole} />
+
+      {/* Toast notifications */}
+      <Toaster
+        position="top-right"
+        richColors
+        toastOptions={{
+          classNames: {
+            toast: "!rounded-xl !border !border-white/40 !shadow-xl",
+            title: "!font-semibold",
+          },
+        }}
+      />
 
       {/* Main content */}
       <main className="flex-1 lg:ml-[260px] relative z-10">

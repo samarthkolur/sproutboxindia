@@ -7,7 +7,7 @@ const roleRoutes: Record<string, string> = {
   ADMIN: "/admin/dashboard",
 };
 
-const protectedPrefixes = ["/grower", "/restaurant", "/admin"];
+const protectedPrefixes = ["/grower", "/restaurant", "/admin", "/dashboard"];
 
 export default auth((req) => {
   const { nextUrl } = req;
@@ -24,6 +24,13 @@ export default auth((req) => {
 
   // Redirect logged-in users away from auth pages to their dashboard
   if (isAuthPage && isLoggedIn && userRole) {
+    return NextResponse.redirect(
+      new URL(roleRoutes[userRole] || "/", nextUrl)
+    );
+  }
+
+  // Redirect /dashboard to the specific role dashboard
+  if (nextUrl.pathname === "/dashboard" && isLoggedIn && userRole) {
     return NextResponse.redirect(
       new URL(roleRoutes[userRole] || "/", nextUrl)
     );
@@ -61,6 +68,7 @@ export const config = {
     "/grower/:path*",
     "/restaurant/:path*",
     "/admin/:path*",
+    "/dashboard",
     "/login",
     "/register",
   ],

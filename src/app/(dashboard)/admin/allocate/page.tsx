@@ -10,7 +10,15 @@ async function getAllocationData() {
         include: {
           order: {
             include: {
-              restaurant: { select: { businessName: true } },
+              // Fetch restaurant lat/lng for proximity scoring
+              restaurant: {
+                select: {
+                  businessName: true,
+                  city: true,
+                  lat: true,
+                  lng: true,
+                },
+              },
             },
           },
         },
@@ -20,7 +28,7 @@ async function getAllocationData() {
         where: { isActive: true },
         include: {
           user: { select: { name: true } },
-          _count: { select: { tasks: true } },
+          _count: { select: { tasks: { where: { status: { in: ["ASSIGNED", "IN_PROGRESS"] } } } } },
         },
         orderBy: { compositeScore: "desc" },
       }),
@@ -34,7 +42,9 @@ async function getAllocationData() {
         city: g.city,
         kitSize: g.kitSize,
         compositeScore: g.compositeScore,
-        taskCount: g._count.tasks,
+        activeTasks: g._count.tasks,
+        lat: g.lat,
+        lng: g.lng,
       })),
     };
   } catch {
@@ -55,8 +65,8 @@ export default async function AllocatePage() {
           </h1>
         </div>
         <p className="text-text-secondary">
-          Assign production plans to growers — {plans.length} plan
-          {plans.length !== 1 ? "s" : ""} awaiting allocation ·{" "}
+          Assign production plans to growers — nearby growers get priority ·{" "}
+          {plans.length} plan{plans.length !== 1 ? "s" : ""} awaiting ·{" "}
           {growers.length} active grower{growers.length !== 1 ? "s" : ""}
         </p>
       </div>

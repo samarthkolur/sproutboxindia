@@ -37,6 +37,8 @@ export const restaurantRegisterSchema = z.object({
   gstNumber: z.string().trim().optional(),
   gstin: z.string().trim().optional(),
   cuisineType: z.string().trim().optional(),
+  lat: z.coerce.number().optional(),
+  lng: z.coerce.number().optional(),
 });
 
 export const createOrderSchema = z.object({
