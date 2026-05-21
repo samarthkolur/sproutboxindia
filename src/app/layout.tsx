@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import "@/app/globals.css";
+import { LanguageProvider } from "@/components/i18n/LanguageProvider";
+import { FloatingLanguageToggle } from "@/components/i18n/LanguageToggle";
 import { GlobalLoadingIndicator } from "@/components/shared/GlobalLoadingIndicator";
 
 export const metadata: Metadata = {
@@ -17,8 +19,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="min-h-screen antialiased">
-        {children}
-        <GlobalLoadingIndicator />
+        <LanguageProvider>
+          {children}
+          <FloatingLanguageToggle />
+          <GlobalLoadingIndicator />
+        </LanguageProvider>
       </body>
     </html>
   );
