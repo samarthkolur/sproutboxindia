@@ -112,7 +112,7 @@ export async function getGrowerDashboard(userId: string) {
       where: { userId },
       include: {
         tasks: {
-          where: { status: { in: ["ASSIGNED", "IN_PROGRESS"] } },
+          where: { status: { in: ["ASSIGNED", "IN_PROGRESS", "HARVEST_READY"] } },
           include: {
             batches: true,
           },
@@ -138,8 +138,14 @@ export async function getGrowerDashboard(userId: string) {
       };
     }
 
-    const activeTrays = grower.tasks.reduce((s, t) => s + t.trayCount, 0);
-    const tasksDue = grower.tasks.filter((t) => t.status === "ASSIGNED").length;
+    const activeTraysAgg = await prisma.task.aggregate({
+      where: { growerId: grower.id, status: { in: ["ASSIGNED", "IN_PROGRESS", "HARVEST_READY"] } },
+      _sum: { trayCount: true },
+    });
+    const activeTrays = activeTraysAgg._sum.trayCount || 0;
+    const tasksDue = await prisma.task.count({
+      where: { growerId: grower.id, status: "ASSIGNED" },
+    });
 
     return {
       activeTrays,

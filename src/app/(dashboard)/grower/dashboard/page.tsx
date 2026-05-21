@@ -26,8 +26,10 @@ export default async function GrowerDashboard() {
   const userId = session?.user?.id || "";
   const data = await getGrowerDashboard(userId);
 
-  // Time-aware greeting
-  const hour = new Date().getHours();
+  // Time-aware greeting (IST)
+  const now = new Date();
+  const istTime = new Date(now.getTime() + (5.5 * 60 * 60 * 1000));
+  const hour = istTime.getUTCHours();
   const greeting =
     hour < 12
       ? "Good morning"
@@ -43,20 +45,13 @@ export default async function GrowerDashboard() {
   }));
 
   // Weekly earnings chart data
-  const earningsData =
-    data.weeklyEarnings.length > 0
-      ? data.weeklyEarnings.map((e) => ({
-          label: e.label,
-          value: e.amount,
-          tooltip: `₹${e.amount}`,
-        }))
-      : [320, 450, 380, 500, 420, 550, 500].map((v, i) => ({
-          label: `W${i + 8}`,
-          value: v,
-          tooltip: `₹${v}`,
-        }));
+  const earningsData = data.weeklyEarnings.map((e) => ({
+    label: e.label,
+    value: e.amount,
+    tooltip: `₹${e.amount}`,
+  }));
 
-  const totalEarnings = earningsData.reduce((s, d) => s + d.value, 0);
+  const totalEarnings = data.totalEarnings;
 
   return (
     <GrowerDashboardClient>
@@ -75,7 +70,8 @@ export default async function GrowerDashboard() {
         <StatCard
           label="Active Trays"
           value={data.activeTrays}
-          change="+2 this week"
+          change={data.activeTrays > 0 ? "Currently growing" : "Ready for tasks"}
+          changeType="neutral"
           icon={<Sprout className="w-[18px] h-[18px] text-sprout-700" strokeWidth={2} />}
         />
         <StatCard
@@ -87,8 +83,9 @@ export default async function GrowerDashboard() {
         />
         <StatCard
           label="Earnings"
-          value={`₹${data.totalEarnings.toLocaleString("en-IN")}`}
-          change="+18%"
+          value={`₹${totalEarnings.toLocaleString("en-IN")}`}
+          change="Total payouts"
+          changeType="neutral"
           icon={<Wallet className="w-[18px] h-[18px] text-sprout-700" strokeWidth={2} />}
         />
         <StatCard
@@ -238,27 +235,34 @@ export default async function GrowerDashboard() {
             </span>
           </div>
           <div className="flex items-end gap-3 h-32">
-            {earningsData.map((item, i) => (
-              <div
-                key={i}
-                className="flex-1 flex flex-col items-center justify-end h-full group relative"
-              >
-                <div className="absolute -top-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10">
-                  <div className="bg-text-primary text-white text-[10px] font-semibold px-2 py-1 rounded-lg whitespace-nowrap shadow-lg">
-                    {item.tooltip}
-                  </div>
-                </div>
+            {earningsData.length > 0 ? (
+              earningsData.map((item, i) => (
                 <div
-                  className="w-full bg-gradient-to-t from-sprout-600 to-sprout-400 rounded-lg transition-all hover:opacity-80 hover:shadow-lg hover:shadow-sprout-500/20"
-                  style={{
-                    height: `${(item.value / Math.max(...earningsData.map((d) => d.value), 1)) * 100}%`,
-                  }}
-                />
-                <p className="text-[10px] text-text-muted mt-1.5 font-medium">
-                  {item.label}
-                </p>
+                  key={i}
+                  className="flex-1 flex flex-col items-center justify-end h-full group relative"
+                >
+                  <div className="absolute -top-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10">
+                    <div className="bg-text-primary text-white text-[10px] font-semibold px-2 py-1 rounded-lg whitespace-nowrap shadow-lg">
+                      {item.tooltip}
+                    </div>
+                  </div>
+                  <div
+                    className="w-full bg-gradient-to-t from-sprout-600 to-sprout-400 rounded-lg transition-all hover:opacity-80 hover:shadow-lg hover:shadow-sprout-500/20"
+                    style={{
+                      height: `${(item.value / Math.max(...earningsData.map((d) => d.value), 1)) * 100}%`,
+                    }}
+                  />
+                  <p className="text-[10px] text-text-muted mt-1.5 font-medium">
+                    {item.label}
+                  </p>
+                </div>
+              ))
+            ) : (
+              <div className="w-full h-full flex flex-col items-center justify-center text-text-muted">
+                <Wallet className="w-8 h-8 opacity-20 mb-2" />
+                <p className="text-xs">No earnings yet</p>
               </div>
-            ))}
+            )}
           </div>
           <div className="flex items-center justify-between mt-3 pt-3 border-t border-white/30">
             <span className="text-sm text-text-muted">Total earned</span>
