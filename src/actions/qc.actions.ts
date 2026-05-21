@@ -12,38 +12,65 @@ export async function processQCCheckIn(
   try {
     const checkIn = await prisma.checkIn.findUnique({
       where: { id: checkInId },
-      include: { batch: true },
+      include: {
+        batch: {
+          include: {
+            task: {
+              include: { grower: true },
+            },
+          },
+        },
+      },
     });
 
     if (!checkIn) {
       throw new Error("Check-in not found");
     }
 
-    // Update check-in
+    // Update check-in with QC result
     await prisma.checkIn.update({
       where: { id: checkInId },
       data: {
         qcResult: result,
-        qcNotes: notes,
+        qcNotes: notes ?? null,
         qcReviewedAt: new Date(),
-        // qcReviewedBy: "admin-id" // Assuming admin ID if available in session
       },
     });
 
-    // Optionally update batch status based on result
-    let batchStatus = checkIn.batch.status;
+    // Update batch status based on result (use correct enum values from schema)
     if (result === "PASS") {
-      batchStatus = "QC_PASSED";
-    } else if (result === "REJECT") {
-      batchStatus = "QC_FAILED";
-    }
-
-    if (batchStatus !== checkIn.batch.status) {
       await prisma.batch.update({
         where: { id: checkIn.batch.id },
-        data: { status: batchStatus },
+        data: { status: "QC_PASSED" },
+      });
+
+      // Notify the grower: batch passed
+      await prisma.notification.create({
+        data: {
+          userId: checkIn.batch.task.grower.userId,
+          title: "Batch passed QC ✅",
+          message: `Tray #${checkIn.batch.trayNumber} passed quality review. Ready to harvest!`,
+          type: "QC_RESULT",
+        },
+      });
+    } else if (result === "REJECT") {
+      // Schema uses "REJECTED" not "QC_FAILED"
+      await prisma.batch.update({
+        where: { id: checkIn.batch.id },
+        data: { status: "REJECTED" },
+      });
+
+      // Notify grower: batch rejected
+      await prisma.notification.create({
+        data: {
+          userId: checkIn.batch.task.grower.userId,
+          title: "Batch rejected ❌",
+          message: `Tray #${checkIn.batch.trayNumber} did not pass quality review.${notes ? ` Admin note: ${notes}` : ""}`,
+          type: "QC_RESULT",
+        },
       });
     }
+    // RISK: keep batch as QC_PENDING, no status change needed
 
     revalidatePath("/admin/qc");
     return { success: true };

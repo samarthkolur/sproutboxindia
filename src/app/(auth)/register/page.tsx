@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { BrandLogo } from "@/components/layout/BrandLogo";
+import { saveRegistrationPrefill } from "@/lib/registration-prefill";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -34,14 +35,17 @@ export default function RegisterPage() {
     setLoading(true);
 
     try {
+      saveRegistrationPrefill({
+        role: formData.role,
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+      });
+
       if (formData.role === "GROWER") {
-        router.push(
-          `/join/grower?name=${encodeURIComponent(formData.name)}&email=${encodeURIComponent(formData.email)}&password=${encodeURIComponent(formData.password)}`
-        );
+        router.push("/join/grower");
       } else {
-        router.push(
-          `/join/restaurant?name=${encodeURIComponent(formData.name)}&email=${encodeURIComponent(formData.email)}&password=${encodeURIComponent(formData.password)}`
-        );
+        router.push("/join/restaurant");
       }
     } catch {
       setError("Something went wrong. Please try again.");

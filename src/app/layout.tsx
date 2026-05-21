@@ -4,12 +4,22 @@ import "leaflet/dist/leaflet.css";
 import { LanguageProvider } from "@/components/i18n/LanguageProvider";
 import { FloatingLanguageToggle } from "@/components/i18n/LanguageToggle";
 import { GlobalLoadingIndicator } from "@/components/shared/GlobalLoadingIndicator";
+import { GoogleAnalytics } from "@/components/shared/GoogleAnalytics";
 
 export const metadata: Metadata = {
-  title: "SproutBox",
+  title: {
+    default: "SproutBox — Farm-fresh Microgreens Delivered",
+    template: "%s | SproutBox",
+  },
   description:
     "Demand-driven, decentralized microgreen production and supply platform connecting restaurants with home-based growers.",
   keywords: ["microgreens", "farm-to-fork", "B2B", "food-tech", "sustainable"],
+  openGraph: {
+    title: "SproutBox — Farm-fresh Microgreens Delivered",
+    description: "Demand-driven microgreen supply platform for restaurants and growers.",
+    siteName: "SproutBox",
+    type: "website",
+  },
 };
 
 export default function RootLayout({
@@ -20,6 +30,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="min-h-screen antialiased">
+        <GoogleAnalytics />
         <LanguageProvider>
           {children}
           <FloatingLanguageToggle />

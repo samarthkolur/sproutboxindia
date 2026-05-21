@@ -57,7 +57,7 @@ export const allocateSchema = z.object({
   planId: z.string().min(1),
   allocations: z.array(z.object({
     growerId: z.string().min(1),
-    trayCount: z.coerce.number().int().positive(),
+    trayCount: z.coerce.number().int().nonnegative(),
   })).min(1),
 });
 

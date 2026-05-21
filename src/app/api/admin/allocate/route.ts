@@ -1,41 +1,7 @@
 import { auth } from "@/lib/auth";
 import { fail, ok, parseError } from "@/lib/api";
-import { allocateTrays } from "@/lib/business";
 import { prisma } from "@/lib/prisma";
 import { allocateSchema } from "@/lib/schemas";
-
-export async function GET(request: Request) {
-  try {
-    const session = await auth();
-    if (!session?.user || session.user.role !== "ADMIN") {
-      return fail("Unauthorized", "UNAUTHORIZED", 401);
-    }
-
-    const url = new URL(request.url);
-    const planId = url.searchParams.get("planId");
-    if (!planId) return fail("planId is required", "VALIDATION_ERROR", 422);
-
-    const [plan, growers] = await Promise.all([
-      prisma.productionPlan.findUnique({ where: { id: planId }, include: { order: true } }),
-      prisma.grower.findMany({ where: { isActive: true }, include: { user: true, cluster: true } }),
-    ]);
-
-    if (!plan) return fail("Plan not found", "NOT_FOUND", 404);
-    const clusterId = growers[0]?.clusterId || "";
-    const allocations = allocateTrays(growers, plan.totalTrays, clusterId).map((allocation) => {
-      const grower = growers.find((item) => item.id === allocation.growerId);
-      return {
-        ...allocation,
-        growerName: grower?.user.name || "Grower",
-        compositeScore: grower?.compositeScore || 0,
-      };
-    });
-
-    return ok({ plan, allocations });
-  } catch (error) {
-    return parseError(error);
-  }
-}
 
 export async function POST(request: Request) {
   try {
@@ -51,12 +17,19 @@ export async function POST(request: Request) {
     });
 
     if (!plan) return fail("Production plan not found", "NOT_FOUND", 404);
+    if (plan.status !== "DRAFT") {
+      return fail("Production plan is not in DRAFT status", "VALIDATION_ERROR", 422);
+    }
 
     const result = await prisma.$transaction(async (tx) => {
       const tasks = [];
 
       for (const allocation of input.allocations) {
-        const grower = await tx.grower.findUnique({ where: { id: allocation.growerId } });
+        if (allocation.trayCount <= 0) continue;
+
+        const grower = await tx.grower.findUnique({
+          where: { id: allocation.growerId },
+        });
         if (!grower || !grower.isActive) continue;
 
         const task = await tx.task.create({
@@ -78,17 +51,29 @@ export async function POST(request: Request) {
           include: { batches: true },
         });
 
+        // Notify grower of new task
         await tx.notification.create({
           data: {
             userId: grower.userId,
-            title: "New trays assigned",
-            message: `You have ${allocation.trayCount} ${plan.order.cropType} trays to sow.`,
+            title: "New trays assigned 🌱",
+            message: `You have been assigned ${allocation.trayCount} ${plan.order.cropType} tray${
+              allocation.trayCount > 1 ? "s" : ""
+            } to sow. Harvest by ${plan.harvestDate.toLocaleDateString("en-IN", {
+              month: "short",
+              day: "numeric",
+            })}.`,
             type: "TASK_ASSIGNED",
           },
         });
 
         tasks.push(task);
       }
+
+      // Mark production plan as ACTIVE after allocation
+      await tx.productionPlan.update({
+        where: { id: input.planId },
+        data: { status: "ACTIVE" },
+      });
 
       return tasks;
     });

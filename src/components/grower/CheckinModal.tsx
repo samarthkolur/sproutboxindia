@@ -3,41 +3,162 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ImageUploader } from "@/components/shared/ImageUploader";
+import { CheckCircle2, Loader2, X } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export function CheckinModal({ batchId, day }: { batchId: string; day: number }) {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [top, setTop] = useState("");
   const [side, setSide] = useState("");
+  const [notes, setNotes] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   async function submit() {
-    await fetch("/api/grower/checkin", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ batchId, day, imageTopUrl: top || undefined, imageSideUrl: side || undefined }),
-    });
-    setOpen(false);
+    setSubmitting(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/grower/checkin", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          batchId,
+          day,
+          imageTopUrl: top || undefined,
+          imageSideUrl: side || undefined,
+          notes: notes || undefined,
+        }),
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data?.error || "Submission failed");
+      }
+      setSuccess(true);
+      setTimeout(() => {
+        setOpen(false);
+        setSuccess(false);
+        setTop("");
+        setSide("");
+        setNotes("");
+        router.refresh();
+      }, 1500);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong");
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  function closeModal() {
+    if (!submitting) {
+      setOpen(false);
+      setError(null);
+    }
   }
 
   return (
     <>
-      <Button type="button" className="bg-sprout-800 text-white hover:bg-sprout-900" onClick={() => setOpen(true)}>
-        Complete Today
+      <Button
+        type="button"
+        size="sm"
+        className="bg-sprout-800 text-white hover:bg-sprout-900 text-xs px-3 py-1.5 h-auto"
+        onClick={() => setOpen(true)}
+      >
+        Check In
       </Button>
-      {open ? (
-        <div className="fixed inset-0 z-50 grid place-items-center bg-black/30 p-4 backdrop-blur-sm">
-          <div className="w-full max-w-xl rounded-2xl bg-white p-6 shadow-2xl">
-            <h3 className="text-lg font-bold text-text-primary">Day {day} check-in</h3>
-            <div className="mt-4 grid gap-4 md:grid-cols-2">
-              <ImageUploader label="Top view" onChange={setTop} />
-              <ImageUploader label="Side view" onChange={setSide} />
+
+      {open && (
+        <div
+          className="fixed inset-0 z-50 grid place-items-center bg-black/40 p-4 backdrop-blur-sm"
+          onClick={(e) => e.target === e.currentTarget && closeModal()}
+        >
+          <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl">
+            {/* Header */}
+            <div className="flex items-center justify-between mb-5">
+              <div>
+                <h3 className="text-lg font-bold text-text-primary">
+                  Day {day} Check-In
+                </h3>
+                <p className="text-sm text-text-muted mt-0.5">
+                  Upload top and side view photos of your tray
+                </p>
+              </div>
+              <button
+                onClick={closeModal}
+                className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors"
+              >
+                <X className="w-4 h-4 text-gray-600" />
+              </button>
             </div>
-            <div className="mt-6 flex justify-end gap-2">
-              <Button type="button" variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
-              <Button type="button" className="bg-sprout-800 text-white hover:bg-sprout-900" onClick={submit}>Submit</Button>
-            </div>
+
+            {success ? (
+              <div className="text-center py-8">
+                <div className="w-14 h-14 rounded-full bg-sprout-100 flex items-center justify-center mx-auto mb-3">
+                  <CheckCircle2 className="w-8 h-8 text-sprout-700" />
+                </div>
+                <p className="font-semibold text-text-primary">Check-in submitted!</p>
+                <p className="text-sm text-text-muted mt-1">Your progress has been recorded.</p>
+              </div>
+            ) : (
+              <>
+                {/* Image uploaders */}
+                <div className="grid gap-4 sm:grid-cols-2 mb-4">
+                  <ImageUploader label="Top View" onChange={setTop} />
+                  <ImageUploader label="Side View" onChange={setSide} />
+                </div>
+
+                {/* Notes */}
+                <div className="mb-4">
+                  <label className="block text-xs font-semibold text-text-muted mb-1.5 uppercase tracking-wide">
+                    Notes (optional)
+                  </label>
+                  <textarea
+                    value={notes}
+                    onChange={(e) => setNotes(e.target.value)}
+                    placeholder="Any observations about growth today..."
+                    rows={2}
+                    className="w-full rounded-xl border border-sprout-800/20 bg-white/70 px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-sprout-500/30 focus:border-sprout-600 resize-none"
+                  />
+                </div>
+
+                {error && (
+                  <p className="text-sm text-red-500 bg-red-50 border border-red-200/50 rounded-xl px-3 py-2 mb-4">
+                    {error}
+                  </p>
+                )}
+
+                {/* Actions */}
+                <div className="flex justify-end gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={closeModal}
+                    disabled={submitting}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    type="button"
+                    disabled={submitting}
+                    className="bg-sprout-800 text-white hover:bg-sprout-900 flex items-center gap-2"
+                    onClick={submit}
+                  >
+                    {submitting ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" /> Submitting…
+                      </>
+                    ) : (
+                      "Submit Check-In"
+                    )}
+                  </Button>
+                </div>
+              </>
+            )}
           </div>
         </div>
-      ) : null}
+      )}
     </>
   );
 }

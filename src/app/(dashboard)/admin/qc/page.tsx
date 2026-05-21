@@ -4,13 +4,27 @@ import { QCClient } from "./QCClient";
 
 async function getQCQueue() {
   try {
-    return await prisma.checkIn.findMany({
-      where: { qcResult: null },
-      include: { batch: { include: { task: { include: { grower: { include: { user: { select: { name: true } } } } } } } } },
+    // Fetch batches that are QC_PENDING — this is the correct approach
+    // (checkin API sets batch status to QC_PENDING on final day)
+    return await prisma.batch.findMany({
+      where: { status: "QC_PENDING" },
+      include: {
+        task: {
+          include: {
+            grower: { include: { user: { select: { name: true } } } },
+          },
+        },
+        checkIns: {
+          orderBy: { day: "desc" },
+          take: 1, // most recent check-in
+        },
+      },
       orderBy: { createdAt: "asc" },
-      take: 20,
+      take: 30,
     });
-  } catch { return []; }
+  } catch {
+    return [];
+  }
 }
 
 export default async function QCReviewPage() {
@@ -21,9 +35,20 @@ export default async function QCReviewPage() {
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-1">
           <CheckCircle2 className="w-7 h-7 text-sprout-700" />
-          <h1 className="text-3xl font-black text-text-primary tracking-tight">QC Review</h1>
+          <h1 className="text-3xl font-black text-text-primary tracking-tight">
+            QC Review
+          </h1>
         </div>
-        <p className="text-text-secondary">Review grower check-in photos and approve quality</p>
+        <p className="text-text-secondary">
+          Review grower check-in photos and approve quality ·{" "}
+          <span
+            className={`font-semibold ${
+              queue.length > 0 ? "text-amber-600" : "text-sprout-700"
+            }`}
+          >
+            {queue.length} pending
+          </span>
+        </p>
       </div>
 
       <QCClient initialQueue={queue} />

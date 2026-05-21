@@ -10,7 +10,6 @@ export function LanguageToggle({ className }: { className?: string }) {
 
   return (
     <label
-      data-i18n-ignore
       data-no-global-loading
       className={cn(
         "inline-flex h-10 items-center gap-2 rounded-xl border border-sprout-200/70 bg-white/90 px-3 text-sm font-semibold text-text-primary shadow-lg shadow-sprout-900/5 backdrop-blur-xl transition-colors hover:border-sprout-300",
@@ -22,6 +21,7 @@ export function LanguageToggle({ className }: { className?: string }) {
         Language
       </span>
       <select
+        data-i18n-ignore
         aria-label="Language"
         value={language}
         onChange={(event) => setLanguage(event.target.value as LanguageCode)}

@@ -1,12 +1,13 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { BrandLogo } from "@/components/layout/BrandLogo";
 import { AddressMapPicker, type SelectedAddress } from "@/components/onboarding/AddressMapPicker";
 import { StepProgress } from "@/components/onboarding/StepProgress";
 import { KIT_OPTIONS } from "@/lib/constants";
+import { clearRegistrationPrefill, readRegistrationPrefill } from "@/lib/registration-prefill";
 
 const steps = ["Personal", "Location", "Space", "Kit", "Review"];
 
@@ -17,11 +18,12 @@ function GrowerOnboardingForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [selectedAddress, setSelectedAddress] = useState<SelectedAddress | null>(null);
+  const [hasPrefilledPassword, setHasPrefilledPassword] = useState(false);
 
   const [data, setData] = useState({
     name: searchParams.get("name") || "",
     email: searchParams.get("email") || "",
-    password: searchParams.get("password") || "",
+    password: "",
     phone: "",
     city: "",
     address: "",
@@ -37,6 +39,19 @@ function GrowerOnboardingForm() {
 
   const update = (field: string, value: string) =>
     setData((prev) => ({ ...prev, [field]: value }));
+
+  useEffect(() => {
+    const prefill = readRegistrationPrefill("GROWER");
+    if (!prefill) return;
+
+    setData((prev) => ({
+      ...prev,
+      name: prefill.name,
+      email: prefill.email,
+      password: prefill.password,
+    }));
+    setHasPrefilledPassword(Boolean(prefill.password));
+  }, []);
 
   const updateAddress = (address: SelectedAddress) => {
     setSelectedAddress(address);
@@ -90,6 +105,7 @@ function GrowerOnboardingForm() {
       });
       const result = await res.json();
       if (!res.ok) throw new Error(result.error || "Registration failed");
+      clearRegistrationPrefill();
       router.push("/login?registered=true");
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
@@ -143,7 +159,7 @@ function GrowerOnboardingForm() {
                 <label className={labelClass}>Email</label>
                 <input className={inputClass} type="email" value={data.email} onChange={(e) => update("email", e.target.value)} placeholder="you@example.com" required />
               </div>
-              {!searchParams.get("password") && (
+              {!hasPrefilledPassword && (
                 <div>
                   <label className={labelClass}>Password</label>
                   <input className={inputClass} type="password" value={data.password} onChange={(e) => update("password", e.target.value)} placeholder="Min. 6 characters" required />

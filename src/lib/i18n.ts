@@ -25,7 +25,9 @@ export const translations: Record<string, TranslationEntry> = {
   "Get started": { kn: "ಪ್ರಾರಂಭಿಸಿ", hi: "शुरू करें" },
   "Get Started": { kn: "ಪ್ರಾರಂಭಿಸಿ", hi: "शुरू करें" },
   "Join as Grower": { kn: "ಬೆಳೆಗಾರರಾಗಿ ಸೇರಿ", hi: "उत्पादक के रूप में जुड़ें" },
+  "Join as Grower 🌱": { kn: "ಬೆಳೆಗಾರರಾಗಿ ಸೇರಿ 🌱", hi: "उत्पादक के रूप में जुड़ें 🌱" },
   "Partner as Restaurant": { kn: "ರೆಸ್ಟೋರೆಂಟ್ ಪಾಲುದಾರರಾಗಿ", hi: "रेस्तरां साझेदार बनें" },
+  "Partner as Restaurant 🍽️": { kn: "ರೆಸ್ಟೋರೆಂಟ್ ಪಾಲುದಾರರಾಗಿ 🍽️", hi: "रेस्तरां साझेदार बनें 🍽️" },
   "Partner With Us": { kn: "ನಮ್ಮೊಂದಿಗೆ ಪಾಲುದಾರರಾಗಿ", hi: "हमारे साथ साझेदारी करें" },
   "Partner with us": { kn: "ನಮ್ಮೊಂದಿಗೆ ಪಾಲುದಾರರಾಗಿ", hi: "हमारे साथ साझेदारी करें" },
   "Start Growing": { kn: "ಬೆಳೆಯಲು ಪ್ರಾರಂಭಿಸಿ", hi: "उगाना शुरू करें" },
@@ -45,6 +47,14 @@ export const translations: Record<string, TranslationEntry> = {
     kn: "ಬೆಳೆಗಾರ ಅಥವಾ ರೆಸ್ಟೋರೆಂಟ್ ಪಾಲುದಾರರಾಗಿ SproutBoxಗೆ ಸೇರಿ",
     hi: "उत्पादक या रेस्तरां साझेदार के रूप में SproutBox से जुड़ें",
   },
+  "Set up your growing profile in a few steps": {
+    kn: "ಕೆಲವು ಹಂತಗಳಲ್ಲಿ ನಿಮ್ಮ ಬೆಳೆಯುವ ಪ್ರೊಫೈಲ್ ಸಿದ್ಧಪಡಿಸಿ",
+    hi: "कुछ चरणों में अपना उत्पादक प्रोफ़ाइल सेट करें",
+  },
+  "Set up your restaurant profile and preferences": {
+    kn: "ನಿಮ್ಮ ರೆಸ್ಟೋರೆಂಟ್ ಪ್ರೊಫೈಲ್ ಮತ್ತು ಆದ್ಯತೆಗಳನ್ನು ಸಿದ್ಧಪಡಿಸಿ",
+    hi: "अपना रेस्तरां प्रोफ़ाइल और पसंदें सेट करें",
+  },
   "I am a": { kn: "ನಾನು", hi: "मैं हूं" },
   Grower: { kn: "ಬೆಳೆಗಾರ", hi: "उत्पादक" },
   Restaurant: { kn: "ರೆಸ್ಟೋರೆಂಟ್", hi: "रेस्तरां" },
@@ -55,6 +65,14 @@ export const translations: Record<string, TranslationEntry> = {
   Tasks: { kn: "ಕೆಲಸಗಳು", hi: "कार्य" },
   Earnings: { kn: "ಆದಾಯ", hi: "कमाई" },
   Profile: { kn: "ಪ್ರೊಫೈಲ್", hi: "प्रोफ़ाइल" },
+  Personal: { kn: "ವೈಯಕ್ತಿಕ", hi: "व्यक्तिगत" },
+  Location: { kn: "ಸ್ಥಳ", hi: "स्थान" },
+  Space: { kn: "ಜಾಗ", hi: "स्थान" },
+  Kit: { kn: "ಕಿಟ್", hi: "किट" },
+  Review: { kn: "ಪರಿಶೀಲನೆ", hi: "समीक्षा" },
+  Business: { kn: "ವ್ಯವಹಾರ", hi: "व्यवसाय" },
+  Crops: { kn: "ಬೆಳೆಗಳು", hi: "फसलें" },
+  Schedule: { kn: "ವೇಳಾಪಟ್ಟಿ", hi: "शेड्यूल" },
   "New Order": { kn: "ಹೊಸ ಆರ್ಡರ್", hi: "नया ऑर्डर" },
   "My Orders": { kn: "ನನ್ನ ಆರ್ಡರ್‌ಗಳು", hi: "मेरे ऑर्डर" },
   Orders: { kn: "ಆರ್ಡರ್‌ಗಳು", hi: "ऑर्डर" },
@@ -206,6 +224,13 @@ export const translations: Record<string, TranslationEntry> = {
   },
   "Back to SproutBox": { kn: "SproutBoxಗೆ ಹಿಂತಿರುಗಿ", hi: "SproutBox पर वापस जाएं" },
   Email: { kn: "ಇಮೇಲ್", hi: "ईमेल" },
+  Name: { kn: "ಹೆಸರು", hi: "नाम" },
+  Contact: { kn: "ಸಂಪರ್ಕ", hi: "संपर्क" },
+  PIN: { kn: "ಪಿನ್", hi: "पिन" },
+  UPI: { kn: "UPI", hi: "UPI" },
+  Light: { kn: "ಬೆಳಕು", hi: "रोशनी" },
+  Day: { kn: "ದಿನ", hi: "दिन" },
+  Frequency: { kn: "ಅವಧಿ", hi: "आवृत्ति" },
   Password: { kn: "ಪಾಸ್‌ವರ್ಡ್", hi: "पासवर्ड" },
   Confirm: { kn: "ದೃಢೀಕರಿಸಿ", hi: "पुष्टि करें" },
   "Full Name": { kn: "ಪೂರ್ಣ ಹೆಸರು", hi: "पूरा नाम" },
@@ -233,11 +258,88 @@ export const translations: Record<string, TranslationEntry> = {
     kn: "ಪಾಸ್‌ವರ್ಡ್ ಕನಿಷ್ಠ 6 ಅಕ್ಷರಗಳಿರಬೇಕು",
     hi: "पासवर्ड कम से कम 6 अक्षरों का होना चाहिए",
   },
+  "Number must be greater than 0": {
+    kn: "ಸಂಖ್ಯೆ 0 ಕ್ಕಿಂತ ಹೆಚ್ಚಿರಬೇಕು",
+    hi: "संख्या 0 से अधिक होनी चाहिए",
+  },
+  "Enter a valid growing area greater than 0 sq ft.": {
+    kn: "0 ಚ.ಅಡಿಗಿಂತ ಹೆಚ್ಚಿನ ಸರಿಯಾದ ಬೆಳೆಯುವ ವಿಸ್ತೀರ್ಣ ನಮೂದಿಸಿ.",
+    hi: "0 वर्ग फुट से अधिक सही उगाने का क्षेत्र दर्ज करें.",
+  },
+  "Choose a location on the map so address, city, and PIN code can be fetched.": {
+    kn: "ವಿಳಾಸ, ನಗರ ಮತ್ತು ಪಿನ್ ಕೋಡ್ ಪಡೆಯಲು ನಕ್ಷೆಯಲ್ಲಿ ಸ್ಥಳ ಆಯ್ಕೆಮಾಡಿ.",
+    hi: "पता, शहर और पिन कोड पाने के लिए नक्शे पर स्थान चुनें.",
+  },
   Continue: { kn: "ಮುಂದುವರಿಸಿ", hi: "जारी रखें" },
+  Back: { kn: "ಹಿಂದೆ", hi: "वापस" },
+  Register: { kn: "ನೋಂದಣಿ", hi: "रजिस्टर" },
+  "Submit Application": { kn: "ಅರ್ಜಿಯನ್ನು ಸಲ್ಲಿಸಿ", hi: "आवेदन जमा करें" },
+  "Selected address": { kn: "ಆಯ್ಕೆ ಮಾಡಿದ ವಿಳಾಸ", hi: "चुना हुआ पता" },
+  "Click the map or use current location to fetch the full address and PIN code.": {
+    kn: "ಪೂರ್ಣ ವಿಳಾಸ ಮತ್ತು ಪಿನ್ ಕೋಡ್ ಪಡೆಯಲು ನಕ್ಷೆಯಲ್ಲಿ ಕ್ಲಿಕ್ ಮಾಡಿ ಅಥವಾ ಪ್ರಸ್ತುತ ಸ್ಥಳ ಬಳಸಿ.",
+    hi: "पूरा पता और पिन कोड पाने के लिए नक्शे पर क्लिक करें या वर्तमान स्थान उपयोग करें.",
+  },
+  "Click anywhere on the map to auto-fill address and PIN code.": {
+    kn: "ವಿಳಾಸ ಮತ್ತು ಪಿನ್ ಕೋಡ್ ಸ್ವಯಂ ಭರ್ತಿಗೆ ನಕ್ಷೆಯಲ್ಲಿ ಎಲ್ಲಿಯಾದರೂ ಕ್ಲಿಕ್ ಮಾಡಿ.",
+    hi: "पता और पिन कोड अपने आप भरने के लिए नक्शे पर कहीं भी क्लिक करें.",
+  },
+  "Use current": { kn: "ಪ್ರಸ್ತುತ ಸ್ಥಳ ಬಳಸಿ", hi: "वर्तमान स्थान उपयोग करें" },
+  "Fetching...": { kn: "ಪಡೆಯುತ್ತಿದೆ...", hi: "लाया जा रहा है..." },
+  "Not found": { kn: "ಸಿಗಲಿಲ್ಲ", hi: "नहीं मिला" },
+  "Loading map...": { kn: "ನಕ್ಷೆ ಲೋಡ್ ಆಗುತ್ತಿದೆ...", hi: "नक्शा लोड हो रहा है..." },
+  "Could not fetch address for this location.": {
+    kn: "ಈ ಸ್ಥಳದ ವಿಳಾಸ ಪಡೆಯಲಾಗಲಿಲ್ಲ.",
+    hi: "इस स्थान का पता नहीं मिल सका.",
+  },
+  "Could not fetch address.": { kn: "ವಿಳಾಸ ಪಡೆಯಲಾಗಲಿಲ್ಲ.", hi: "पता नहीं मिल सका." },
+  "Current location is not supported by this browser.": {
+    kn: "ಈ ಬ್ರೌಸರ್ ಪ್ರಸ್ತುತ ಸ್ಥಳವನ್ನು ಬೆಂಬಲಿಸುವುದಿಲ್ಲ.",
+    hi: "यह ब्राउज़र वर्तमान स्थान का समर्थन नहीं करता.",
+  },
+  "Allow location access or click the map to choose manually.": {
+    kn: "ಸ್ಥಳ ಪ್ರವೇಶ ಅನುಮತಿಸಿ ಅಥವಾ ಕೈಯಾರೆ ಆಯ್ಕೆ ಮಾಡಲು ನಕ್ಷೆಯಲ್ಲಿ ಕ್ಲಿಕ್ ಮಾಡಿ.",
+    hi: "स्थान अनुमति दें या मैन्युअली चुनने के लिए नक्शे पर क्लिक करें.",
+  },
   "Grow from home": { kn: "ಮನೆಯಿಂದ ಬೆಳೆಸಿ", hi: "घर से उगाएं" },
   "Order fresh produce": { kn: "ತಾಜಾ ಉತ್ಪನ್ನ ಆರ್ಡರ್ ಮಾಡಿ", hi: "ताज़ी उपज ऑर्डर करें" },
   "Your full name": { kn: "ನಿಮ್ಮ ಪೂರ್ಣ ಹೆಸರು", hi: "आपका पूरा नाम" },
   "Min. 6 chars": { kn: "ಕನಿಷ್ಠ 6 ಅಕ್ಷರಗಳು", hi: "कम से कम 6 अक्षर" },
+  "Min. 6 characters": { kn: "ಕನಿಷ್ಠ 6 ಅಕ್ಷರಗಳು", hi: "कम से कम 6 अक्षर" },
+  "Your growing location address": {
+    kn: "ನಿಮ್ಮ ಬೆಳೆಯುವ ಸ್ಥಳದ ವಿಳಾಸ",
+    hi: "आपके उगाने के स्थान का पता",
+  },
+  "Restaurant address": { kn: "ರೆಸ್ಟೋರೆಂಟ್ ವಿಳಾಸ", hi: "रेस्तरां का पता" },
+  "Primary contact person": { kn: "ಪ್ರಾಥಮಿಕ ಸಂಪರ್ಕ ವ್ಯಕ್ತಿ", hi: "प्राथमिक संपर्क व्यक्ति" },
+  "Your restaurant name": { kn: "ನಿಮ್ಮ ರೆಸ್ಟೋರೆಂಟ್ ಹೆಸರು", hi: "आपके रेस्तरां का नाम" },
+  "name@upi": { kn: "name@upi", hi: "name@upi" },
+  "e.g. 100": { kn: "ಉದಾ. 100", hi: "जैसे 100" },
+  terrace: { kn: "ಟೆರೇಸ್", hi: "छत" },
+  balcony: { kn: "ಬಾಲ್ಕನಿ", hi: "बालकनी" },
+  room: { kn: "ಕೊಠಡಿ", hi: "कमरा" },
+  backyard: { kn: "ಹಿಂಭಾಗದ ಜಾಗ", hi: "बैकयार्ड" },
+  Terrace: { kn: "ಟೆರೇಸ್", hi: "छत" },
+  Balcony: { kn: "ಬಾಲ್ಕನಿ", hi: "बालकनी" },
+  Room: { kn: "ಕೊಠಡಿ", hi: "कमरा" },
+  Backyard: { kn: "ಹಿಂಭಾಗದ ಜಾಗ", hi: "बैकयार्ड" },
+  natural: { kn: "ನೈಸರ್ಗಿಕ", hi: "प्राकृतिक" },
+  artificial: { kn: "ಕೃತಕ", hi: "कृत्रिम" },
+  both: { kn: "ಎರಡೂ", hi: "दोनों" },
+  Natural: { kn: "ನೈಸರ್ಗಿಕ", hi: "प्राकृतिक" },
+  Artificial: { kn: "ಕೃತಕ", hi: "कृत्रिम" },
+  Both: { kn: "ಎರಡೂ", hi: "दोनों" },
+  Starter: { kn: "ಸ್ಟಾರ್ಟರ್", hi: "स्टार्टर" },
+  Standard: { kn: "ಸ್ಟ್ಯಾಂಡರ್ಡ್", hi: "स्टैंडर्ड" },
+  Pro: { kn: "ಪ್ರೊ", hi: "प्रो" },
+  Free: { kn: "ಉಚಿತ", hi: "मुफ़्त" },
+  weekly: { kn: "ವಾರಕ್ಕೊಮ್ಮೆ", hi: "साप्ताहिक" },
+  biweekly: { kn: "ಎರಡು ವಾರಕ್ಕೊಮ್ಮೆ", hi: "द्विसाप्ताहिक" },
+  Weekly: { kn: "ವಾರಕ್ಕೊಮ್ಮೆ", hi: "साप्ताहिक" },
+  Biweekly: { kn: "ಎರಡು ವಾರಕ್ಕೊಮ್ಮೆ", hi: "द्विसाप्ताहिक" },
+  "Every week": { kn: "ಪ್ರತಿ ವಾರ", hi: "हर सप्ताह" },
+  "Every 2 weeks": { kn: "ಪ್ರತಿ 2 ವಾರಗಳು", hi: "हर 2 सप्ताह" },
+  "None selected": { kn: "ಯಾವುದೂ ಆಯ್ಕೆ ಮಾಡಿಲ್ಲ", hi: "कुछ नहीं चुना" },
+  "varieties selected": { kn: "ಜಾತಿಗಳು ಆಯ್ಕೆಮಾಡಲಾಗಿದೆ", hi: "किस्में चुनी गईं" },
   Pending: { kn: "ಬಾಕಿ", hi: "लंबित" },
   Active: { kn: "ಸಕ್ರಿಯ", hi: "सक्रिय" },
   Completed: { kn: "ಪೂರ್ಣಗೊಂಡಿದೆ", hi: "पूर्ण" },
@@ -390,6 +492,10 @@ export const translations: Record<string, TranslationEntry> = {
   "/kg": { kn: "/ಕೆ.ಜಿ", hi: "/किग्रा" },
 };
 
+function translateToken(value: string, language: Exclude<LanguageCode, "en">) {
+  return translations[value]?.[language] ?? value;
+}
+
 const regexTranslations = [
   {
     pattern: /^Step (\d+)$/,
@@ -405,6 +511,13 @@ const regexTranslations = [
     pattern: /^Day (\d+) of (\d+)$/,
     replace: (language: Exclude<LanguageCode, "en">, day: string, total: string) =>
       language === "kn" ? `${total}ರಲ್ಲಿ ${day}ನೇ ದಿನ` : `${total} में से दिन ${day}`,
+  },
+  {
+    pattern: /^(.+), (.+) sq ft$/i,
+    replace: (language: Exclude<LanguageCode, "en">, spaceType: string, area: string) =>
+      language === "kn"
+        ? `${translateToken(spaceType, language)}, ${area} ಚ.ಅಡಿ`
+        : `${translateToken(spaceType, language)}, ${area} वर्ग फुट`,
   },
 ];
 
@@ -436,7 +549,11 @@ export function translateText(value: string, language: LanguageCode) {
   for (const { pattern, replace } of regexTranslations) {
     const match = key.match(pattern);
     if (match) {
-      return `${leading}${replace(language, ...match.slice(1) as [string, string])}${trailing}`;
+      const applyRegexTranslation = replace as (
+        targetLanguage: Exclude<LanguageCode, "en">,
+        ...values: string[]
+      ) => string;
+      return `${leading}${applyRegexTranslation(language, ...match.slice(1))}${trailing}`;
     }
   }
 

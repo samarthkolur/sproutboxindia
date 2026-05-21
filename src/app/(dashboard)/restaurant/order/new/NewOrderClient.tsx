@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { GlassCard } from "@/components/shared/GlassCard";
 import {
@@ -121,10 +122,12 @@ export function NewOrderClient() {
               <GlassCard key={crop} className="overflow-hidden p-0 flex flex-col h-full group hover:shadow-sprout-800/10 hover:border-sprout-700/30 transition-all duration-300">
                 {/* Product Image */}
                 <div className="relative h-44 w-full overflow-hidden bg-sprout-50">
-                  <img
+                  <Image
                     src={CROP_IMAGES[crop]}
                     alt={CROP_DISPLAY_NAMES[crop]}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    fill
+                    className="object-cover group-hover:scale-105 transition-transform duration-500"
+                    unoptimized
                   />
                   <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-md px-2.5 py-1 rounded-lg text-xs font-semibold text-sprout-800 shadow-sm border border-white/40">
                     {crop === "wheatgrass" ? "10 days" : crop === "sunflower" ? "9 days" : "7-8 days"} grow
