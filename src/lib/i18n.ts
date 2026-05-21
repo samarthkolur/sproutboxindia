@@ -61,7 +61,7 @@ export const translations: Record<string, TranslationEntry> = {
   "Sign out": { kn: "ಸೈನ್ ಔಟ್", hi: "साइन आउट" },
   "Are you sure you want to sign out of your account?": { kn: "ನಿಮ್ಮ ಖಾತೆಯಿಂದ ಸೈನ್ ಔಟ್ ಮಾಡಲು ನೀವು ಖಚಿತವಾಗಿ ಬಯಸುವಿರಾ?", hi: "क्या आप वाकई अपने खाते से साइन आउट करना चाहते हैं?" },
   "Yes, Sign Out": { kn: "ಹೌದು, ಸೈನ್ ಔಟ್ ಮಾಡಿ", hi: "हां, साइन आउट करें" },
-  Cancel: { kn: "ರದ್ದುಮಾಡಿ", hi: "रद्द करें" },
+
   "Get started": { kn: "ಪ್ರಾರಂಭಿಸಿ", hi: "शुरू करें" },
   "Get Started": { kn: "ಪ್ರಾರಂಭಿಸಿ", hi: "शुरू करें" },
   "Join as Grower": { kn: "ಬೆಳೆಗಾರರಾಗಿ ಸೇರಿ", hi: "उत्पादक के रूप में जुड़ें" },

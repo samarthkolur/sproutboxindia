@@ -82,7 +82,7 @@ export async function POST(req: Request) {
     // [Optional] Email logic could go here using Nodemailer or Resend
 
     return NextResponse.json({ success: true });
-  } catch (error: any) {
+  } catch (error) {
     console.error("[REQUEST_PICKUP_ERROR]", error);
     return NextResponse.json(
       { error: "Failed to request pickup" },

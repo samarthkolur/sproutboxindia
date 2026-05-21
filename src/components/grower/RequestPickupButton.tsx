@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { CheckCircle2, Truck } from "lucide-react";
+import { Truck } from "lucide-react";
 import { toast } from "sonner";
 
 export function RequestPickupButton({ taskId, disabled }: { taskId: string; disabled?: boolean }) {
@@ -27,9 +27,9 @@ export function RequestPickupButton({ taskId, disabled }: { taskId: string; disa
         description: "Admin has been notified for dispatch.",
       });
       router.refresh();
-    } catch (err: any) {
+    } catch (err) {
       toast.error("Error", {
-        description: err.message,
+        description: err instanceof Error ? err.message : "Unknown error",
       });
     } finally {
       setLoading(false);

@@ -6,7 +6,17 @@ import { CROP_DISPLAY_NAMES, type CropType } from "@/lib/constants";
 import { toast } from "sonner";
 import { User, Sprout, CheckCircle2 } from "lucide-react";
 
-export function DispatchClient({ dispatch }: { dispatch: any }) {
+export function DispatchClient({
+  dispatch,
+}: {
+  dispatch: {
+    id: string;
+    cropType: string;
+    trayCount: number;
+    grower: { user?: { name: string | null } | null };
+    plan?: { order?: { restaurant?: { businessName: string } | null } | null } | null;
+  };
+}) {
   const [loading, setLoading] = useState(false);
 
   const handleMarkDelivered = async () => {
@@ -16,8 +26,10 @@ export function DispatchClient({ dispatch }: { dispatch: any }) {
       toast.success("Supplies Marked Delivered", {
         description: `Grower ${dispatch.grower.user?.name || "Unknown"} has been notified.`,
       });
-    } catch (err: any) {
-      toast.error("Failed to mark delivered", { description: err.message });
+    } catch (err) {
+      toast.error("Failed to mark delivered", {
+        description: err instanceof Error ? err.message : "Unknown error",
+      });
     } finally {
       setLoading(false);
     }

@@ -107,7 +107,7 @@ export default function TutorialPage() {
               Ensure there is decent airflow in the room to prevent mold growth on the dense root mats.
             </li>
             <li className="bg-white/60 p-3 rounded-lg border border-sprout-100 text-sm text-text-primary">
-              <span className="font-semibold block mb-1">Don't overwater</span>
+              <span className="font-semibold block mb-1">Don&apos;t overwater</span>
               The soil/mat should be moist like a wrung-out sponge, never sitting in a puddle of water.
             </li>
             <li className="bg-white/60 p-3 rounded-lg border border-sprout-100 text-sm text-text-primary">

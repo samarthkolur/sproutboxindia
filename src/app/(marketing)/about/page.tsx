@@ -18,7 +18,7 @@ export default function AboutPage() {
               </span>
             </h1>
             <p className="text-xl text-text-secondary leading-relaxed max-w-2xl mx-auto">
-              We believe that the freshest, most nutritious food shouldn't travel thousands of miles. By empowering individuals to grow microgreens from home, we're building a hyper-local food system.
+              We believe that the freshest, most nutritious food shouldn&apos;t travel thousands of miles. By empowering individuals to grow microgreens from home, we&apos;re building a hyper-local food system.
             </p>
           </div>
         </section>
@@ -32,7 +32,7 @@ export default function AboutPage() {
                   <Sprout className="w-8 h-8 text-sprout-700" />
                 </div>
                 <h3 className="text-xl font-bold text-text-primary mb-3">Hyper-Local</h3>
-                <p className="text-text-secondary">Produce grown within a 5km radius of where it's consumed, maximizing freshness.</p>
+                <p className="text-text-secondary">Produce grown within a 5km radius of where it&apos;s consumed, maximizing freshness.</p>
               </div>
               <div className="text-center">
                 <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
@@ -74,7 +74,7 @@ export default function AboutPage() {
                 Instead of one massive farm supplying the city, why not have the city be the farm? By providing the seeds, training, and logistics, we allow anyone with a spare room or balcony to become a grower. SproutBox connects these home-growers directly to local restaurants that need premium greens daily.
               </p>
               <p>
-                Today, we're building the infrastructure for a distributed, resilient, and community-driven food network.
+                Today, we&apos;re building the infrastructure for a distributed, resilient, and community-driven food network.
               </p>
             </div>
           </div>

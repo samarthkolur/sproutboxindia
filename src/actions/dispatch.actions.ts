@@ -39,11 +39,12 @@ export async function markSeedsDelivered(taskId: string) {
     const task = await prisma.task.update({
       where: { id: taskId },
       data: { status: "IN_PROGRESS" },
+      include: { grower: true },
     });
 
     await prisma.notification.create({
       data: {
-        userId: (await prisma.task.findUnique({ where: { id: taskId }, select: { grower: { select: { userId: true } } } }))?.grower.userId!,
+        userId: task.grower.userId,
         title: "Seeds & Trays Delivered",
         message: `Your supplies for ${task.trayCount} trays of ${task.cropType} have been delivered. You can now start growing!`,
         type: "SUPPLIES_DELIVERED",
@@ -53,7 +54,7 @@ export async function markSeedsDelivered(taskId: string) {
     revalidatePath("/admin/dispatch");
     revalidatePath("/admin/dashboard");
     return { success: true };
-  } catch (error: any) {
-    throw new Error(error.message || "Failed to mark as delivered");
+  } catch (error) {
+    throw new Error(error instanceof Error ? error.message : "Failed to mark as delivered");
   }
 }
