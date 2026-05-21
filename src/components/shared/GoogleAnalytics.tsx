@@ -3,7 +3,7 @@ import Script from "next/script";
 const GA_MEASUREMENT_ID = "G-3S2T96R14P";
 
 export function GoogleAnalytics() {
-  if (process.env.NODE_ENV !== "production") return null;
+  // if (process.env.NODE_ENV !== "production") return null;
 
   return (
     <>

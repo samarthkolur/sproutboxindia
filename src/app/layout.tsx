@@ -8,14 +8,14 @@ import { GoogleAnalytics } from "@/components/shared/GoogleAnalytics";
 
 export const metadata: Metadata = {
   title: {
-    default: "SproutBox — Farm-fresh Microgreens Delivered",
+    default: "SproutBox",
     template: "%s | SproutBox",
   },
   description:
     "Demand-driven, decentralized microgreen production and supply platform connecting restaurants with home-based growers.",
   keywords: ["microgreens", "farm-to-fork", "B2B", "food-tech", "sustainable"],
   openGraph: {
-    title: "SproutBox — Farm-fresh Microgreens Delivered",
+    title: "SproutBox",
     description: "Demand-driven microgreen supply platform for restaurants and growers.",
     siteName: "SproutBox",
     type: "website",
