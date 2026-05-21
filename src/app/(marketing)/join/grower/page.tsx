@@ -119,7 +119,7 @@ function GrowerOnboardingForm() {
       if (!res.ok) throw new Error(result.error || "Registration failed");
       clearRegistrationPrefill();
       router.push("/login?registered=true");
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -133,13 +133,13 @@ function GrowerOnboardingForm() {
     "block text-xs font-semibold text-text-primary mb-2 uppercase tracking-wider";
 
   return (
-    <div className="min-h-screen flex items-center justify-center relative overflow-hidden py-12">
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden px-4 py-8 sm:py-12">
       <div className="absolute inset-0 bg-grid bg-grid-fade" />
       <div className="absolute inset-0 bg-dots opacity-30" />
       <div className="blob blob-animated w-[500px] h-[500px] bg-sprout-200/60 -top-40 -left-20" />
       <div className="blob blob-animated-alt w-[400px] h-[400px] bg-sprout-300/40 bottom-0 right-0" />
 
-      <div className="glass-strong p-8 sm:p-10 w-full max-w-lg mx-4 relative z-10">
+      <div className="glass-strong relative z-10 w-full max-w-lg p-5 sm:p-10">
         <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent rounded-[24px]" />
         <div className="relative z-10">
           {/* Logo */}
@@ -196,17 +196,16 @@ function GrowerOnboardingForm() {
             <div className="space-y-4">
               <div>
                 <label className={labelClass}>Space Type</label>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid gap-3 min-[420px]:grid-cols-2">
                   {(["terrace", "balcony", "room", "backyard"] as const).map((type) => (
                     <button
                       key={type}
                       type="button"
                       onClick={() => update("spaceType", type)}
-                      className={`p-3 rounded-xl border text-center transition-all text-sm font-medium capitalize ${
-                        data.spaceType === type
+                      className={`p-3 rounded-xl border text-center transition-all text-sm font-medium capitalize ${data.spaceType === type
                           ? "border-sprout-600 bg-sprout-50/80 text-sprout-800 shadow-md"
                           : "border-white/50 bg-white/40 text-text-secondary hover:bg-white/60"
-                      }`}
+                        }`}
                     >
                       {type}
                     </button>
@@ -219,17 +218,16 @@ function GrowerOnboardingForm() {
               </div>
               <div>
                 <label className={labelClass}>Light Access</label>
-                <div className="grid grid-cols-3 gap-3">
+                <div className="grid gap-3 min-[520px]:grid-cols-3">
                   {(["natural", "artificial", "both"] as const).map((type) => (
                     <button
                       key={type}
                       type="button"
                       onClick={() => update("lightAccess", type)}
-                      className={`p-3 rounded-xl border text-center transition-all text-sm font-medium capitalize ${
-                        data.lightAccess === type
+                      className={`p-3 rounded-xl border text-center transition-all text-sm font-medium capitalize ${data.lightAccess === type
                           ? "border-sprout-600 bg-sprout-50/80 text-sprout-800 shadow-md"
                           : "border-white/50 bg-white/40 text-text-secondary hover:bg-white/60"
-                      }`}
+                        }`}
                     >
                       {type}
                     </button>
@@ -250,13 +248,12 @@ function GrowerOnboardingForm() {
                       key={kit.name}
                       type="button"
                       onClick={() => update("kit", kit.name)}
-                      className={`w-full p-4 rounded-xl border text-left transition-all ${
-                        data.kit === kit.name
+                      className={`w-full p-4 rounded-xl border text-left transition-all ${data.kit === kit.name
                           ? "border-sprout-600 bg-sprout-50/80 shadow-md"
                           : "border-white/50 bg-white/40 hover:bg-white/60"
-                      }`}
+                        }`}
                     >
-                      <div className="flex items-center justify-between">
+                      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                         <div>
                           <p className="text-sm font-bold text-text-primary">{kit.name}</p>
                           <p className="text-xs text-text-muted">{kit.description} — {kit.trays} trays</p>
@@ -291,16 +288,16 @@ function GrowerOnboardingForm() {
                 { label: "Kit", value: data.kit },
                 { label: "UPI", value: data.upiId || "—" },
               ].map((item) => (
-                <div key={item.label} className="flex items-center justify-between bg-white/50 rounded-xl p-3 border border-white/40">
+                <div key={item.label} className="flex flex-col gap-1 rounded-xl border border-white/40 bg-white/50 p-3 min-[420px]:flex-row min-[420px]:items-center min-[420px]:justify-between">
                   <span className="text-xs font-semibold text-text-muted uppercase tracking-wider">{item.label}</span>
-                  <span className="text-sm font-medium text-text-primary capitalize">{item.value}</span>
+                  <span className="break-words text-sm font-medium capitalize text-text-primary min-[420px]:text-right">{item.value}</span>
                 </div>
               ))}
             </div>
           )}
 
           {/* Nav buttons */}
-          <div className="flex items-center justify-between mt-8">
+          <div className="mt-8 flex items-center justify-between gap-3">
             {step > 0 ? (
               <button onClick={back} className="text-sm font-semibold text-text-secondary hover:text-sprout-800 transition-colors">
                 ← Back

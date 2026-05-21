@@ -44,7 +44,7 @@ export default async function AnalyticsPage() {
         <p className="text-text-secondary">Platform-wide performance metrics</p>
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+      <div className="mb-8 grid gap-4 min-[480px]:grid-cols-2 lg:grid-cols-5">
         {metrics.map((m) => (
           <GlassCard key={m.label}>
             <div className={`w-12 h-12 ${m.bg} rounded-xl flex items-center justify-center mb-3`}>

@@ -45,7 +45,7 @@ export default async function GrowerEarningsPage() {
           <div className="w-14 h-14 bg-gradient-to-br from-sprout-600 to-sprout-800 rounded-2xl flex items-center justify-center shadow-lg shadow-sprout-800/20">
             <Wallet className="w-7 h-7 text-white" />
           </div>
-          <div>
+          <div className="min-w-0">
             <p className="text-sm text-text-muted font-medium">Total Earnings</p>
             <p className="text-3xl font-black text-text-primary tracking-tight">
               ₹{data.totalEarnings.toLocaleString("en-IN")}
@@ -62,7 +62,7 @@ export default async function GrowerEarningsPage() {
             {data.payouts.map((payout) => (
               <div
                 key={payout.id}
-                className="flex items-center gap-4 bg-white/50 rounded-xl p-4 border border-white/40"
+            className="flex flex-col gap-3 rounded-xl border border-white/40 bg-white/50 p-4 min-[420px]:flex-row min-[420px]:items-center min-[420px]:gap-4"
               >
                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
                   payout.status === "PAID" ? "bg-sprout-100" : "bg-amber-100"
@@ -83,7 +83,7 @@ export default async function GrowerEarningsPage() {
                     })}
                   </p>
                 </div>
-                <div className="text-right">
+                <div className="min-[420px]:text-right">
                   <p className="text-sm font-bold text-text-primary">
                     ₹{payout.amount.toLocaleString("en-IN")}
                   </p>

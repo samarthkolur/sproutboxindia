@@ -73,7 +73,7 @@ export default async function GrowerTaskDetailPage({
       {/* Check-in or Pickup CTA */}
       {isCompleted && task.status !== "HARVEST_READY" && task.status !== "HARVESTED" && task.status !== "CANCELLED" ? (
         <GlassCard>
-          <div className="flex items-center justify-between gap-4">
+          <div className="flex flex-col gap-4 min-[520px]:flex-row min-[520px]:items-center min-[520px]:justify-between">
             <div>
               <h3 className="text-base font-bold text-text-primary mb-1">
                 Microgreens are Ready!
@@ -88,7 +88,7 @@ export default async function GrowerTaskDetailPage({
         </GlassCard>
       ) : activeBatch && task.status !== "HARVESTED" && task.status !== "CANCELLED" && (
         <GlassCard>
-          <div className="flex items-start justify-between gap-4">
+          <div className="flex flex-col gap-4 min-[520px]:flex-row min-[520px]:items-start min-[520px]:justify-between">
             <div>
               <h3 className="text-base font-bold text-text-primary mb-1">
                 Day {Math.min(currentDay + 1, totalDays)} Action Required

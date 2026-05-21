@@ -35,7 +35,7 @@ export function DayInstructions({
                 : "bg-white/30 border-white/20 opacity-60"
             }`}
           >
-            <div className="flex items-start justify-between gap-3">
+            <div className="flex flex-col gap-3 min-[520px]:flex-row min-[520px]:items-start min-[520px]:justify-between">
               <div className="flex items-start gap-3 flex-1 min-w-0">
                 {/* Day indicator */}
                 <div
@@ -51,7 +51,7 @@ export function DayInstructions({
                 </div>
 
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
+                  <div className="mb-1 flex flex-wrap items-center gap-2">
                     <p className="font-semibold text-text-primary text-sm">
                       Day {day}
                     </p>

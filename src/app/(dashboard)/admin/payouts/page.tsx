@@ -29,7 +29,7 @@ export default async function PayoutsPage() {
         <p className="text-text-secondary">Manage grower payout processing</p>
       </div>
 
-      <div className="grid grid-cols-2 gap-4 mb-8">
+      <div className="mb-8 grid gap-4 sm:grid-cols-2">
         <GlassCard>
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center">

@@ -112,10 +112,10 @@ export function NewOrderClient() {
   };
 
   return (
-    <div className="grid lg:grid-cols-3 gap-8">
+    <div className="grid gap-6 lg:grid-cols-3 lg:gap-8">
       {/* Crop Catalog */}
       <div className="lg:col-span-2 space-y-6">
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="grid gap-5 md:grid-cols-2 md:gap-6">
           {CROP_TYPES.map((crop) => {
             const cartItem = cart.find((item) => item.cropType === crop);
             return (
@@ -137,11 +137,11 @@ export function NewOrderClient() {
                 {/* Product Info */}
                 <div className="p-5 flex-1 flex flex-col justify-between">
                   <div>
-                    <div className="flex items-center justify-between mb-1">
+                    <div className="mb-1 flex flex-col gap-1 min-[420px]:flex-row min-[420px]:items-start min-[420px]:justify-between">
                       <h3 className="text-lg font-bold text-text-primary group-hover:text-sprout-800 transition-colors">
                         {CROP_DISPLAY_NAMES[crop]}
                       </h3>
-                      <span className="text-lg font-black text-sprout-800">
+                      <span className="shrink-0 text-lg font-black text-sprout-800">
                         ₹{CROP_PRICE_PER_KG[crop]}<span className="text-xs font-normal text-text-muted">/kg</span>
                       </span>
                     </div>
@@ -186,7 +186,7 @@ export function NewOrderClient() {
 
       {/* Cart Summary & Delivery Details */}
       <div className="space-y-6">
-        <GlassCard className="sticky top-6">
+        <GlassCard className="lg:sticky lg:top-6">
           <div className="flex items-center gap-2 mb-6 pb-4 border-b border-sprout-200/20">
             <ShoppingCart className="w-5 h-5 text-sprout-800" />
             <h2 className="text-lg font-bold text-text-primary">Order Cart</h2>
@@ -212,8 +212,8 @@ export function NewOrderClient() {
               {/* Cart List */}
               <div className="divide-y divide-sprout-200/10 max-h-60 overflow-y-auto pr-1">
                 {cart.map((item) => (
-                  <div key={item.cropType} className="py-3 flex items-center justify-between first:pt-0 last:pb-0">
-                    <div>
+                  <div key={item.cropType} className="flex flex-col gap-2 py-3 first:pt-0 last:pb-0 min-[420px]:flex-row min-[420px]:items-center min-[420px]:justify-between">
+                    <div className="min-w-0">
                       <h4 className="text-sm font-bold text-text-primary">
                         {CROP_DISPLAY_NAMES[item.cropType]}
                       </h4>
@@ -221,7 +221,7 @@ export function NewOrderClient() {
                         {item.quantityKg} kg @ ₹{CROP_PRICE_PER_KG[item.cropType]}/kg
                       </p>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center justify-between gap-2 min-[420px]:justify-end">
                       <span className="text-sm font-bold text-text-primary">
                         ₹{item.quantityKg * CROP_PRICE_PER_KG[item.cropType]}
                       </span>
@@ -262,7 +262,7 @@ export function NewOrderClient() {
 
               {/* Total & Submit */}
               <div className="pt-4 border-t border-sprout-200/20 space-y-4">
-                <div className="flex items-center justify-between text-base">
+                <div className="flex items-center justify-between gap-3 text-base">
                   <span className="font-bold text-text-secondary">Estimated Total</span>
                   <span className="text-xl font-black text-sprout-800">
                     ₹{totalAmount.toLocaleString("en-IN")}

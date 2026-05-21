@@ -27,14 +27,14 @@ export default async function RestaurantOrdersPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-8">
+      <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-3xl font-black text-text-primary tracking-tight">My Orders</h1>
           <p className="text-text-secondary mt-1">View and track all your orders</p>
         </div>
         <Link
           href="/restaurant/order/new"
-          className="inline-flex items-center gap-2 bg-sprout-800 text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-sprout-900 transition-all"
+          className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-sprout-800 px-5 py-2.5 text-sm font-semibold text-white transition-all hover:bg-sprout-900 sm:w-auto"
         >
           New Order <ArrowRight className="w-4 h-4" />
         </Link>
@@ -51,7 +51,7 @@ export default async function RestaurantOrdersPage() {
               <GlassCard key={order.id} padding="sm">
                 <Link
                   href={`/restaurant/orders/${order.id}`}
-                  className="flex items-center gap-4 cursor-pointer group row-hover rounded-xl w-full block"
+                  className="flex w-full flex-col gap-3 rounded-xl row-hover cursor-pointer group min-[520px]:flex-row min-[520px]:items-center min-[520px]:gap-4"
                 >
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
@@ -65,8 +65,8 @@ export default async function RestaurantOrdersPage() {
                       · {order.createdAt.toLocaleDateString("en-IN", { month: "short", day: "numeric", year: "numeric" })}
                     </p>
                   </div>
-                  <p className="text-sm font-bold text-text-primary">₹{order.totalPrice.toLocaleString("en-IN")}</p>
-                  <ChevronRight className="w-4 h-4 text-text-muted group-hover:text-sprout-800 transition-all" />
+                  <p className="text-sm font-bold text-text-primary min-[520px]:text-right">₹{order.totalPrice.toLocaleString("en-IN")}</p>
+                  <ChevronRight className="hidden h-4 w-4 text-text-muted transition-all group-hover:text-sprout-800 min-[520px]:block" />
                 </Link>
               </GlassCard>
             );

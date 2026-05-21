@@ -133,7 +133,7 @@ export default function LeafletAddressMap({
         center={position}
         zoom={value ? 15 : 12}
         scrollWheelZoom
-        className="h-56 w-full"
+        className="h-64 w-full sm:h-56"
       >
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
@@ -154,7 +154,7 @@ export default function LeafletAddressMap({
         {loading ? "Fetching..." : "Use current"}
       </button>
 
-      <div className="absolute bottom-3 left-3 right-3 z-[500] rounded-xl bg-white/90 px-3 py-2 text-xs font-semibold text-text-secondary shadow-lg shadow-sprout-900/10">
+      <div className="absolute bottom-3 left-3 right-3 z-[500] rounded-xl bg-white/90 px-3 py-2 text-[11px] font-semibold text-text-secondary shadow-lg shadow-sprout-900/10 sm:text-xs">
         {error || "Click anywhere on the map to auto-fill address and PIN code."}
       </div>
     </div>

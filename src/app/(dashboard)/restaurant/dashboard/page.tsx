@@ -54,7 +54,7 @@ export default async function RestaurantDashboard() {
   return (
     <RestaurantDashboardClient>
       {/* Header */}
-      <div className="flex items-center justify-between mb-8">
+      <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-3xl font-black text-text-primary tracking-tight">
             Welcome back
@@ -65,7 +65,7 @@ export default async function RestaurantDashboard() {
         </div>
         <Link
           href="/restaurant/order/new"
-          className="inline-flex items-center gap-2 bg-sprout-800 text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-sprout-900 transition-all hover:shadow-lg hover:shadow-sprout-800/20 active:scale-[0.98]"
+          className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-sprout-800 px-5 py-2.5 text-sm font-semibold text-white transition-all hover:bg-sprout-900 hover:shadow-lg hover:shadow-sprout-800/20 active:scale-[0.98] sm:w-auto"
         >
           New Order
           <Plus className="w-4 h-4" strokeWidth={2.5} />
@@ -73,7 +73,7 @@ export default async function RestaurantDashboard() {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <div className="mb-8 grid gap-4 min-[480px]:grid-cols-2 lg:grid-cols-4">
         <StatCard
           label="Active Orders"
           value={data.activeOrders}
@@ -107,7 +107,7 @@ export default async function RestaurantDashboard() {
         {/* Recent Orders — 2 cols */}
         <div className="lg:col-span-2">
           <GlassCard>
-            <div className="flex items-center justify-between mb-5">
+            <div className="mb-5 flex flex-col gap-2 min-[420px]:flex-row min-[420px]:items-center min-[420px]:justify-between">
               <h2 className="text-lg font-bold text-text-primary">Recent Orders</h2>
               <Link
                 href="/restaurant/orders"
@@ -123,7 +123,7 @@ export default async function RestaurantDashboard() {
                 {data.recentOrders.map((order) => (
                   <div
                     key={order.id}
-                    className="flex items-center gap-4 bg-white/50 rounded-xl p-4 border border-white/40 row-hover cursor-pointer group"
+                    className="flex flex-col gap-3 rounded-xl border border-white/40 bg-white/50 p-4 row-hover cursor-pointer group min-[520px]:flex-row min-[520px]:items-center min-[520px]:gap-4"
                   >
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
@@ -159,13 +159,13 @@ export default async function RestaurantDashboard() {
                       />
                     </div>
 
-                    <div className="text-right flex-shrink-0">
+                    <div className="flex-shrink-0 min-[520px]:text-right">
                       <p className="text-sm font-bold text-text-primary">
                         ₹{order.totalPrice.toLocaleString("en-IN")}
                       </p>
                       <p className="text-[11px] text-text-muted">{order.date}</p>
                     </div>
-                    <ChevronRight className="w-4 h-4 text-text-muted flex-shrink-0 group-hover:text-sprout-800 group-hover:translate-x-0.5 transition-all" />
+                    <ChevronRight className="hidden h-4 w-4 flex-shrink-0 text-text-muted transition-all group-hover:translate-x-0.5 group-hover:text-sprout-800 min-[520px]:block" />
                   </div>
                 ))}
               </div>

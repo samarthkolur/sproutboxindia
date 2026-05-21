@@ -106,7 +106,7 @@ export default async function GrowerTasksPage() {
 
                   return (
                     <GlassCard key={task.id}>
-                      <div className="flex items-start justify-between mb-4">
+                      <div className="mb-4 flex flex-col gap-3 min-[560px]:flex-row min-[560px]:items-start min-[560px]:justify-between">
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-1">
                             <h2 className="text-lg font-bold text-text-primary">
@@ -129,7 +129,7 @@ export default async function GrowerTasksPage() {
                             {totalDays}
                           </p>
                         </div>
-                        <div className="flex items-center gap-2 ml-4">
+                        <div className="flex items-center gap-2 min-[560px]:ml-4">
                           <div className="flex items-center gap-1 text-xs text-text-muted">
                             <Calendar className="w-3.5 h-3.5" />
                             <span>
@@ -176,7 +176,7 @@ export default async function GrowerTasksPage() {
                       )}
 
                       {/* Actions */}
-                      <div className="flex items-center justify-between">
+                      <div className="flex flex-col gap-3 min-[520px]:flex-row min-[520px]:items-center min-[520px]:justify-between">
                         {isCompleted && task.status !== "HARVEST_READY" && task.status !== "HARVESTED" ? (
                           <RequestPickupButton taskId={task.id} />
                         ) : activeBatch && !alreadyCheckedInToday ? (
@@ -222,7 +222,7 @@ export default async function GrowerTasksPage() {
                     <Link
                       key={task.id}
                       href={`/grower/tasks/${task.id}`}
-                      className="flex items-center gap-4 bg-white/40 rounded-xl p-4 border border-white/30 hover:bg-white/60 transition-all group"
+                      className="flex items-center gap-3 rounded-xl border border-white/30 bg-white/40 p-4 transition-all hover:bg-white/60 group sm:gap-4"
                     >
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-0.5">

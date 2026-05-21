@@ -67,9 +67,9 @@ export default function RegisterPage() {
   return (
     <div>
       {/* Logo */}
-      <BrandLogo className="mb-8" markClassName="h-10 w-10" textClassName="text-xl" />
+      <BrandLogo className="mb-6 sm:mb-8" markClassName="h-10 w-10" textClassName="text-xl" />
 
-      <h1 className="text-3xl font-black text-text-primary mb-1 tracking-tight">
+      <h1 className="text-2xl font-black text-text-primary mb-1 tracking-tight sm:text-3xl">
         Create your account
       </h1>
       <p className="text-text-secondary text-sm mb-8">
@@ -88,17 +88,16 @@ export default function RegisterPage() {
           <label className="block text-xs font-semibold text-text-primary mb-2 uppercase tracking-wider">
             I am a
           </label>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid gap-3 min-[420px]:grid-cols-2">
             <button
               type="button"
               onClick={() =>
                 setFormData((prev) => ({ ...prev, role: "GROWER" }))
               }
-              className={`p-4 rounded-xl border text-center transition-all group ${
-                formData.role === "GROWER"
+              className={`p-4 rounded-xl border text-center transition-all group ${formData.role === "GROWER"
                   ? "border-sprout-600 bg-sprout-50/80 shadow-md shadow-sprout-800/10"
                   : "border-white/50 bg-white/40 hover:bg-white/60 hover:border-white/70"
-              }`}
+                }`}
             >
               <span className="text-2xl mb-1.5 block group-hover:scale-110 transition-transform">🌱</span>
               <span className={`text-sm font-semibold ${formData.role === "GROWER" ? "text-sprout-800" : "text-text-secondary"}`}>
@@ -113,11 +112,10 @@ export default function RegisterPage() {
               onClick={() =>
                 setFormData((prev) => ({ ...prev, role: "RESTAURANT" }))
               }
-              className={`p-4 rounded-xl border text-center transition-all group ${
-                formData.role === "RESTAURANT"
+              className={`p-4 rounded-xl border text-center transition-all group ${formData.role === "RESTAURANT"
                   ? "border-sprout-600 bg-sprout-50/80 shadow-md shadow-sprout-800/10"
                   : "border-white/50 bg-white/40 hover:bg-white/60 hover:border-white/70"
-              }`}
+                }`}
             >
               <span className="text-2xl mb-1.5 block group-hover:scale-110 transition-transform">🍽️</span>
               <span className={`text-sm font-semibold ${formData.role === "RESTAURANT" ? "text-sprout-800" : "text-text-secondary"}`}>
@@ -170,7 +168,7 @@ export default function RegisterPage() {
           />
         </div>
 
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid gap-3 sm:grid-cols-2">
           <div>
             <label
               htmlFor="reg-password"

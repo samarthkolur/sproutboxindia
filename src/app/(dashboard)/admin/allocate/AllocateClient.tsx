@@ -264,7 +264,7 @@ export function AllocateClient({
 
   // ── Main layout ──────────────────────────────────────────────────────────────
   return (
-    <div className="grid lg:grid-cols-2 gap-6">
+    <div className="grid gap-6 lg:grid-cols-2">
       {/* ── LEFT: Plan selection ────────────────────────────────────────────── */}
       <div className="space-y-3">
         <h2 className="text-sm font-bold text-text-muted uppercase tracking-wider mb-3">
@@ -296,7 +296,7 @@ export function AllocateClient({
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-0.5">
+                    <div className="mb-0.5 flex flex-wrap items-center gap-2">
                       <p className="text-sm font-bold text-text-primary truncate">
                         {plan.order.restaurant.businessName}
                       </p>
@@ -331,7 +331,7 @@ export function AllocateClient({
                     />
                   )}
                 </div>
-                <div className="flex items-center gap-4 mt-3 text-[11px] text-text-muted">
+                <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-text-muted">
                   <span>
                     Sow:{" "}
                     {new Date(plan.sowDate).toLocaleDateString("en-IN", {
@@ -359,8 +359,8 @@ export function AllocateClient({
         {selectedPlan ? (
           <GlassCard>
             {/* Header */}
-            <div className="flex items-start justify-between mb-1">
-              <div>
+            <div className="mb-1 flex flex-col gap-3 min-[520px]:flex-row min-[520px]:items-start min-[520px]:justify-between">
+              <div className="min-w-0">
                 <h2 className="text-base font-bold text-text-primary">
                   Assign Trays
                 </h2>
@@ -373,14 +373,14 @@ export function AllocateClient({
               </div>
               <button
                 onClick={handleAutoAllocate}
-                className="text-xs font-semibold text-sprout-700 bg-sprout-100 hover:bg-sprout-200 px-3 py-1.5 rounded-lg transition-colors flex-shrink-0"
+                className="flex-shrink-0 rounded-lg bg-sprout-100 px-3 py-1.5 text-xs font-semibold text-sprout-700 transition-colors hover:bg-sprout-200"
               >
                 Auto-Allocate
               </button>
             </div>
 
             {/* Direct delivery notice */}
-            <div className="flex items-center gap-2 bg-blue-50/60 border border-blue-200/40 rounded-xl px-3 py-2 mb-4 mt-3">
+            <div className="mb-4 mt-3 flex items-start gap-2 rounded-xl border border-blue-200/40 bg-blue-50/60 px-3 py-2">
               <Navigation className="w-3.5 h-3.5 text-blue-600 flex-shrink-0" />
               <p className="text-[11px] text-blue-700">
                 Direct delivery — growers ship straight to restaurant. Nearest growers ranked first.
@@ -389,7 +389,7 @@ export function AllocateClient({
 
             {/* Progress bar */}
             <div className="mb-4">
-              <div className="flex items-center justify-between text-xs mb-1.5">
+              <div className="mb-1.5 flex flex-col gap-1 text-xs min-[420px]:flex-row min-[420px]:items-center min-[420px]:justify-between">
                 <span className="text-text-muted">
                   {totalAssigned} / {selectedPlan.totalTrays} trays
                 </span>
@@ -426,7 +426,7 @@ export function AllocateClient({
                 {allocations.map((a, rank) => (
                   <div
                     key={a.growerId}
-                    className={`flex items-center gap-3 rounded-xl px-3 py-2.5 border transition-all ${
+                    className={`flex flex-col gap-3 rounded-xl border px-3 py-2.5 transition-all min-[520px]:flex-row min-[520px]:items-center ${
                       rank === 0
                         ? "bg-sprout-50/70 border-sprout-300/40"
                         : "bg-white/60 border-white/40"
@@ -446,7 +446,7 @@ export function AllocateClient({
                     </span>
 
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-1.5">
+                      <div className="flex flex-wrap items-center gap-1.5">
                         <p className="text-sm font-semibold text-text-primary truncate">
                           {a.growerName}
                         </p>
@@ -456,7 +456,7 @@ export function AllocateClient({
                           </span>
                         )}
                       </div>
-                      <div className="flex items-center gap-3 mt-0.5">
+                      <div className="mt-0.5 flex flex-wrap items-center gap-x-3 gap-y-1">
                         {/* Distance */}
                         <span className="flex items-center gap-0.5 text-[10px] text-text-muted">
                           <MapPin className="w-2.5 h-2.5" />
@@ -482,7 +482,7 @@ export function AllocateClient({
                     </div>
 
                     {/* Tray input */}
-                    <div className="flex items-center gap-1 flex-shrink-0">
+                    <div className="flex flex-shrink-0 items-center justify-end gap-1">
                       <input
                         type="number"
                         min={0}

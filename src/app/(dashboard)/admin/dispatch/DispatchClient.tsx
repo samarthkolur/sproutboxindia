@@ -39,8 +39,8 @@ export function DispatchClient({
 
   return (
     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white/50 rounded-xl p-4 border border-white/40 row-hover">
-      <div className="flex-1">
-        <div className="flex items-center gap-2 mb-2">
+      <div className="min-w-0 flex-1">
+        <div className="mb-2 flex flex-wrap items-center gap-2">
           <span className="text-xs font-bold px-2 py-1 bg-amber-100 text-amber-700 rounded-md">
             PENDING DISPATCH
           </span>
@@ -48,8 +48,8 @@ export function DispatchClient({
             {cropName} ({dispatch.trayCount} trays)
           </span>
         </div>
-        
-        <div className="grid grid-cols-2 gap-4 text-sm">
+
+        <div className="grid gap-2 text-sm sm:grid-cols-2 sm:gap-4">
           <div className="flex items-center gap-1.5 text-text-secondary">
             <User className="w-4 h-4 text-text-muted" />
             <span className="truncate">Grower: {dispatch.grower.user?.name || "Unknown"}</span>
@@ -64,7 +64,7 @@ export function DispatchClient({
       <button
         onClick={handleMarkDelivered}
         disabled={loading}
-        className="flex items-center justify-center gap-2 px-5 py-2.5 bg-sprout-800 text-white text-sm font-semibold rounded-xl hover:bg-sprout-900 transition-all shadow-md active:scale-95 disabled:opacity-50"
+        className="flex w-full items-center justify-center gap-2 rounded-xl bg-sprout-800 px-5 py-2.5 text-sm font-semibold text-white shadow-md transition-all hover:bg-sprout-900 active:scale-95 disabled:opacity-50 md:w-auto"
       >
         {loading ? (
           <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />

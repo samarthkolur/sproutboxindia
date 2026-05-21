@@ -69,9 +69,9 @@ export function PayoutClient({ initialPayouts }: { initialPayouts: PayoutItem[] 
         {payouts.map((p) => (
           <div
             key={p.id}
-            className="flex items-center justify-between bg-white/50 rounded-xl p-4 border border-white/40 row-hover"
+            className="flex flex-col gap-4 rounded-xl border border-white/40 bg-white/50 p-4 row-hover sm:flex-row sm:items-center sm:justify-between"
           >
-            <div className="flex items-center gap-4">
+            <div className="flex min-w-0 items-center gap-4">
               <div
                 className={`w-10 h-10 rounded-xl flex items-center justify-center ${
                   p.status === "PAID" ? "bg-sprout-100" : "bg-amber-100"
@@ -83,7 +83,7 @@ export function PayoutClient({ initialPayouts }: { initialPayouts: PayoutItem[] 
                   <Clock className="w-5 h-5 text-amber-600" />
                 )}
               </div>
-              <div>
+              <div className="min-w-0">
                 <p className="text-sm font-semibold text-text-primary">
                   {p.grower.user.name}
                 </p>
@@ -97,7 +97,7 @@ export function PayoutClient({ initialPayouts }: { initialPayouts: PayoutItem[] 
               </div>
             </div>
             
-            <div className="flex items-center gap-4">
+            <div className="flex items-center justify-between gap-4 sm:justify-end">
               <div className="text-right">
                 <p className="text-sm font-bold text-text-primary">
                   ₹{p.amount.toLocaleString("en-IN")}

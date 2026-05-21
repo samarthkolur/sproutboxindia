@@ -16,7 +16,7 @@ export default async function AdminGrowerDetailPage({ params }: { params: { grow
         <h1 className="text-3xl font-black text-text-primary">{grower.user.name || grower.user.email}</h1>
         <p className="mt-2 text-text-muted">{grower.address}, {grower.city}</p>
       </GlassCard>
-      <div className="grid gap-4 md:grid-cols-4">
+      <div className="grid gap-4 min-[480px]:grid-cols-2 md:grid-cols-4">
         <GlassCard><p className="text-sm text-text-muted">Composite</p><p className="text-2xl font-black">{Math.round(grower.compositeScore * 100)}%</p></GlassCard>
         <GlassCard><p className="text-sm text-text-muted">Yield</p><p className="text-2xl font-black">{Math.round(grower.yieldScore * 100)}%</p></GlassCard>
         <GlassCard><p className="text-sm text-text-muted">Quality</p><p className="text-2xl font-black">{Math.round(grower.qualityScore * 100)}%</p></GlassCard>

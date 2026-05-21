@@ -20,7 +20,7 @@ export default async function DashboardLayout({
   const userName = session.user.name || "User";
 
   return (
-    <div className="min-h-screen flex relative">
+    <div className="relative flex min-h-screen overflow-x-hidden">
       {/* Scroll progress indicator */}
       <ScrollProgress />
 
@@ -48,8 +48,8 @@ export default async function DashboardLayout({
       />
 
       {/* Main content */}
-      <main className="flex-1 lg:ml-[260px] relative z-10">
-        <div className="p-6 lg:p-8 max-w-7xl mx-auto pt-20 lg:pt-8">{children}</div>
+      <main className="relative z-10 min-w-0 flex-1 lg:ml-[260px]">
+        <div className="mx-auto max-w-7xl px-4 pb-24 pt-16 sm:px-6 lg:p-8">{children}</div>
       </main>
     </div>
   );

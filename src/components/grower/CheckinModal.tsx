@@ -74,10 +74,10 @@ export function CheckinModal({ batchId, day }: { batchId: string; day: number })
           className="fixed inset-0 z-50 grid place-items-center bg-black/40 p-4 backdrop-blur-sm"
           onClick={(e) => e.target === e.currentTarget && closeModal()}
         >
-          <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl">
+          <div className="max-h-[calc(100svh-2rem)] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-4 shadow-2xl sm:p-6">
             {/* Header */}
-            <div className="flex items-center justify-between mb-5">
-              <div>
+            <div className="mb-5 flex items-start justify-between gap-3">
+              <div className="min-w-0">
                 <h3 className="text-lg font-bold text-text-primary">
                   Day {day} Check-In
                 </h3>
@@ -130,7 +130,7 @@ export function CheckinModal({ batchId, day }: { batchId: string; day: number })
                 )}
 
                 {/* Actions */}
-                <div className="flex justify-end gap-2">
+                <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
                   <Button
                     type="button"
                     variant="outline"

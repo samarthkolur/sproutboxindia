@@ -9,24 +9,24 @@ export default function AboutPage() {
 
       <main className="flex-1">
         {/* Hero Section */}
-        <section className="pt-32 pb-16 px-6 lg:px-8">
+        <section className="px-4 pb-12 pt-24 sm:px-6 sm:pb-16 sm:pt-32 lg:px-8">
           <div className="max-w-4xl mx-auto text-center">
-            <h1 className="text-5xl lg:text-6xl font-black text-text-primary tracking-tight mb-6">
+            <h1 className="mb-6 text-4xl font-black tracking-tight text-text-primary sm:text-5xl lg:text-6xl">
               Our Mission is to <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-sprout-600 to-sprout-800">
                 Decentralize Farming
               </span>
             </h1>
-            <p className="text-xl text-text-secondary leading-relaxed max-w-2xl mx-auto">
+            <p className="mx-auto max-w-2xl text-base leading-relaxed text-text-secondary sm:text-xl">
               We believe that the freshest, most nutritious food shouldn&apos;t travel thousands of miles. By empowering individuals to grow microgreens from home, we&apos;re building a hyper-local food system.
             </p>
           </div>
         </section>
 
         {/* Values Section */}
-        <section className="py-24 bg-white px-6 lg:px-8">
+        <section className="bg-white px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
           <div className="max-w-6xl mx-auto">
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-12">
+            <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-4 lg:gap-12">
               <div className="text-center">
                 <div className="w-16 h-16 bg-sprout-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
                   <Sprout className="w-8 h-8 text-sprout-700" />
@@ -60,10 +60,10 @@ export default function AboutPage() {
         </section>
 
         {/* Story Section */}
-        <section className="py-24 px-6 lg:px-8">
+        <section className="px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
           <div className="max-w-3xl mx-auto">
             <h2 className="text-3xl font-black text-text-primary mb-6 text-center">Our Story</h2>
-            <div className="space-y-6 text-lg text-text-secondary leading-relaxed bg-white/50 backdrop-blur-sm p-8 rounded-3xl border border-white/60 shadow-xl shadow-sprout-900/5">
+            <div className="space-y-6 rounded-2xl border border-white/60 bg-white/50 p-5 text-base leading-relaxed text-text-secondary shadow-xl shadow-sprout-900/5 backdrop-blur-sm sm:rounded-3xl sm:p-8 sm:text-lg">
               <p>
                 SproutBox started with a simple observation: restaurants were struggling to get consistent, fresh, and high-quality microgreens, while urban spaces sat empty and unused.
               </p>

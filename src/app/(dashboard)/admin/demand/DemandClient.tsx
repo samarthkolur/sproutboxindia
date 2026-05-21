@@ -50,7 +50,7 @@ export function DemandClient({ initialOrders }: { initialOrders: OrderItem[] }) 
     <div className="space-y-4">
       {/* Success banner with CTA to allocate */}
       {createdPlanIds.length > 0 && (
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 rounded-xl border border-sprout-500/30 bg-sprout-50 px-5 py-4">
+        <div className="flex flex-col gap-4 rounded-xl border border-sprout-500/30 bg-sprout-50 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-5">
           <div className="flex items-center gap-3">
             <Check className="w-5 h-5 text-sprout-700 flex-shrink-0" />
             <div>
@@ -64,7 +64,7 @@ export function DemandClient({ initialOrders }: { initialOrders: OrderItem[] }) 
           </div>
           <Link
             href="/admin/allocate"
-            className="flex items-center gap-2 bg-sprout-800 text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-sprout-900 transition-all hover:shadow-lg hover:shadow-sprout-800/20 flex-shrink-0"
+            className="flex w-full flex-shrink-0 items-center justify-center gap-2 rounded-xl bg-sprout-800 px-4 py-2 text-sm font-semibold text-white transition-all hover:bg-sprout-900 hover:shadow-lg hover:shadow-sprout-800/20 sm:w-auto"
           >
             <Target className="w-4 h-4" />
             Allocate Now
@@ -100,8 +100,8 @@ export function DemandClient({ initialOrders }: { initialOrders: OrderItem[] }) 
 
           return (
             <GlassCard key={order.id}>
-              <div className="flex items-start justify-between mb-4">
-                <div>
+              <div className="mb-4 flex flex-col gap-3 min-[520px]:flex-row min-[520px]:items-start min-[520px]:justify-between">
+                <div className="min-w-0">
                   <div className="flex items-center gap-2 mb-1">
                     <h3 className="text-lg font-bold text-text-primary">
                       {order.id.slice(0, 8).toUpperCase()}
@@ -114,7 +114,7 @@ export function DemandClient({ initialOrders }: { initialOrders: OrderItem[] }) 
                     {order.quantityKg}kg
                   </p>
                 </div>
-                <div className="text-right">
+                <div className="shrink-0 min-[520px]:text-right">
                   <p className="text-sm text-text-muted">
                     Delivery:{" "}
                     {new Date(order.deliveryDate).toLocaleDateString("en-IN", {
@@ -128,7 +128,7 @@ export function DemandClient({ initialOrders }: { initialOrders: OrderItem[] }) 
                 </div>
               </div>
 
-              <div className="grid grid-cols-3 gap-2 sm:gap-4 bg-sprout-50/50 rounded-xl p-4 border border-sprout-200/30 mb-4">
+              <div className="mb-4 grid gap-3 rounded-xl border border-sprout-200/30 bg-sprout-50/50 p-4 sm:grid-cols-3 sm:gap-4">
                 <div>
                   <p className="text-[11px] text-text-muted uppercase tracking-wider font-semibold">
                     Base Trays

@@ -68,7 +68,7 @@ export default async function GrowerDashboard() {
         </div>
         <a 
           href="/grower/tutorial"
-          className="flex items-center gap-2 bg-sprout-50 hover:bg-sprout-100 text-sprout-800 px-4 py-2 rounded-xl text-sm font-semibold border border-sprout-200 transition-colors"
+          className="flex w-full items-center justify-center gap-2 rounded-xl border border-sprout-200 bg-sprout-50 px-4 py-2 text-sm font-semibold text-sprout-800 transition-colors hover:bg-sprout-100 md:w-auto"
         >
           <BookOpen className="w-4 h-4" />
           How to Grow Guide
@@ -76,7 +76,7 @@ export default async function GrowerDashboard() {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <div className="mb-8 grid gap-4 min-[480px]:grid-cols-2 lg:grid-cols-4">
         <StatCard
           label="Active Trays"
           value={data.activeTrays}
@@ -112,7 +112,7 @@ export default async function GrowerDashboard() {
         {/* Active Tasks — 2 cols */}
         <div className="lg:col-span-2">
           <GlassCard>
-            <div className="flex items-center justify-between mb-5">
+            <div className="mb-5 flex flex-col gap-2 min-[420px]:flex-row min-[420px]:items-center min-[420px]:justify-between">
               <h2 className="text-lg font-bold text-text-primary">Active Tasks</h2>
               <span className="text-xs font-semibold text-sprout-600 bg-sprout-100 px-3 py-1 rounded-full">
                 {data.tasks.length} tasks
@@ -130,7 +130,7 @@ export default async function GrowerDashboard() {
                   return (
                     <div
                       key={task.id}
-                      className="flex items-center gap-4 bg-white/50 rounded-xl p-4 border border-white/40 row-hover cursor-pointer group"
+                      className="flex flex-col gap-3 rounded-xl border border-white/40 bg-white/50 p-4 row-hover cursor-pointer group min-[520px]:flex-row min-[520px]:items-center min-[520px]:gap-4"
                     >
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
@@ -155,19 +155,19 @@ export default async function GrowerDashboard() {
                       </div>
 
                       {/* Progress bar */}
-                      <div className="w-32 flex-shrink-0">
+                      <div className="w-full flex-shrink-0 min-[520px]:w-32">
                         <div className="w-full bg-sprout-100 rounded-full h-1.5">
                           <div
                             className="bg-gradient-to-r from-sprout-600 to-sprout-500 h-1.5 rounded-full progress-bar-animate"
                             style={{ width: `${progress}%` }}
                           />
                         </div>
-                        <p className="text-[10px] text-text-muted mt-1 text-right">
+                        <p className="mt-1 text-right text-[10px] text-text-muted">
                           {progress}%
                         </p>
                       </div>
 
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center justify-end gap-2">
                         {task.currentDay >= task.totalDays && task.status !== "harvest-ready" && task.status !== "harvested" && (
                           <RequestPickupButton taskId={task.id} />
                         )}
@@ -238,13 +238,13 @@ export default async function GrowerDashboard() {
       {/* Earnings overview row */}
       <div className="mt-6">
         <GlassCard>
-          <div className="flex items-center justify-between mb-4">
+          <div className="mb-4 flex flex-col gap-1 min-[420px]:flex-row min-[420px]:items-center min-[420px]:justify-between">
             <h2 className="text-lg font-bold text-text-primary">Weekly Earnings</h2>
             <span className="text-xs text-text-muted">
               Last {earningsData.length} periods
             </span>
           </div>
-          <div className="flex items-end gap-3 h-32">
+          <div className="flex h-32 items-end gap-1.5 sm:gap-3">
             {earningsData.length > 0 ? (
               earningsData.map((item, i) => (
                 <div
@@ -274,7 +274,7 @@ export default async function GrowerDashboard() {
               </div>
             )}
           </div>
-          <div className="flex items-center justify-between mt-3 pt-3 border-t border-white/30">
+          <div className="mt-3 flex flex-col gap-1 border-t border-white/30 pt-3 min-[420px]:flex-row min-[420px]:items-center min-[420px]:justify-between">
             <span className="text-sm text-text-muted">Total earned</span>
             <span className="text-lg font-black text-sprout-800">
               ₹{totalEarnings.toLocaleString("en-IN")}

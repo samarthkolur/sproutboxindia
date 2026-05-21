@@ -41,7 +41,7 @@ export function AddressMapPicker({
         {value ? (
           <div className="space-y-2 text-sm">
             <p className="leading-relaxed text-text-primary">{value.address}</p>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid gap-2 min-[420px]:grid-cols-2">
               <div className="rounded-xl bg-white/50 px-3 py-2">
                 <p className="text-[10px] font-semibold uppercase tracking-wider text-text-muted">
                   City

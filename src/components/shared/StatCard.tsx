@@ -32,9 +32,9 @@ export function StatCard({
         : Minus;
 
   return (
-    <div className={cn("glass-card p-5 group hover:shadow-lg hover:shadow-sprout-500/10 transition-all duration-300", className)}>
+    <div className={cn("glass-card p-4 sm:p-5 group hover:shadow-lg hover:shadow-sprout-500/10 transition-all duration-300", className)}>
       <div className="flex items-start justify-between mb-3">
-        <p className="text-[11px] font-semibold text-text-muted uppercase tracking-wider">
+        <p className="text-[10px] sm:text-[11px] font-semibold text-text-muted uppercase tracking-wider leading-tight">
           {label}
         </p>
         {icon && (
@@ -43,7 +43,7 @@ export function StatCard({
           </div>
         )}
       </div>
-      <p className="text-2xl font-black text-text-primary mb-1 tracking-tight">{value}</p>
+      <p className="text-xl sm:text-2xl font-black text-text-primary mb-1 tracking-tight break-words">{value}</p>
       {change && (
         <div className={cn("flex items-center gap-1", changeColors[changeType])}>
           <TrendIcon className="w-3 h-3" strokeWidth={2.5} />

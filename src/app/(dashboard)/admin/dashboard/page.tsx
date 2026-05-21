@@ -91,7 +91,7 @@ export default async function AdminDashboard() {
       </div>
 
       {/* KPI Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mb-8">
+      <div className="mb-8 grid gap-4 min-[480px]:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
         <StatCard
           label="Active Orders"
           value={kpis.activeOrders}
@@ -133,7 +133,7 @@ export default async function AdminDashboard() {
       </div>
 
       {/* Pending Actions */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {pendingActions.map((action) => {
           const Icon = action.icon;
           return (
@@ -166,7 +166,7 @@ export default async function AdminDashboard() {
         {/* Recent Orders — 2 cols */}
         <div className="lg:col-span-2 space-y-6">
           <GlassCard>
-            <div className="flex items-center justify-between mb-5">
+            <div className="mb-5 flex flex-col gap-2 min-[420px]:flex-row min-[420px]:items-center min-[420px]:justify-between">
               <h2 className="text-lg font-bold text-text-primary">Recent Orders</h2>
               <Link
                 href="/admin/demand"
@@ -182,7 +182,7 @@ export default async function AdminDashboard() {
                 {recentOrders.map((order) => (
                   <div
                     key={order.id}
-                    className="flex items-center gap-4 bg-white/50 rounded-xl p-4 border border-white/40 row-hover cursor-pointer group"
+                    className="flex flex-col gap-3 rounded-xl border border-white/40 bg-white/50 p-4 row-hover cursor-pointer group min-[520px]:flex-row min-[520px]:items-center min-[520px]:gap-4"
                   >
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
@@ -205,13 +205,13 @@ export default async function AdminDashboard() {
                         {order.restaurant} — {order.cropType} × {order.quantityKg}kg
                       </p>
                     </div>
-                    <div className="text-right flex-shrink-0">
+                    <div className="flex-shrink-0 min-[520px]:text-right">
                       <p className="text-sm font-bold text-text-primary">
                         ₹{order.totalPrice.toLocaleString("en-IN")}
                       </p>
                       <p className="text-[11px] text-text-muted">{order.date}</p>
                     </div>
-                    <ChevronRight className="w-4 h-4 text-text-muted flex-shrink-0 group-hover:text-sprout-800 transition-all" />
+                    <ChevronRight className="hidden h-4 w-4 flex-shrink-0 text-text-muted transition-all group-hover:text-sprout-800 min-[520px]:block" />
                   </div>
                 ))}
               </div>
@@ -225,12 +225,12 @@ export default async function AdminDashboard() {
 
           {/* Production Volume Chart */}
           <GlassCard>
-            <div className="flex items-center justify-between mb-4">
+            <div className="mb-4 flex flex-col gap-1 min-[420px]:flex-row min-[420px]:items-center min-[420px]:justify-between">
               <h2 className="text-lg font-bold text-text-primary">Weekly Production</h2>
               <span className="text-xs text-text-muted">Last 8 weeks</span>
             </div>
             <AdminWeeklyChart data={weeklyProduction} />
-            <div className="flex items-center justify-between mt-3 pt-3 border-t border-white/30">
+            <div className="mt-3 flex flex-col gap-1 border-t border-white/30 pt-3 min-[420px]:flex-row min-[420px]:items-center min-[420px]:justify-between">
               <span className="text-sm text-text-muted">Total output (8 weeks)</span>
               <span className="text-lg font-black text-sprout-800">{totalProduction} kg</span>
             </div>
@@ -257,7 +257,7 @@ export default async function AdminDashboard() {
                   return (
                     <div
                       key={grower.name}
-                      className="flex items-center gap-3 bg-white/50 rounded-xl p-3 border border-white/40 row-hover"
+                      className="flex items-center gap-3 rounded-xl border border-white/40 bg-white/50 p-3 row-hover"
                     >
                       <span
                         className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${
@@ -278,7 +278,7 @@ export default async function AdminDashboard() {
                           {grower.city} · {grower.trays} tasks
                         </p>
                       </div>
-                      <div className="text-right">
+                      <div className="shrink-0 text-right">
                         <p className="text-sm font-bold text-sprout-800">{grower.score}</p>
                         <p className="text-[10px] text-text-muted">score</p>
                       </div>
@@ -306,7 +306,7 @@ function AdminWeeklyChart({
   data: { label: string; value: number; tooltip: string }[];
 }) {
   return (
-    <div className="flex items-end gap-2 h-36">
+    <div className="flex h-36 items-end gap-1.5 sm:gap-2">
       {data.map((item, i) => (
         <div
           key={i}

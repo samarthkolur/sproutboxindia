@@ -34,12 +34,12 @@ export default async function DeliveriesPage() {
             const currentStep = statusSteps.indexOf(d.status);
             return (
               <GlassCard key={d.id}>
-                <div className="flex items-start justify-between mb-4">
-                  <div>
+                <div className="mb-4 flex flex-col gap-2 min-[420px]:flex-row min-[420px]:items-start min-[420px]:justify-between">
+                  <div className="min-w-0">
                     <p className="text-sm font-semibold text-text-primary">{d.order.restaurant.businessName}</p>
                     <p className="text-xs text-text-muted flex items-center gap-1"><MapPin className="w-3 h-3" /> {d.hub.name}</p>
                   </div>
-                  <span className={`px-3 py-1 rounded-full text-[11px] font-semibold ${
+                  <span className={`w-fit shrink-0 rounded-full px-3 py-1 text-[11px] font-semibold ${
                     d.status === "DELIVERED" ? "bg-sprout-50 text-sprout-700" :
                     d.status === "IN_TRANSIT" ? "bg-blue-50 text-blue-700" :
                     d.status === "FAILED" ? "bg-red-50 text-red-700" : "bg-amber-50 text-amber-700"
@@ -53,7 +53,7 @@ export default async function DeliveriesPage() {
                     </div>
                   ))}
                 </div>
-                <div className="flex justify-between text-[10px] text-text-muted">
+                <div className="flex justify-between gap-2 text-[9px] text-text-muted min-[420px]:text-[10px]">
                   {statusSteps.map((step) => <span key={step}>{statusLabels[step]}</span>)}
                 </div>
               </GlassCard>

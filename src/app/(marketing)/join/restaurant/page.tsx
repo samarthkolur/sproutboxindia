@@ -110,7 +110,7 @@ function RestaurantOnboardingForm() {
       if (!res.ok) throw new Error(result.error || "Registration failed");
       clearRegistrationPrefill();
       router.push("/login?registered=true");
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -133,13 +133,13 @@ function RestaurantOnboardingForm() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center relative overflow-hidden py-12">
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden px-4 py-8 sm:py-12">
       <div className="absolute inset-0 bg-grid bg-grid-fade" />
       <div className="absolute inset-0 bg-dots opacity-30" />
       <div className="blob blob-animated w-[500px] h-[500px] bg-sprout-300/40 -top-40 right-0" />
       <div className="blob blob-animated-alt w-[400px] h-[400px] bg-sprout-200/50 bottom-0 -left-20" />
 
-      <div className="glass-strong p-8 sm:p-10 w-full max-w-lg mx-4 relative z-10">
+      <div className="glass-strong relative z-10 w-full max-w-lg p-5 sm:p-10">
         <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent rounded-[24px]" />
         <div className="relative z-10">
           {/* Logo */}
@@ -181,7 +181,7 @@ function RestaurantOnboardingForm() {
                   <input className={inputClass} type="password" value={data.password} onChange={(e) => update("password", e.target.value)} placeholder="Min. 6 characters" required />
                 </div>
               )}
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid gap-3 sm:grid-cols-2">
                 <div>
                   <label className={labelClass}>Phone</label>
                   <input className={inputClass} type="tel" value={data.phone} onChange={(e) => update("phone", e.target.value)} placeholder="+91 98765" />
@@ -201,7 +201,7 @@ function RestaurantOnboardingForm() {
               <p className="text-sm text-text-secondary mb-2">
                 Select the microgreens you&apos;d like to order regularly:
               </p>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid gap-3 min-[420px]:grid-cols-2">
                 {CROP_TYPES.map((crop) => {
                   const isSelected = data.selectedCrops.includes(crop);
                   return (
@@ -209,11 +209,10 @@ function RestaurantOnboardingForm() {
                       key={crop}
                       type="button"
                       onClick={() => toggleCrop(crop)}
-                      className={`p-4 rounded-xl border text-left transition-all group ${
-                        isSelected
+                      className={`p-4 rounded-xl border text-left transition-all group ${isSelected
                           ? "border-sprout-600 bg-sprout-50/80 shadow-md"
                           : "border-white/50 bg-white/40 hover:bg-white/60"
-                      }`}
+                        }`}
                     >
                       <span className="text-xl mb-1 block">{cropEmojis[crop]}</span>
                       <p className="text-sm font-semibold text-text-primary">{CROP_DISPLAY_NAMES[crop]}</p>
@@ -235,17 +234,16 @@ function RestaurantOnboardingForm() {
             <div className="space-y-4">
               <div>
                 <label className={labelClass}>Delivery Frequency</label>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid gap-3 min-[420px]:grid-cols-2">
                   {(["weekly", "biweekly"] as const).map((freq) => (
                     <button
                       key={freq}
                       type="button"
                       onClick={() => update("deliveryFrequency", freq)}
-                      className={`p-4 rounded-xl border text-center transition-all ${
-                        data.deliveryFrequency === freq
+                      className={`p-4 rounded-xl border text-center transition-all ${data.deliveryFrequency === freq
                           ? "border-sprout-600 bg-sprout-50/80 text-sprout-800 shadow-md"
                           : "border-white/50 bg-white/40 text-text-secondary hover:bg-white/60"
-                      }`}
+                        }`}
                     >
                       <p className="text-sm font-bold capitalize">{freq}</p>
                       <p className="text-[11px] text-text-muted mt-0.5">
@@ -281,16 +279,16 @@ function RestaurantOnboardingForm() {
                 { label: "Frequency", value: data.deliveryFrequency },
                 { label: "Day", value: data.preferredDay },
               ].map((item) => (
-                <div key={item.label} className="flex items-center justify-between bg-white/50 rounded-xl p-3 border border-white/40">
+                <div key={item.label} className="flex flex-col gap-1 rounded-xl border border-white/40 bg-white/50 p-3 min-[420px]:flex-row min-[420px]:items-center min-[420px]:justify-between">
                   <span className="text-xs font-semibold text-text-muted uppercase tracking-wider">{item.label}</span>
-                  <span className="text-sm font-medium text-text-primary capitalize text-right max-w-[60%] truncate">{item.value}</span>
+                  <span className="break-words text-sm font-medium capitalize text-text-primary min-[420px]:max-w-[60%] min-[420px]:text-right">{item.value}</span>
                 </div>
               ))}
             </div>
           )}
 
           {/* Nav buttons */}
-          <div className="flex items-center justify-between mt-8">
+          <div className="mt-8 flex items-center justify-between gap-3">
             {step > 0 ? (
               <button onClick={back} className="text-sm font-semibold text-text-secondary hover:text-sprout-800 transition-colors">
                 ← Back

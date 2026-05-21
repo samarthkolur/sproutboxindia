@@ -55,7 +55,7 @@ export default function TutorialPage() {
 
   return (
     <div className="max-w-4xl mx-auto pb-10">
-      <div className="mb-8 flex items-center gap-3">
+      <div className="mb-8 flex flex-col gap-3 min-[420px]:flex-row min-[420px]:items-center">
         <div className="w-12 h-12 rounded-xl bg-sprout-100 flex items-center justify-center">
           <BookOpen className="w-6 h-6 text-sprout-700" />
         </div>
@@ -73,12 +73,12 @@ export default function TutorialPage() {
         {steps.map((step, index) => (
           <GlassCard key={index} className="overflow-hidden relative">
             <div className="absolute top-0 left-0 w-1 h-full bg-sprout-500 opacity-20" />
-            <div className="flex gap-5">
+            <div className="flex flex-col gap-4 sm:flex-row sm:gap-5">
               <div className={`w-14 h-14 rounded-2xl flex-shrink-0 flex items-center justify-center ${step.color}`}>
                 {step.icon}
               </div>
               <div>
-                <h3 className="text-xl font-bold text-text-primary flex items-center gap-2">
+                <h3 className="flex flex-wrap items-center gap-2 text-xl font-bold text-text-primary">
                   <span>{`Step ${index + 1}`}</span>
                   <span>: </span>
                   <span>{step.title}</span>

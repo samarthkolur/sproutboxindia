@@ -181,6 +181,15 @@ export default function LandingPage() {
   const section4 = useScrollReveal();
   const section5 = useScrollReveal();
   const section6 = useScrollReveal();
+  const previewBars = [
+    { day: "Mon", height: 42, opacity: 0.75 },
+    { day: "Tue", height: 58, opacity: 0.82 },
+    { day: "Wed", height: 74, opacity: 0.95 },
+    { day: "Thu", height: 66, opacity: 0.88 },
+    { day: "Fri", height: 80, opacity: 1 },
+    { day: "Sat", height: 52, opacity: 0.78 },
+    { day: "Sun", height: 70, opacity: 0.9 },
+  ];
 
   return (
     <>
@@ -191,7 +200,7 @@ export default function LandingPage() {
       {/* ═══════════════════════════════════════════════════════════════════
           HERO SECTION
       ═══════════════════════════════════════════════════════════════════ */}
-      <section className="relative min-h-screen flex items-center justify-center pt-28 pb-24 overflow-hidden">
+      <section className="relative flex min-h-[100svh] items-center justify-center overflow-hidden px-4 pb-20 pt-24 sm:pt-28">
         {/* Background grid */}
         <div className="absolute inset-0 bg-grid bg-grid-fade" />
 
@@ -201,10 +210,10 @@ export default function LandingPage() {
         <div className="blob blob-animated w-[400px] h-[400px] bg-sprout-100/80 top-1/3 right-1/4" />
         <div className="blob w-[200px] h-[200px] bg-sprout-400/20 top-20 right-20" />
 
-        <div className="relative z-10 text-center max-w-5xl mx-auto px-4">
+        <div className="relative z-10 mx-auto max-w-5xl text-center">
           {/* Badge */}
           <div
-            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass-card mb-10 animate-in fade-in slide-in-from-bottom-4 duration-700"
+            className="mb-8 inline-flex items-center gap-2 rounded-full px-4 py-1.5 glass-card animate-in fade-in slide-in-from-bottom-4 duration-700 sm:mb-10"
           >
             <div className="w-2 h-2 bg-sprout-600 rounded-full animate-pulse" />
             <span className="text-xs font-semibold text-sprout-800 uppercase tracking-wider">
@@ -213,14 +222,14 @@ export default function LandingPage() {
           </div>
 
           {/* Main headline */}
-          <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black text-text-primary leading-[0.95] tracking-tight mb-6 animate-in fade-in slide-in-from-bottom-6 duration-1000">
+          <h1 className="mb-5 text-4xl font-black leading-[1.02] tracking-tight text-text-primary animate-in fade-in slide-in-from-bottom-6 duration-1000 min-[380px]:text-5xl sm:mb-6 sm:text-6xl md:text-7xl lg:text-8xl lg:leading-[0.95]">
             Farm-to-fork,
             <br />
             <span className="gradient-text-animated">door to door.</span>
           </h1>
 
           {/* Subheadline */}
-          <p className="text-lg sm:text-xl text-text-secondary max-w-2xl mx-auto mb-10 leading-relaxed animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-200">
+          <p className="mx-auto mb-8 max-w-2xl text-base leading-relaxed text-text-secondary animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-200 sm:mb-10 sm:text-xl">
             A demand-driven, decentralized microgreen network — connecting
             restaurants with home-based growers for the freshest produce,
             delivered on schedule.
@@ -230,7 +239,7 @@ export default function LandingPage() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-in fade-in slide-in-from-bottom-10 duration-1000 delay-300">
             <Link
               href="/join/grower"
-              className="group relative inline-flex items-center gap-2 bg-sprout-800 text-white px-8 py-3.5 rounded-2xl text-base font-semibold hover:bg-sprout-900 transition-all hover:shadow-xl hover:shadow-sprout-800/25 active:scale-[0.98]"
+              className="group relative inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-sprout-800 px-6 py-3.5 text-base font-semibold text-white transition-all hover:bg-sprout-900 hover:shadow-xl hover:shadow-sprout-800/25 active:scale-[0.98] sm:w-auto sm:px-8"
             >
               <span>Join as Grower</span>
               <svg
@@ -249,16 +258,16 @@ export default function LandingPage() {
             </Link>
             <Link
               href="/join/restaurant"
-              className="inline-flex items-center gap-2 border-2 border-sprout-800/20 text-sprout-800 px-8 py-3.5 rounded-2xl text-base font-semibold hover:bg-sprout-50 hover:border-sprout-800/40 transition-all active:scale-[0.98]"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-2xl border-2 border-sprout-800/20 px-6 py-3.5 text-base font-semibold text-sprout-800 transition-all hover:border-sprout-800/40 hover:bg-sprout-50 active:scale-[0.98] sm:w-auto sm:px-8"
             >
               Partner as Restaurant
             </Link>
           </div>
 
           {/* Dashboard Preview */}
-          <div className="mt-16 relative animate-in fade-in slide-in-from-bottom-12 duration-1000 delay-500">
-            <div className="glass-strong p-6 sm:p-8 max-w-3xl mx-auto glow-green">
-              <div className="grid grid-cols-3 gap-4 mb-4">
+          <div className="relative mt-12 animate-in fade-in slide-in-from-bottom-12 duration-1000 delay-500 sm:mt-16">
+            <div className="glass-strong mx-auto max-w-3xl p-4 glow-green sm:p-8">
+              <div className="mb-4 grid gap-3 sm:grid-cols-3 sm:gap-4">
                 {[
                   { label: "Active Trays", value: "127", change: "+12%" },
                   { label: "QC Pass Rate", value: "94%", change: "+3%" },
@@ -266,7 +275,7 @@ export default function LandingPage() {
                 ].map((stat) => (
                   <div
                     key={stat.label}
-                    className="bg-white/50 rounded-xl p-4 border border-white/60"
+                    className="rounded-xl border border-white/60 bg-white/50 p-3 sm:p-4"
                   >
                     <p className="text-xs text-text-muted font-medium mb-1">
                       {stat.label}
@@ -280,18 +289,18 @@ export default function LandingPage() {
                   </div>
                 ))}
               </div>
-              <div className="flex gap-3">
-                {Array.from({ length: 7 }).map((_, i) => (
-                  <div key={i} className="flex-1">
+              <div className="flex gap-2 sm:gap-3">
+                {previewBars.map((bar) => (
+                  <div key={bar.day} className="flex-1">
                     <div
                       className="bg-gradient-to-t from-sprout-600 to-sprout-400 rounded-md"
                       style={{
-                        height: `${30 + Math.random() * 50}px`,
-                        opacity: 0.7 + Math.random() * 0.3,
+                        height: `${bar.height}px`,
+                        opacity: bar.opacity,
                       }}
                     />
                     <p className="text-[10px] text-text-muted text-center mt-1">
-                      {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"][i]}
+                      {bar.day}
                     </p>
                   </div>
                 ))}
@@ -303,7 +312,7 @@ export default function LandingPage() {
         </div>
 
         {/* Scroll indicator */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 animate-bounce">
+        <div className="absolute bottom-4 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-2 animate-bounce sm:flex">
           <span className="text-xs text-text-muted font-medium">Scroll</span>
           <svg className="w-4 h-4 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
@@ -351,19 +360,19 @@ export default function LandingPage() {
       {/* ═══════════════════════════════════════════════════════════════════
           HOW IT WORKS — Interactive Steps
       ═══════════════════════════════════════════════════════════════════ */}
-      <section id="how-it-works" className="py-32 px-4 relative" ref={section1}>
+      <section id="how-it-works" className="relative px-4 py-20 sm:py-24 lg:py-32" ref={section1}>
         <div className="absolute inset-0 bg-dots opacity-40" />
 
         <div className="relative z-10 max-w-6xl mx-auto">
-          <div className="text-center mb-20 reveal">
+          <div className="reveal mb-12 text-center sm:mb-20">
             <span className="inline-block text-xs font-bold text-sprout-600 uppercase tracking-[0.2em] mb-4">
               The Process
             </span>
-            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black text-text-primary tracking-tight">
+            <h2 className="text-3xl font-black tracking-tight text-text-primary sm:text-5xl lg:text-6xl">
               Three steps to{" "}
               <span className="gradient-text">fresh delivery</span>
             </h2>
-            <p className="text-text-secondary max-w-lg mx-auto mt-4 text-lg">
+            <p className="mx-auto mt-4 max-w-lg text-base text-text-secondary sm:text-lg">
               From restaurant order to doorstep in 7–10 days
             </p>
           </div>
@@ -397,7 +406,7 @@ export default function LandingPage() {
             ].map((item, i) => (
               <div
                 key={item.step}
-                className="reveal glass-card p-8 relative group"
+                className="reveal glass-card relative p-5 group sm:p-8"
                 style={{ transitionDelay: `${i * 150}ms` }}
               >
                 {/* Inner shine */}
@@ -406,7 +415,7 @@ export default function LandingPage() {
                 <div className="relative z-10">
                   {/* Step number */}
                   <div className="flex items-center gap-3 mb-6">
-                    <span className="text-[64px] font-black text-sprout-200/80 leading-none select-none">
+                    <span className="select-none text-5xl font-black leading-none text-sprout-200/80 sm:text-[64px]">
                       {item.step}
                     </span>
                   </div>
@@ -435,18 +444,18 @@ export default function LandingPage() {
       {/* ═══════════════════════════════════════════════════════════════════
           FOR GROWERS — Split section with glass mockup
       ═══════════════════════════════════════════════════════════════════ */}
-      <section id="growers" className="py-32 px-4 relative overflow-hidden" ref={section2}>
+      <section id="growers" className="relative overflow-hidden px-4 py-20 sm:py-24 lg:py-32" ref={section2}>
         <div className="blob blob-animated w-[500px] h-[500px] bg-sprout-200/50 bottom-0 -left-20" />
         <div className="blob blob-animated-alt w-[300px] h-[300px] bg-sprout-100 top-20 right-0" />
 
         <div className="relative z-10 max-w-6xl mx-auto">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
+          <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
             {/* Left — Content */}
             <div className="reveal-left">
               <span className="inline-block text-xs font-bold text-sprout-600 uppercase tracking-[0.2em] mb-4">
                 For Growers
               </span>
-              <h2 className="text-4xl sm:text-5xl font-black text-text-primary tracking-tight mb-6 leading-tight">
+              <h2 className="mb-6 text-3xl font-black leading-tight tracking-tight text-text-primary sm:text-5xl">
                 Turn your space into a{" "}
                 <span className="gradient-text">micro-farm</span>
               </h2>
@@ -501,7 +510,7 @@ export default function LandingPage() {
 
             {/* Right — Glass mockup */}
             <div className="reveal-right">
-              <div className="glass-strong p-6 relative float">
+              <div className="glass-strong relative p-4 float sm:p-6">
                 <div className="absolute -top-3 -right-3 w-20 h-20 bg-sprout-400/20 rounded-full blur-2xl" />
 
                 {/* Task card mockup */}
@@ -524,7 +533,7 @@ export default function LandingPage() {
                 </div>
 
                 {/* Tray cards */}
-                <div className="grid grid-cols-3 gap-3">
+                <div className="grid gap-3 min-[520px]:grid-cols-3">
                   {[
                     { crop: "Sunflower", trays: 5, status: "Growing" },
                     { crop: "Pea Shoots", trays: 3, status: "Sowing" },
@@ -540,13 +549,12 @@ export default function LandingPage() {
                       <p className="text-lg font-black text-sprout-800">
                         {item.trays}
                       </p>
-                      <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${
-                        item.status === "Ready"
+                      <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${item.status === "Ready"
                           ? "bg-sprout-100 text-sprout-700"
                           : item.status === "Growing"
-                          ? "bg-blue-50 text-blue-600"
-                          : "bg-amber-50 text-amber-600"
-                      }`}>
+                            ? "bg-blue-50 text-blue-600"
+                            : "bg-amber-50 text-amber-600"
+                        }`}>
                         {item.status}
                       </span>
                     </div>
@@ -567,15 +575,15 @@ export default function LandingPage() {
       {/* ═══════════════════════════════════════════════════════════════════
           FOR RESTAURANTS — Crop catalog mockup
       ═══════════════════════════════════════════════════════════════════ */}
-      <section id="restaurants" className="py-32 px-4 relative overflow-hidden" ref={section3}>
+      <section id="restaurants" className="relative overflow-hidden px-4 py-20 sm:py-24 lg:py-32" ref={section3}>
         <div className="absolute inset-0 bg-grid opacity-30" />
         <div className="blob blob-animated w-[400px] h-[400px] bg-sprout-300/30 top-10 -right-20" />
 
         <div className="relative z-10 max-w-6xl mx-auto">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
+          <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
             {/* Left — Glass mockup */}
             <div className="order-2 lg:order-1 reveal-left">
-              <div className="glass-strong p-6 relative float-delayed">
+              <div className="glass-strong relative p-4 float-delayed sm:p-6">
                 <div className="absolute -top-4 -left-4 w-24 h-24 bg-sprout-300/30 rounded-full blur-2xl" />
 
                 <h4 className="text-sm font-bold text-text-primary mb-4">Crop Catalog</h4>
@@ -614,7 +622,7 @@ export default function LandingPage() {
               <span className="inline-block text-xs font-bold text-sprout-600 uppercase tracking-[0.2em] mb-4">
                 For Restaurants
               </span>
-              <h2 className="text-4xl sm:text-5xl font-black text-text-primary tracking-tight mb-6 leading-tight">
+              <h2 className="mb-6 text-3xl font-black leading-tight tracking-tight text-text-primary sm:text-5xl">
                 The freshest{" "}
                 <span className="gradient-text">microgreens</span>,
                 <br />
@@ -675,15 +683,15 @@ export default function LandingPage() {
       {/* ═══════════════════════════════════════════════════════════════════
           SOCIAL PROOF — Metric cards
       ═══════════════════════════════════════════════════════════════════ */}
-      <section className="py-32 px-4 relative" ref={section4}>
+      <section className="relative px-4 py-20 sm:py-24 lg:py-32" ref={section4}>
         <div className="absolute inset-0 bg-dots opacity-30" />
 
         <div className="relative z-10 max-w-6xl mx-auto">
           <div className="text-center mb-16 reveal">
-            <h2 className="text-4xl sm:text-5xl font-black text-text-primary tracking-tight">
+            <h2 className="text-3xl font-black tracking-tight text-text-primary sm:text-5xl">
               Built for <span className="gradient-text">scale</span>
             </h2>
-            <p className="text-text-secondary mt-4 text-lg max-w-md mx-auto">
+            <p className="mx-auto mt-4 max-w-md text-base text-text-secondary sm:text-lg">
               Numbers that define our growing ecosystem
             </p>
           </div>
@@ -741,29 +749,29 @@ export default function LandingPage() {
       {/* ═══════════════════════════════════════════════════════════════════
           CTA SECTION
       ═══════════════════════════════════════════════════════════════════ */}
-      <section className="py-32 px-4 relative" ref={section5}>
+      <section className="relative px-4 py-20 sm:py-24 lg:py-32" ref={section5}>
         <div className="blob blob-animated w-[400px] h-[400px] bg-sprout-200/50 top-0 left-1/4" />
 
         <div className="relative z-10 max-w-4xl mx-auto reveal">
-          <div className="glass-strong p-12 sm:p-20 text-center relative overflow-hidden">
+          <div className="glass-strong relative overflow-hidden p-6 text-center sm:p-12 lg:p-20">
             {/* Grid overlay */}
             <div className="absolute inset-0 bg-grid opacity-20 rounded-[24px]" />
             <div className="absolute inset-0 bg-gradient-to-br from-sprout-800/5 via-transparent to-sprout-600/5 rounded-[24px]" />
 
             <div className="relative z-10">
-              <h2 className="text-4xl sm:text-5xl font-black text-text-primary tracking-tight mb-4">
+              <h2 className="mb-4 text-3xl font-black tracking-tight text-text-primary sm:text-5xl">
                 Ready to grow
                 <br />
                 <span className="gradient-text-animated">with us?</span>
               </h2>
-              <p className="text-text-secondary max-w-md mx-auto mb-10 text-lg">
+              <p className="mx-auto mb-8 max-w-md text-base text-text-secondary sm:mb-10 sm:text-lg">
                 Join the microgreen revolution — whether you grow or you order,
                 we&apos;ve got you covered.
               </p>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                 <Link
                   href="/join/grower"
-                  className="group inline-flex items-center gap-2 bg-sprout-800 text-white px-8 py-3.5 rounded-2xl text-base font-semibold hover:bg-sprout-900 transition-all hover:shadow-xl hover:shadow-sprout-800/25 active:scale-[0.98]"
+                  className="group inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-sprout-800 px-6 py-3.5 text-base font-semibold text-white transition-all hover:bg-sprout-900 hover:shadow-xl hover:shadow-sprout-800/25 active:scale-[0.98] sm:w-auto sm:px-8"
                 >
                   Join as Grower
                   <svg
@@ -782,7 +790,7 @@ export default function LandingPage() {
                 </Link>
                 <Link
                   href="/join/restaurant"
-                  className="inline-flex items-center gap-2 border-2 border-sprout-800/20 text-sprout-800 px-8 py-3.5 rounded-2xl text-base font-semibold hover:bg-sprout-50 hover:border-sprout-800/40 transition-all active:scale-[0.98]"
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-2xl border-2 border-sprout-800/20 px-6 py-3.5 text-base font-semibold text-sprout-800 transition-all hover:border-sprout-800/40 hover:bg-sprout-50 active:scale-[0.98] sm:w-auto sm:px-8"
                 >
                   Partner as Restaurant
                 </Link>
@@ -795,7 +803,7 @@ export default function LandingPage() {
       {/* ═══════════════════════════════════════════════════════════════════
           FOOTER
       ═══════════════════════════════════════════════════════════════════ */}
-      <footer className="border-t border-sprout-200/30 py-16 px-4" ref={section6}>
+      <footer className="border-t border-sprout-200/30 px-4 py-12 sm:py-16" ref={section6}>
         <div className="max-w-6xl mx-auto">
           <div className="grid sm:grid-cols-3 gap-12 mb-12 reveal">
             <div>

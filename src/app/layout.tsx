@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Analytics } from "@vercel/analytics/next";
 import "@/app/globals.css";
 import "leaflet/dist/leaflet.css";
 import { LanguageProvider } from "@/components/i18n/LanguageProvider";
@@ -31,6 +32,7 @@ export default function RootLayout({
     <html lang="en">
       <body className="min-h-screen antialiased">
         <GoogleAnalytics />
+        <Analytics />
         <LanguageProvider>
           {children}
           <FloatingLanguageToggle />

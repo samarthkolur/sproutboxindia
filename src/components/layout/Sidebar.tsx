@@ -183,7 +183,7 @@ export function Sidebar({ userName, userRole }: SidebarProps) {
       {/* Mobile hamburger trigger */}
       <button
         onClick={() => setMobileOpen(true)}
-        className="lg:hidden fixed top-4 left-4 z-50 w-10 h-10 glass-card flex items-center justify-center rounded-xl shadow-lg"
+        className="fixed left-4 top-4 z-50 flex h-10 w-10 items-center justify-center rounded-xl glass-card shadow-lg lg:hidden"
       >
         <Menu className="w-5 h-5 text-text-primary" />
       </button>
@@ -199,7 +199,7 @@ export function Sidebar({ userName, userRole }: SidebarProps) {
       {/* Mobile drawer */}
       <aside
         className={cn(
-          "lg:hidden fixed inset-y-0 left-0 w-[280px] z-50 transform transition-transform duration-300 ease-out",
+          "fixed inset-y-0 left-0 z-50 w-[min(86vw,280px)] transform transition-transform duration-300 ease-out lg:hidden",
           mobileOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >

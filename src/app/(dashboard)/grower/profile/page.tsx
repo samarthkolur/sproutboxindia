@@ -42,7 +42,7 @@ export default async function GrowerProfilePage() {
 
       {/* Score cards */}
       {grower && (
-        <div className="grid grid-cols-3 gap-4 mb-6">
+        <div className="mb-6 grid gap-4 min-[480px]:grid-cols-3">
           {[
             { label: "Yield Score", value: Math.round(grower.yieldScore * 100) },
             { label: "Quality Score", value: Math.round(grower.qualityScore * 100) },
@@ -62,13 +62,13 @@ export default async function GrowerProfilePage() {
           {fields.map((field) => {
             const Icon = field.icon;
             return (
-              <div key={field.label} className="flex items-center gap-4 bg-white/50 rounded-xl p-4 border border-white/40">
-                <div className="w-10 h-10 bg-sprout-50 rounded-xl flex items-center justify-center">
+              <div key={field.label} className="flex items-center gap-4 rounded-xl border border-white/40 bg-white/50 p-4">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-sprout-50">
                   <Icon className="w-5 h-5 text-sprout-600" />
                 </div>
-                <div>
+                <div className="min-w-0">
                   <p className="text-[11px] font-semibold text-text-muted uppercase tracking-wider">{field.label}</p>
-                  <p className="text-sm font-medium text-text-primary">{field.value}</p>
+                  <p className="break-words text-sm font-medium text-text-primary">{field.value}</p>
                 </div>
               </div>
             );

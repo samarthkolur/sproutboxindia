@@ -111,8 +111,8 @@ export function QCClient({ initialQueue }: { initialQueue: QCBatchItem[] }) {
           const latestCheckIn = batch.checkIns[0];
           return (
             <GlassCard key={batch.id}>
-              <div className="flex items-start justify-between mb-4">
-                <div>
+              <div className="mb-4 flex flex-col gap-2 min-[420px]:flex-row min-[420px]:items-start min-[420px]:justify-between">
+                <div className="min-w-0">
                   <p className="text-sm font-bold text-text-primary">
                     {batch.task.grower.user.name || "Unknown Grower"}
                   </p>
@@ -121,7 +121,7 @@ export function QCClient({ initialQueue }: { initialQueue: QCBatchItem[] }) {
                     {batch.currentDay}
                   </p>
                 </div>
-                <p className="text-xs text-text-muted">
+                <p className="shrink-0 text-xs text-text-muted">
                   {new Date(batch.createdAt).toLocaleDateString("en-IN", {
                     month: "short",
                     day: "numeric",
@@ -131,7 +131,7 @@ export function QCClient({ initialQueue }: { initialQueue: QCBatchItem[] }) {
 
               {/* Images */}
               {latestCheckIn && (
-                <div className="grid grid-cols-2 gap-3 mb-4">
+                <div className="mb-4 grid gap-3 min-[420px]:grid-cols-2">
                   {latestCheckIn.imageTopUrl ? (
                     <button
                       onClick={() => setLightboxSrc(latestCheckIn.imageTopUrl!)}
@@ -185,11 +185,11 @@ export function QCClient({ initialQueue }: { initialQueue: QCBatchItem[] }) {
                 </p>
               )}
 
-              <div className="flex flex-col sm:flex-row items-center gap-3">
+              <div className="grid gap-3 min-[420px]:grid-cols-3">
                 <button
                   disabled={processingId === batch.id}
                   onClick={() => handleQC(batch, "PASS")}
-                  className="w-full sm:flex-1 bg-sprout-800 text-white py-2 rounded-xl text-sm font-semibold hover:bg-sprout-900 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex items-center justify-center gap-2 rounded-xl bg-sprout-800 py-2 text-sm font-semibold text-white transition-all hover:bg-sprout-900 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {processingId === batch.id ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
@@ -201,7 +201,7 @@ export function QCClient({ initialQueue }: { initialQueue: QCBatchItem[] }) {
                 <button
                   disabled={processingId === batch.id}
                   onClick={() => handleQC(batch, "RISK")}
-                  className="w-full sm:flex-1 bg-amber-500 text-white py-2 rounded-xl text-sm font-semibold hover:bg-amber-600 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex items-center justify-center gap-2 rounded-xl bg-amber-500 py-2 text-sm font-semibold text-white transition-all hover:bg-amber-600 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {processingId === batch.id ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
@@ -213,7 +213,7 @@ export function QCClient({ initialQueue }: { initialQueue: QCBatchItem[] }) {
                 <button
                   disabled={processingId === batch.id}
                   onClick={() => handleQC(batch, "REJECT")}
-                  className="w-full sm:flex-1 bg-red-500 text-white py-2 rounded-xl text-sm font-semibold hover:bg-red-600 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex items-center justify-center gap-2 rounded-xl bg-red-500 py-2 text-sm font-semibold text-white transition-all hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {processingId === batch.id ? (
                     <Loader2 className="w-4 h-4 animate-spin" />

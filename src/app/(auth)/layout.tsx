@@ -6,7 +6,7 @@ export default function AuthLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen flex items-center justify-center relative overflow-hidden">
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden px-4 py-10 sm:py-12">
       {/* Background grid */}
       <div className="absolute inset-0 bg-grid bg-grid-fade" />
 
@@ -20,13 +20,13 @@ export default function AuthLayout({
       <div className="absolute inset-0 bg-dots opacity-30" />
 
       {/* Glass card */}
-      <div className="glass-strong p-8 sm:p-10 w-full max-w-[460px] mx-4 relative z-10 glow-green">
+      <div className="glass-strong relative z-10 w-full max-w-[460px] p-5 glow-green sm:p-10">
         <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent rounded-[24px]" />
         <div className="relative z-10">{children}</div>
       </div>
 
       {/* Bottom link back to home */}
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10">
+      <div className="absolute bottom-3 left-1/2 z-10 -translate-x-1/2 sm:bottom-6">
         <Link
           href="/"
           className="text-xs text-text-muted hover:text-sprout-800 transition-colors flex items-center gap-1.5"
