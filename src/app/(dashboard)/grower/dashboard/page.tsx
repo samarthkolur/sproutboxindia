@@ -15,6 +15,7 @@ import {
   AlertTriangle,
   Info,
   Clock,
+  BookOpen,
 } from "lucide-react";
 import {
   CROP_DISPLAY_NAMES,
@@ -56,13 +57,22 @@ export default async function GrowerDashboard() {
   return (
     <GrowerDashboardClient>
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-black text-text-primary tracking-tight">
-          {greeting}
-        </h1>
-        <p className="text-text-secondary mt-1">
-          Here&apos;s your growing overview for today
-        </p>
+      <div className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-black text-text-primary tracking-tight">
+            {greeting}
+          </h1>
+          <p className="text-text-secondary mt-1">
+            Here&apos;s your growing overview for today
+          </p>
+        </div>
+        <a 
+          href="/grower/tutorial"
+          className="flex items-center gap-2 bg-sprout-50 hover:bg-sprout-100 text-sprout-800 px-4 py-2 rounded-xl text-sm font-semibold border border-sprout-200 transition-colors"
+        >
+          <BookOpen className="w-4 h-4" />
+          How to Grow Guide
+        </a>
       </div>
 
       {/* Stats Grid */}

@@ -26,6 +26,7 @@ import {
   Menu,
   X,
   Send,
+  BookOpen,
   type LucideIcon,
 } from "lucide-react";
 
@@ -41,6 +42,7 @@ const roleNavItems: Record<string, NavItem[]> = {
     { label: "My Tasks", href: "/grower/tasks", icon: ClipboardList },
     { label: "Earnings", href: "/grower/earnings", icon: Wallet },
     { label: "Profile", href: "/grower/profile", icon: UserCircle },
+    { label: "Tutorial", href: "/grower/tutorial", icon: BookOpen },
   ],
   RESTAURANT: [
     { label: "Dashboard", href: "/restaurant/dashboard", icon: LayoutDashboard },
