@@ -64,6 +64,18 @@ function GrowerOnboardingForm() {
   };
 
   const validateStep = () => {
+    if (step === 0) {
+      if (!data.name.trim() || !data.email.trim() || (!hasPrefilledPassword && !data.password)) {
+        setError("Please fill in all required fields.");
+        return false;
+      }
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(data.email.trim())) {
+        setError("Please enter a valid email address.");
+        return false;
+      }
+    }
+
     if (step === 1 && (!data.address || !data.city || !data.pincode)) {
       setError("Choose a location on the map so address, city, and PIN code can be fetched.");
       return false;
