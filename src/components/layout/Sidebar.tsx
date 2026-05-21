@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+import { BrandLogo } from "@/components/layout/BrandLogo";
 import { cn } from "@/lib/utils";
 import {
   LayoutDashboard,
@@ -86,14 +87,7 @@ export function Sidebar({ userName, userRole }: SidebarProps) {
     <div className="relative z-10 flex flex-col h-full">
       {/* Logo */}
       <div className="flex items-center justify-between px-6 py-5 border-b border-sprout-200/30">
-        <div className="flex items-center gap-2.5">
-          <div className="w-9 h-9 bg-gradient-to-br from-sprout-700 to-sprout-900 rounded-xl flex items-center justify-center shadow-lg shadow-sprout-800/20">
-            <span className="text-white text-sm font-bold">S</span>
-          </div>
-          <span className="text-lg font-bold text-text-primary tracking-tight">
-            Sprout<span className="text-sprout-800">Box</span>
-          </span>
-        </div>
+        <BrandLogo />
         {/* Mobile close button */}
         <button
           onClick={() => setMobileOpen(false)}

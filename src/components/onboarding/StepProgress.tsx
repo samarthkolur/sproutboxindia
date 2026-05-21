@@ -8,27 +8,31 @@ interface StepProgressProps {
 }
 
 export function StepProgress({ steps, currentStep }: StepProgressProps) {
-  return (
-    <div className="flex items-center gap-1 mb-8">
-      {steps.map((step, i) => {
-        const isCompleted = i < currentStep;
-        const isCurrent = i === currentStep;
+  const progress =
+    steps.length > 1 ? `${(currentStep / (steps.length - 1)) * 100}%` : "0%";
 
-        return (
-          <div key={step} className="flex-1 flex flex-col items-center">
-            {/* Line + dot */}
-            <div className="flex items-center w-full">
-              {i > 0 && (
-                <div
-                  className={cn(
-                    "flex-1 h-[2px] transition-colors duration-300",
-                    isCompleted ? "bg-sprout-600" : "bg-sprout-200/50"
-                  )}
-                />
-              )}
+  return (
+    <div className="mb-8">
+      <div className="relative">
+        <div className="absolute left-4 right-4 top-4 h-[2px] rounded-full bg-sprout-100">
+          <div
+            className="h-full rounded-full bg-sprout-600 transition-all duration-300"
+            style={{ width: progress }}
+          />
+        </div>
+        <div
+          className="relative grid"
+          style={{ gridTemplateColumns: `repeat(${steps.length}, minmax(0, 1fr))` }}
+        >
+          {steps.map((step, i) => {
+            const isCompleted = i < currentStep;
+            const isCurrent = i === currentStep;
+
+            return (
+            <div key={step} className="flex min-w-0 flex-col items-center">
               <div
                 className={cn(
-                  "w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300 flex-shrink-0",
+                  "relative z-10 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold transition-all duration-300",
                   isCompleted
                     ? "bg-sprout-600 text-white shadow-md shadow-sprout-600/20"
                     : isCurrent
@@ -44,27 +48,20 @@ export function StepProgress({ steps, currentStep }: StepProgressProps) {
                   i + 1
                 )}
               </div>
-              {i < steps.length - 1 && (
-                <div
-                  className={cn(
-                    "flex-1 h-[2px] transition-colors duration-300",
-                    isCompleted ? "bg-sprout-600" : "bg-sprout-200/50"
-                  )}
-                />
-              )}
-            </div>
-            {/* Label */}
             <span
               className={cn(
-                "text-[10px] font-semibold mt-2 text-center transition-colors",
+                "mt-2 max-w-16 truncate text-center text-[10px] font-semibold transition-colors",
                 isCurrent ? "text-sprout-800" : isCompleted ? "text-sprout-600" : "text-text-muted"
               )}
+              title={step}
             >
               {step}
             </span>
           </div>
-        );
-      })}
+            );
+          })}
+        </div>
+      </div>
     </div>
   );
 }

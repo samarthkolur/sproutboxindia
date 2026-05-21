@@ -5,6 +5,10 @@ const cropTypeSchema = z.enum(CROP_TYPES);
 
 export const emailSchema = z.string().email().trim().toLowerCase();
 export const passwordSchema = z.string().min(6, "Password must be at least 6 characters");
+const optionalPositiveIntSchema = z.preprocess(
+  (value) => (value === "" || value === null ? undefined : value),
+  z.coerce.number().int().positive().optional()
+);
 
 export const growerRegisterSchema = z.object({
   name: z.string().min(2).trim(),
@@ -14,8 +18,8 @@ export const growerRegisterSchema = z.object({
   city: z.string().min(2).trim(),
   address: z.string().min(5).trim(),
   pincode: z.string().min(4).trim(),
-  areaSize: z.coerce.number().int().positive().optional(),
-  spaceAvailable: z.coerce.number().int().positive().optional(),
+  areaSize: optionalPositiveIntSchema,
+  spaceAvailable: optionalPositiveIntSchema,
   spacePhotoUrl: z.string().url().optional(),
   kit: z.enum(["Starter", "Standard", "Pro"]).default("Starter"),
   upiId: z.string().trim().optional(),

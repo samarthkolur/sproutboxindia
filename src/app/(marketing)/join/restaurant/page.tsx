@@ -3,6 +3,8 @@
 import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { BrandLogo } from "@/components/layout/BrandLogo";
+import { AddressMapPicker, type SelectedAddress } from "@/components/onboarding/AddressMapPicker";
 import { StepProgress } from "@/components/onboarding/StepProgress";
 import { CROP_TYPES, CROP_DISPLAY_NAMES, CROP_PRICE_PER_KG, CROP_CYCLE_DAYS, type CropType } from "@/lib/constants";
 
@@ -14,6 +16,7 @@ function RestaurantOnboardingForm() {
   const [step, setStep] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [selectedAddress, setSelectedAddress] = useState<SelectedAddress | null>(null);
 
   const [data, setData] = useState({
     name: searchParams.get("name") || "",
@@ -23,6 +26,7 @@ function RestaurantOnboardingForm() {
     phone: "",
     address: "",
     city: "",
+    pincode: "",
     gstNumber: "",
     selectedCrops: [] as CropType[],
     deliveryFrequency: "weekly" as "weekly" | "biweekly",
@@ -31,6 +35,16 @@ function RestaurantOnboardingForm() {
 
   const update = (field: string, value: string | string[]) =>
     setData((prev) => ({ ...prev, [field]: value }));
+
+  const updateAddress = (address: SelectedAddress) => {
+    setSelectedAddress(address);
+    setData((prev) => ({
+      ...prev,
+      address: address.address,
+      city: address.city,
+      pincode: address.pincode,
+    }));
+  };
 
   const toggleCrop = (crop: CropType) => {
     setData((prev) => ({
@@ -41,7 +55,20 @@ function RestaurantOnboardingForm() {
     }));
   };
 
-  const next = () => setStep((s) => Math.min(s + 1, steps.length - 1));
+  const validateStep = () => {
+    if (step === 0 && (!data.address || !data.city || !data.pincode)) {
+      setError("Choose a location on the map so address, city, and PIN code can be fetched.");
+      return false;
+    }
+
+    setError("");
+    return true;
+  };
+
+  const next = () => {
+    if (!validateStep()) return;
+    setStep((s) => Math.min(s + 1, steps.length - 1));
+  };
   const back = () => setStep((s) => Math.max(s - 1, 0));
 
   const handleSubmit = async () => {
@@ -89,14 +116,7 @@ function RestaurantOnboardingForm() {
         <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent rounded-[24px]" />
         <div className="relative z-10">
           {/* Logo */}
-          <div className="flex items-center gap-2.5 mb-6">
-            <div className="w-9 h-9 bg-gradient-to-br from-sprout-700 to-sprout-900 rounded-xl flex items-center justify-center shadow-lg shadow-sprout-800/20">
-              <span className="text-white text-sm font-bold">S</span>
-            </div>
-            <span className="text-lg font-bold text-text-primary tracking-tight">
-              Sprout<span className="text-sprout-800">Box</span>
-            </span>
-          </div>
+          <BrandLogo className="mb-6" />
 
           <h1 className="text-2xl font-black text-text-primary tracking-tight mb-1">
             Partner as Restaurant 🍽️
@@ -144,19 +164,7 @@ function RestaurantOnboardingForm() {
                   <input className={inputClass} value={data.gstNumber} onChange={(e) => update("gstNumber", e.target.value)} placeholder="22AAAA..." />
                 </div>
               </div>
-              <div>
-                <label className={labelClass}>City</label>
-                <select className={inputClass} value={data.city} onChange={(e) => update("city", e.target.value)}>
-                  <option value="">Select city</option>
-                  <option value="bangalore">Bangalore</option>
-                  <option value="mumbai">Mumbai</option>
-                  <option value="delhi">Delhi</option>
-                </select>
-              </div>
-              <div>
-                <label className={labelClass}>Address</label>
-                <input className={inputClass} value={data.address} onChange={(e) => update("address", e.target.value)} placeholder="Restaurant address" />
-              </div>
+              <AddressMapPicker value={selectedAddress} onChange={updateAddress} />
             </div>
           )}
 
@@ -240,6 +248,8 @@ function RestaurantOnboardingForm() {
                 { label: "Email", value: data.email },
                 { label: "Phone", value: data.phone || "—" },
                 { label: "City", value: data.city || "—" },
+                { label: "PIN", value: data.pincode || "—" },
+                { label: "Address", value: data.address || "—" },
                 { label: "Crops", value: data.selectedCrops.map((c) => CROP_DISPLAY_NAMES[c]).join(", ") || "None selected" },
                 { label: "Frequency", value: data.deliveryFrequency },
                 { label: "Day", value: data.preferredDay },

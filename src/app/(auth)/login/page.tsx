@@ -4,6 +4,7 @@ import { Suspense, useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { BrandLogo } from "@/components/layout/BrandLogo";
 
 function LoginForm() {
   const router = useRouter();
@@ -42,14 +43,7 @@ function LoginForm() {
   return (
     <div>
       {/* Logo */}
-      <div className="flex items-center gap-2.5 mb-8">
-        <div className="w-10 h-10 bg-gradient-to-br from-sprout-700 to-sprout-900 rounded-xl flex items-center justify-center shadow-lg shadow-sprout-800/20">
-          <span className="text-white text-lg font-bold">S</span>
-        </div>
-        <span className="text-xl font-bold text-text-primary tracking-tight">
-          Sprout<span className="text-sprout-800">Box</span>
-        </span>
-      </div>
+      <BrandLogo className="mb-8" markClassName="h-10 w-10" textClassName="text-xl" />
 
       <h1 className="text-3xl font-black text-text-primary mb-1 tracking-tight">
         Welcome back

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { BrandLogo } from "@/components/layout/BrandLogo";
 
 // ── Scroll Reveal Hook ──────────────────────────────────────────────────────
 function useScrollReveal() {
@@ -136,13 +137,8 @@ function Navbar() {
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="w-9 h-9 bg-gradient-to-br from-sprout-700 to-sprout-900 rounded-xl flex items-center justify-center shadow-lg shadow-sprout-800/20 group-hover:shadow-sprout-800/30 transition-shadow">
-              <span className="text-white text-sm font-bold">S</span>
-            </div>
-            <span className="text-lg font-bold text-text-primary tracking-tight">
-              Sprout<span className="text-sprout-800">Box</span>
-            </span>
+          <Link href="/" className="group">
+            <BrandLogo />
           </Link>
 
           <div className="hidden md:flex items-center gap-8">
@@ -803,14 +799,7 @@ export default function LandingPage() {
         <div className="max-w-6xl mx-auto">
           <div className="grid sm:grid-cols-3 gap-12 mb-12 reveal">
             <div>
-              <div className="flex items-center gap-2.5 mb-4">
-                <div className="w-9 h-9 bg-gradient-to-br from-sprout-700 to-sprout-900 rounded-xl flex items-center justify-center">
-                  <span className="text-white text-sm font-bold">S</span>
-                </div>
-                <span className="text-lg font-bold text-text-primary tracking-tight">
-                  Sprout<span className="text-sprout-800">Box</span>
-                </span>
-              </div>
+              <BrandLogo className="mb-4" />
               <p className="text-sm text-text-muted leading-relaxed">
                 Demand-driven, decentralized microgreen production and supply platform.
               </p>
