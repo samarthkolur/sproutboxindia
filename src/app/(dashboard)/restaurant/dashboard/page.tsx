@@ -15,6 +15,10 @@ import {
   ChevronRight,
   Leaf,
   ArrowRight,
+  Sun,
+  CloudRain,
+  Flower2,
+  Sprout,
 } from "lucide-react";
 import {
   CROP_TYPES,
@@ -140,10 +144,21 @@ export default async function RestaurantDashboard() {
                           }
                         />
                       </div>
-                      <p className="text-xs text-text-muted">
+                      <p className="text-xs text-text-muted mt-1">
                         {CROP_DISPLAY_NAMES[order.cropType as CropType] || order.cropType} × {order.quantityKg}kg
                       </p>
                     </div>
+
+                    {/* Visual Progress Bar */}
+                    <div className="flex-1 max-w-[200px] hidden md:block">
+                      <OrderProgressVisualizer 
+                        progress={order.progress || 0} 
+                        status={order.status} 
+                        daysPassed={order.daysPassed}
+                        totalDays={order.totalDays}
+                      />
+                    </div>
+
                     <div className="text-right flex-shrink-0">
                       <p className="text-sm font-bold text-text-primary">
                         ₹{order.totalPrice.toLocaleString("en-IN")}
@@ -208,5 +223,65 @@ export default async function RestaurantDashboard() {
         </div>
       </div>
     </RestaurantDashboardClient>
+  );
+}
+
+// ── Creative Visual Progress Component ────────────────────────────────────────
+
+function OrderProgressVisualizer({ progress, status, daysPassed, totalDays }: { progress: number, status: string, daysPassed?: number, totalDays?: number }) {
+  // Determine which icon is active based on progress
+  const isSeed = progress === 0;
+  const isSprout = progress > 0 && progress < 50;
+  const isGrowing = progress >= 50 && progress < 90;
+  const isReady = progress >= 90;
+
+  return (
+    <div className="w-full">
+      <div className="flex justify-between items-end px-2 mb-1">
+        {/* Seed Phase */}
+        <div className={`flex flex-col items-center transition-all duration-500 ${isSeed ? "scale-110 opacity-100" : "opacity-40 scale-90"}`}>
+          <div className="w-4 h-4 rounded-full bg-amber-700 shadow-sm" />
+          <span className="text-[9px] font-bold mt-1 text-text-muted">Seed</span>
+        </div>
+        {/* Sprout Phase */}
+        <div className={`flex flex-col items-center transition-all duration-500 ${isSprout ? "scale-110 opacity-100" : "opacity-40 scale-90"}`}>
+          <Sprout className={`w-5 h-5 ${isSprout ? "text-sprout-600 drop-shadow-sm" : "text-gray-400"}`} />
+          <span className="text-[9px] font-bold mt-1 text-text-muted">Sprout</span>
+        </div>
+        {/* Growing Phase */}
+        <div className={`flex flex-col items-center transition-all duration-500 ${isGrowing ? "scale-110 opacity-100" : "opacity-40 scale-90"}`}>
+          <Leaf className={`w-6 h-6 ${isGrowing ? "text-sprout-700 drop-shadow-md" : "text-gray-400"}`} />
+          <span className="text-[9px] font-bold mt-1 text-text-muted">Growing</span>
+        </div>
+        {/* Ready Phase */}
+        <div className={`flex flex-col items-center transition-all duration-500 ${isReady ? "scale-110 opacity-100" : "opacity-40 scale-90"}`}>
+          <Flower2 className={`w-6 h-6 ${isReady ? "text-emerald-600 drop-shadow-lg animate-pulse" : "text-gray-400"}`} />
+          <span className="text-[9px] font-bold mt-1 text-text-muted">Ready</span>
+        </div>
+      </div>
+      
+      {/* Progress Track */}
+      <div className="relative w-full h-2 bg-sprout-100 rounded-full mt-1 overflow-hidden">
+        <div 
+          className="absolute left-0 top-0 h-full bg-gradient-to-r from-sprout-400 to-sprout-600 rounded-full transition-all duration-1000 ease-out" 
+          style={{ width: `${progress}%` }} 
+        />
+        {/* Water/Sun animation effect overlay */}
+        {progress > 0 && progress < 100 && (
+          <div className="absolute inset-0 bg-[linear-gradient(90deg,transparent_25%,rgba(255,255,255,0.3)_50%,transparent_75%)] bg-[length:200%_100%] animate-shimmer" />
+        )}
+      </div>
+      
+      {/* Status Text */}
+      <div className="flex justify-between items-center mt-1.5 px-1">
+        <span className="text-[10px] text-sprout-800 font-semibold flex items-center gap-1">
+          {progress > 0 && progress < 100 ? <CloudRain className="w-3 h-3 text-blue-400" /> : <Sun className="w-3 h-3 text-amber-500" />}
+          {progress}%
+        </span>
+        {daysPassed !== undefined && totalDays !== undefined && status === "in-production" && (
+          <span className="text-[9px] text-text-muted font-medium">Day {daysPassed} of {totalDays}</span>
+        )}
+      </div>
+    </div>
   );
 }

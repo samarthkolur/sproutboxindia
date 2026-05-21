@@ -42,11 +42,18 @@ export default async function AdminDashboard() {
       href: "/admin/demand",
     },
     {
-      label: "Tasks to allocate",
-      count: pending.unassignedTasks,
+      label: "Plans to allocate",
+      count: pending.allocatePending,
       color: "bg-blue-500",
       icon: Target,
       href: "/admin/allocate",
+    },
+    {
+      label: "Seeds to dispatch",
+      count: pending.dispatchPending,
+      color: "bg-orange-500",
+      icon: Truck,
+      href: "/admin/dispatch",
     },
     {
       label: "QC reviews pending",
@@ -54,13 +61,6 @@ export default async function AdminDashboard() {
       color: "bg-purple-500",
       icon: ShieldCheck,
       href: "/admin/qc",
-    },
-    {
-      label: "Deliveries in transit",
-      count: pending.inTransit,
-      color: "bg-sprout-500",
-      icon: Truck,
-      href: "/admin/deliveries",
     },
   ];
 

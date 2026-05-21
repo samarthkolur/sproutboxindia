@@ -2,6 +2,7 @@ import { StatCard } from "@/components/shared/StatCard";
 import { GlassCard } from "@/components/shared/GlassCard";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { GrowerDashboardClient } from "./client";
+import { RequestPickupButton } from "@/components/grower/RequestPickupButton";
 import { auth } from "@/lib/auth";
 import { getGrowerDashboard } from "@/actions/dashboard.actions";
 import {
@@ -159,7 +160,12 @@ export default async function GrowerDashboard() {
                         </p>
                       </div>
 
-                      <ChevronRight className="w-4 h-4 text-text-muted flex-shrink-0 group-hover:text-sprout-800 group-hover:translate-x-0.5 transition-all" />
+                      <div className="flex items-center gap-2">
+                        {task.currentDay >= task.totalDays && task.status !== "harvest-ready" && task.status !== "harvested" && (
+                          <RequestPickupButton taskId={task.id} />
+                        )}
+                        <ChevronRight className="w-4 h-4 text-text-muted flex-shrink-0 group-hover:text-sprout-800 group-hover:translate-x-0.5 transition-all" />
+                      </div>
                     </div>
                   );
                 })}

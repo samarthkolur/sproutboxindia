@@ -25,6 +25,7 @@ import {
   LogOut,
   Menu,
   X,
+  Send,
   type LucideIcon,
 } from "lucide-react";
 
@@ -51,6 +52,7 @@ const roleNavItems: Record<string, NavItem[]> = {
     { label: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
     { label: "Demand Engine", href: "/admin/demand", icon: Settings2 },
     { label: "Allocations", href: "/admin/allocate", icon: Target },
+    { label: "Dispatch", href: "/admin/dispatch", icon: Send },
     { label: "QC Review", href: "/admin/qc", icon: CheckCircle2 },
     { label: "Hubs", href: "/admin/hubs", icon: Warehouse },
     { label: "Growers", href: "/admin/growers", icon: Users },

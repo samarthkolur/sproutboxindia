@@ -188,6 +188,15 @@ export async function getRestaurantDashboard(userId: string) {
         orders: {
           orderBy: { createdAt: "desc" },
           take: 5,
+          include: {
+            productionPlan: {
+              include: {
+                tasks: {
+                  include: { batches: true },
+                },
+              },
+            },
+          },
         },
         feedbacks: {
           select: { rating: true },
@@ -228,14 +237,46 @@ export async function getRestaurantDashboard(userId: string) {
       monthSpend,
       totalOrders: restaurant.orders.length,
       avgRating,
-      recentOrders: restaurant.orders.slice(0, 5).map((o) => ({
-        id: o.id.slice(0, 8).toUpperCase(),
-        cropType: o.cropType,
-        quantityKg: o.quantityKg,
-        totalPrice: o.totalPrice,
-        status: o.status.toLowerCase().replace(/_/g, "-"),
-        date: o.createdAt.toLocaleDateString("en-IN", { month: "short", day: "numeric" }),
-      })),
+      recentOrders: restaurant.orders.slice(0, 5).map((o) => {
+        let progress = 0;
+        let daysPassed = 0;
+        let totalDays = 7;
+        
+        if (["DELIVERED"].includes(o.status)) {
+          progress = 100;
+        } else if (["AT_HUB", "IN_TRANSIT"].includes(o.status)) {
+          progress = 90;
+        } else if (o.status === "IN_PRODUCTION" && o.productionPlan) {
+          totalDays = Math.max(
+            7,
+            Math.ceil(
+              (o.productionPlan.harvestDate.getTime() - o.productionPlan.sowDate.getTime()) /
+                (1000 * 60 * 60 * 24)
+            )
+          );
+          
+          let maxDay = 0;
+          for (const task of o.productionPlan.tasks) {
+            for (const batch of task.batches) {
+              if (batch.currentDay > maxDay) maxDay = batch.currentDay;
+            }
+          }
+          daysPassed = maxDay;
+          progress = Math.min(85, Math.round((maxDay / totalDays) * 100));
+        }
+
+        return {
+          id: o.id.slice(0, 8).toUpperCase(),
+          cropType: o.cropType,
+          quantityKg: o.quantityKg,
+          totalPrice: o.totalPrice,
+          status: o.status.toLowerCase().replace(/_/g, "-"),
+          date: o.createdAt.toLocaleDateString("en-IN", { month: "short", day: "numeric" }),
+          progress,
+          daysPassed,
+          totalDays,
+        };
+      }),
     };
   } catch {
     return {
@@ -251,17 +292,18 @@ export async function getRestaurantDashboard(userId: string) {
 // ── Pending Action Counts (Admin) ─────────────────────────────────────────────
 export async function getAdminPendingCounts() {
   try {
-    const [ordersNoPlan, unassignedTasks, qcPending, inTransit] = await Promise.all([
+    const [ordersNoPlan, allocatePending, dispatchPending, qcPending, inTransit] = await Promise.all([
       prisma.order.count({
         where: { status: "CONFIRMED", productionPlan: null },
       }),
+      prisma.productionPlan.count({ where: { status: "DRAFT" } }),
       prisma.task.count({ where: { status: "ASSIGNED" } }),
       prisma.batch.count({ where: { status: "QC_PENDING" } }),
       prisma.delivery.count({ where: { status: "IN_TRANSIT" } }),
     ]);
 
-    return { ordersNoPlan, unassignedTasks, qcPending, inTransit };
+    return { ordersNoPlan, allocatePending, dispatchPending, qcPending, inTransit };
   } catch {
-    return { ordersNoPlan: 0, unassignedTasks: 0, qcPending: 0, inTransit: 0 };
+    return { ordersNoPlan: 0, allocatePending: 0, dispatchPending: 0, qcPending: 0, inTransit: 0 };
   }
 }
