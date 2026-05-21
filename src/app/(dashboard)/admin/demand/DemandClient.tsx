@@ -50,7 +50,7 @@ export function DemandClient({ initialOrders }: { initialOrders: OrderItem[] }) 
     <div className="space-y-4">
       {/* Success banner with CTA to allocate */}
       {createdPlanIds.length > 0 && (
-        <div className="flex items-center justify-between gap-4 rounded-xl border border-sprout-500/30 bg-sprout-50 px-5 py-4">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 rounded-xl border border-sprout-500/30 bg-sprout-50 px-5 py-4">
           <div className="flex items-center gap-3">
             <Check className="w-5 h-5 text-sprout-700 flex-shrink-0" />
             <div>
@@ -128,7 +128,7 @@ export function DemandClient({ initialOrders }: { initialOrders: OrderItem[] }) 
                 </div>
               </div>
 
-              <div className="grid grid-cols-3 gap-4 bg-sprout-50/50 rounded-xl p-4 border border-sprout-200/30 mb-4">
+              <div className="grid grid-cols-3 gap-2 sm:gap-4 bg-sprout-50/50 rounded-xl p-4 border border-sprout-200/30 mb-4">
                 <div>
                   <p className="text-[11px] text-text-muted uppercase tracking-wider font-semibold">
                     Base Trays

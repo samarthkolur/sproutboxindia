@@ -49,7 +49,7 @@ export default async function DashboardLayout({
 
       {/* Main content */}
       <main className="flex-1 lg:ml-[260px] relative z-10">
-        <div className="p-6 lg:p-8 max-w-7xl mx-auto pt-14 lg:pt-8">{children}</div>
+        <div className="p-6 lg:p-8 max-w-7xl mx-auto pt-20 lg:pt-8">{children}</div>
       </main>
     </div>
   );

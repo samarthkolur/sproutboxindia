@@ -185,11 +185,11 @@ export function QCClient({ initialQueue }: { initialQueue: QCBatchItem[] }) {
                 </p>
               )}
 
-              <div className="flex items-center gap-3">
+              <div className="flex flex-col sm:flex-row items-center gap-3">
                 <button
                   disabled={processingId === batch.id}
                   onClick={() => handleQC(batch, "PASS")}
-                  className="flex-1 bg-sprout-800 text-white py-2 rounded-xl text-sm font-semibold hover:bg-sprout-900 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full sm:flex-1 bg-sprout-800 text-white py-2 rounded-xl text-sm font-semibold hover:bg-sprout-900 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {processingId === batch.id ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
@@ -201,7 +201,7 @@ export function QCClient({ initialQueue }: { initialQueue: QCBatchItem[] }) {
                 <button
                   disabled={processingId === batch.id}
                   onClick={() => handleQC(batch, "RISK")}
-                  className="flex-1 bg-amber-500 text-white py-2 rounded-xl text-sm font-semibold hover:bg-amber-600 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full sm:flex-1 bg-amber-500 text-white py-2 rounded-xl text-sm font-semibold hover:bg-amber-600 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {processingId === batch.id ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
@@ -213,7 +213,7 @@ export function QCClient({ initialQueue }: { initialQueue: QCBatchItem[] }) {
                 <button
                   disabled={processingId === batch.id}
                   onClick={() => handleQC(batch, "REJECT")}
-                  className="flex-1 bg-red-500 text-white py-2 rounded-xl text-sm font-semibold hover:bg-red-600 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full sm:flex-1 bg-red-500 text-white py-2 rounded-xl text-sm font-semibold hover:bg-red-600 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {processingId === batch.id ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
