@@ -169,7 +169,7 @@ export function Sidebar({ userName, userRole }: SidebarProps) {
             </p>
           </div>
           <Link
-            href="/api/auth/signout"
+            href="/signout"
             className="w-8 h-8 rounded-lg flex items-center justify-center text-text-muted hover:bg-red-50 hover:text-red-600 transition-colors"
             title="Sign out"
           >

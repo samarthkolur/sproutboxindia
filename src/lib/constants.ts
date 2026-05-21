@@ -40,6 +40,16 @@ export const CROP_DISPLAY_NAMES: Record<CropType, string> = {
   fenugreek: "Fenugreek",
 };
 
+// ── Crop Images ─────────────────────────────────────────────────────────────
+export const CROP_IMAGES: Record<CropType, string> = {
+  sunflower: "/sunflower.png",
+  "pea-shoots": "/pea-shoots.png",
+  radish: "/radish.png",
+  wheatgrass: "/wheatgrass.jpg",
+  mustard: "/mustard.jpg",
+  fenugreek: "/fenugreek.jpg",
+};
+
 // ── Production Constants ────────────────────────────────────────────────────
 export const PAYOUT_PER_TRAY = 50; // ₹50 per accepted tray
 export const TRAY_YIELD_GRAMS = 200; // 200g per tray
