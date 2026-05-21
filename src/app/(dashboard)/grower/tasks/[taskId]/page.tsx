@@ -2,10 +2,11 @@ import { notFound } from "next/navigation";
 import { DayInstructions } from "@/components/grower/DayInstructions";
 import { TaskCard } from "@/components/grower/TaskCard";
 import { CheckinModal } from "@/components/grower/CheckinModal";
+import { RequestPickupButton } from "@/components/grower/RequestPickupButton";
 import { GlassCard } from "@/components/shared/GlassCard";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { CROP_DISPLAY_NAMES, type CropType } from "@/lib/constants";
+import { CROP_DISPLAY_NAMES, CROP_CYCLE_DAYS, type CropType } from "@/lib/constants";
 import { CheckCircle2, AlertCircle } from "lucide-react";
 
 export default async function GrowerTaskDetailPage({
@@ -39,9 +40,13 @@ export default async function GrowerTaskDetailPage({
       b.status !== "QC_FAILED"
   );
 
-  // Determine if grower already checked in today for active batch
-  const alreadyCheckedInToday =
-    activeBatch?.checkIns[0]?.day === currentDay + 1;
+  const lastCheckIn = activeBatch?.checkIns?.[0];
+  const alreadyCheckedInToday = lastCheckIn
+    ? new Date(lastCheckIn.createdAt).toDateString() === new Date().toDateString()
+    : false;
+
+  const totalDays = CROP_CYCLE_DAYS[task.cropType as CropType] || 7;
+  const isCompleted = currentDay >= totalDays;
 
   const cropName =
     CROP_DISPLAY_NAMES[task.cropType as CropType] || task.cropType;
@@ -65,13 +70,28 @@ export default async function GrowerTaskDetailPage({
         harvestDate={task.harvestDate}
       />
 
-      {/* Check-in CTA */}
-      {activeBatch && task.status !== "HARVESTED" && task.status !== "CANCELLED" && (
+      {/* Check-in or Pickup CTA */}
+      {isCompleted && task.status !== "HARVEST_READY" && task.status !== "HARVESTED" && task.status !== "CANCELLED" ? (
+        <GlassCard>
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <h3 className="text-base font-bold text-text-primary mb-1">
+                Microgreens are Ready!
+              </h3>
+              <div className="flex items-center gap-2 text-sm text-sprout-700">
+                <CheckCircle2 className="w-4 h-4" />
+                <span>Growth cycle complete. Request pickup for delivery.</span>
+              </div>
+            </div>
+            <RequestPickupButton taskId={task.id} />
+          </div>
+        </GlassCard>
+      ) : activeBatch && task.status !== "HARVESTED" && task.status !== "CANCELLED" && (
         <GlassCard>
           <div className="flex items-start justify-between gap-4">
             <div>
               <h3 className="text-base font-bold text-text-primary mb-1">
-                Day {currentDay + 1} Action Required
+                Day {Math.min(currentDay + 1, totalDays)} Action Required
               </h3>
               {alreadyCheckedInToday ? (
                 <div className="flex items-center gap-2 text-sm text-sprout-700">
@@ -86,7 +106,7 @@ export default async function GrowerTaskDetailPage({
               )}
             </div>
             {!alreadyCheckedInToday && (
-              <CheckinModal batchId={activeBatch.id} day={currentDay + 1} />
+              <CheckinModal batchId={activeBatch.id} day={Math.min(currentDay + 1, totalDays)} />
             )}
           </div>
         </GlassCard>

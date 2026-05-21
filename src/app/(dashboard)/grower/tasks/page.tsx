@@ -15,6 +15,7 @@ import {
   CheckCircle2,
 } from "lucide-react";
 import { CheckinModal } from "@/components/grower/CheckinModal";
+import { RequestPickupButton } from "@/components/grower/RequestPickupButton";
 
 async function getGrowerTasks(userId: string) {
   try {
@@ -91,14 +92,17 @@ export default async function GrowerTasksPage() {
                   const instructions = CROP_INSTRUCTIONS[task.cropType];
                   const todayInstruction = instructions?.[currentDay + 1];
 
-                  // Find active batch for check-in
                   const activeBatch = task.batches.find(
                     (b) =>
                       b.status !== "HARVESTED" &&
                       b.status !== "REJECTED"
                   );
-                  const alreadyCheckedIn =
-                    activeBatch?.checkIns[0]?.day === currentDay + 1;
+                  const lastCheckIn = activeBatch?.checkIns?.[0];
+                  const alreadyCheckedInToday = lastCheckIn 
+                    ? new Date(lastCheckIn.createdAt).toDateString() === new Date().toDateString() 
+                    : false;
+
+                  const isCompleted = currentDay >= totalDays;
 
                   return (
                     <GlassCard key={task.id}>
@@ -173,12 +177,14 @@ export default async function GrowerTasksPage() {
 
                       {/* Actions */}
                       <div className="flex items-center justify-between">
-                        {activeBatch && !alreadyCheckedIn ? (
+                        {isCompleted && task.status !== "HARVEST_READY" && task.status !== "HARVESTED" ? (
+                          <RequestPickupButton taskId={task.id} />
+                        ) : activeBatch && !alreadyCheckedInToday ? (
                           <CheckinModal
                             batchId={activeBatch.id}
-                            day={currentDay + 1}
+                            day={Math.min(currentDay + 1, totalDays)}
                           />
-                        ) : activeBatch && alreadyCheckedIn ? (
+                        ) : activeBatch && alreadyCheckedInToday ? (
                           <span className="flex items-center gap-1.5 text-sm text-sprout-700 font-medium">
                             <CheckCircle2 className="w-4 h-4" />
                             Checked in today
