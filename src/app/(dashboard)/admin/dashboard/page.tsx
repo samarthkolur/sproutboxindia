@@ -81,17 +81,17 @@ export default async function AdminDashboard() {
   return (
     <AdminDashboardClient>
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-black text-text-primary tracking-tight">
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-2xl sm:text-3xl font-black text-text-primary tracking-tight">
           Command Center
         </h1>
-        <p className="text-text-secondary mt-1">
+        <p className="text-sm sm:text-base text-text-secondary mt-1">
           Platform overview and operations at a glance
         </p>
       </div>
 
       {/* KPI Grid */}
-      <div className="mb-8 grid gap-4 min-[480px]:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+      <div className="mb-8 grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 xl:grid-cols-6">
         <StatCard
           label="Active Orders"
           value={kpis.activeOrders}
@@ -133,7 +133,7 @@ export default async function AdminDashboard() {
       </div>
 
       {/* Pending Actions */}
-      <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mb-6 sm:mb-8 grid gap-3 sm:gap-4 grid-cols-1 min-[420px]:grid-cols-2 lg:grid-cols-4">
         {pendingActions.map((action) => {
           const Icon = action.icon;
           return (
@@ -162,7 +162,7 @@ export default async function AdminDashboard() {
         })}
       </div>
 
-      <div className="grid lg:grid-cols-3 gap-6">
+      <div className="grid gap-5 sm:gap-6 lg:grid-cols-3">
         {/* Recent Orders — 2 cols */}
         <div className="lg:col-span-2 space-y-6">
           <GlassCard>
@@ -306,7 +306,7 @@ function AdminWeeklyChart({
   data: { label: string; value: number; tooltip: string }[];
 }) {
   return (
-    <div className="flex h-36 items-end gap-1.5 sm:gap-2">
+    <div className="flex h-28 sm:h-36 items-end gap-1 sm:gap-2">
       {data.map((item, i) => (
         <div
           key={i}

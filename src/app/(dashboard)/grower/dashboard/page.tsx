@@ -57,18 +57,18 @@ export default async function GrowerDashboard() {
   return (
     <GrowerDashboardClient>
       {/* Header */}
-      <div className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
+      <div className="mb-6 sm:mb-8 flex flex-col gap-3 sm:gap-4 md:flex-row md:items-end md:justify-between">
         <div>
-          <h1 className="text-3xl font-black text-text-primary tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-black text-text-primary tracking-tight">
             {greeting}
           </h1>
-          <p className="text-text-secondary mt-1">
+          <p className="text-sm sm:text-base text-text-secondary mt-1">
             Here&apos;s your growing overview for today
           </p>
         </div>
         <a 
           href="/grower/tutorial"
-          className="flex w-full items-center justify-center gap-2 rounded-xl border border-sprout-200 bg-sprout-50 px-4 py-2 text-sm font-semibold text-sprout-800 transition-colors hover:bg-sprout-100 md:w-auto"
+          className="flex w-full items-center justify-center gap-2 rounded-xl border border-sprout-200 bg-sprout-50 px-4 py-2.5 text-sm font-semibold text-sprout-800 transition-colors hover:bg-sprout-100 sm:w-auto"
         >
           <BookOpen className="w-4 h-4" />
           How to Grow Guide
@@ -76,7 +76,7 @@ export default async function GrowerDashboard() {
       </div>
 
       {/* Stats Grid */}
-      <div className="mb-8 grid gap-4 min-[480px]:grid-cols-2 lg:grid-cols-4">
+      <div className="mb-6 sm:mb-8 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
         <StatCard
           label="Active Trays"
           value={data.activeTrays}
@@ -108,7 +108,7 @@ export default async function GrowerDashboard() {
       </div>
 
       {/* Main content grid */}
-      <div className="grid lg:grid-cols-3 gap-6">
+      <div className="grid gap-5 sm:gap-6 lg:grid-cols-3">
         {/* Active Tasks — 2 cols */}
         <div className="lg:col-span-2">
           <GlassCard>
@@ -244,7 +244,7 @@ export default async function GrowerDashboard() {
               Last {earningsData.length} periods
             </span>
           </div>
-          <div className="flex h-32 items-end gap-1.5 sm:gap-3">
+          <div className="flex h-24 sm:h-32 items-end gap-1 sm:gap-3">
             {earningsData.length > 0 ? (
               earningsData.map((item, i) => (
                 <div

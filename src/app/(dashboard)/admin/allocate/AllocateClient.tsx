@@ -264,7 +264,7 @@ export function AllocateClient({
 
   // ── Main layout ──────────────────────────────────────────────────────────────
   return (
-    <div className="grid gap-6 lg:grid-cols-2">
+    <div className="grid gap-5 sm:gap-6 lg:grid-cols-2">
       {/* ── LEFT: Plan selection ────────────────────────────────────────────── */}
       <div className="space-y-3">
         <h2 className="text-sm font-bold text-text-muted uppercase tracking-wider mb-3">

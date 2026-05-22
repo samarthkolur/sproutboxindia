@@ -27,10 +27,10 @@ export default async function RestaurantOrdersPage() {
 
   return (
     <div>
-      <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="mb-6 sm:mb-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-3xl font-black text-text-primary tracking-tight">My Orders</h1>
-          <p className="text-text-secondary mt-1">View and track all your orders</p>
+          <h1 className="text-2xl sm:text-3xl font-black text-text-primary tracking-tight">My Orders</h1>
+          <p className="text-sm sm:text-base text-text-secondary mt-1">View and track all your orders</p>
         </div>
         <Link
           href="/restaurant/order/new"

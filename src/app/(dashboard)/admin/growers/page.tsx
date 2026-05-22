@@ -8,9 +8,9 @@ export default async function AdminGrowersPage() {
 
   return (
     <div>
-      <h1 className="mb-6 text-3xl font-black text-text-primary">Growers</h1>
+      <h1 className="mb-6 text-2xl sm:text-3xl font-black text-text-primary">Growers</h1>
       {growers.length ? (
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <div className="grid gap-3 sm:gap-4 grid-cols-1 min-[480px]:grid-cols-2 xl:grid-cols-3">
           {growers.map((grower) => (
             <Link key={grower.id} href={`/admin/growers/${grower.id}`}>
               <GlassCard hover>

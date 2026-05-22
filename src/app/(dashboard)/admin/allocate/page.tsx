@@ -57,14 +57,14 @@ export default async function AllocatePage() {
 
   return (
     <div>
-      <div className="mb-8">
-        <div className="flex items-center gap-3 mb-1">
-          <Target className="w-7 h-7 text-sprout-700" />
-          <h1 className="text-3xl font-black text-text-primary tracking-tight">
+      <div className="mb-6 sm:mb-8">
+        <div className="flex items-center gap-2 sm:gap-3 mb-1">
+          <Target className="w-6 h-6 sm:w-7 sm:h-7 text-sprout-700 flex-shrink-0" />
+          <h1 className="text-2xl sm:text-3xl font-black text-text-primary tracking-tight">
             Allocate Tasks
           </h1>
         </div>
-        <p className="text-text-secondary">
+        <p className="text-sm sm:text-base text-text-secondary">
           Assign production plans to growers — nearby growers get priority ·{" "}
           {plans.length} plan{plans.length !== 1 ? "s" : ""} awaiting ·{" "}
           {growers.length} active grower{growers.length !== 1 ? "s" : ""}

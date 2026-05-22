@@ -55,11 +55,11 @@ export default async function GrowerTasksPage() {
 
   return (
     <div>
-      <div className="mb-8">
-        <h1 className="text-3xl font-black text-text-primary tracking-tight">
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-2xl sm:text-3xl font-black text-text-primary tracking-tight">
           My Tasks
         </h1>
-        <p className="text-text-secondary mt-1">
+        <p className="text-sm sm:text-base text-text-secondary mt-1">
           {activeTasks.length} active task{activeTasks.length !== 1 ? "s" : ""}{" "}
           · {completedTasks.length} completed
         </p>

@@ -34,9 +34,9 @@ export default async function GrowerEarningsPage() {
 
   return (
     <div>
-      <div className="mb-8">
-        <h1 className="text-3xl font-black text-text-primary tracking-tight">Earnings</h1>
-        <p className="text-text-secondary mt-1">Track your payouts and total earnings</p>
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-2xl sm:text-3xl font-black text-text-primary tracking-tight">Earnings</h1>
+        <p className="text-sm sm:text-base text-text-secondary mt-1">Track your payouts and total earnings</p>
       </div>
 
       {/* Total earnings card */}

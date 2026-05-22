@@ -55,15 +55,15 @@ export default function TutorialPage() {
 
   return (
     <div className="max-w-4xl mx-auto pb-10">
-      <div className="mb-8 flex flex-col gap-3 min-[420px]:flex-row min-[420px]:items-center">
-        <div className="w-12 h-12 rounded-xl bg-sprout-100 flex items-center justify-center">
-          <BookOpen className="w-6 h-6 text-sprout-700" />
+      <div className="mb-6 sm:mb-8 flex flex-col gap-3 min-[420px]:flex-row min-[420px]:items-center">
+        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-sprout-100 flex items-center justify-center flex-shrink-0">
+          <BookOpen className="w-5 h-5 sm:w-6 sm:h-6 text-sprout-700" />
         </div>
         <div>
-          <h1 className="text-3xl font-black text-text-primary tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-black text-text-primary tracking-tight">
             Grower Tutorial
           </h1>
-          <p className="text-text-secondary mt-1">
+          <p className="text-sm sm:text-base text-text-secondary mt-1">
             Learn how to use your SproutBox kit to grow premium microgreens
           </p>
         </div>
@@ -78,7 +78,7 @@ export default function TutorialPage() {
                 {step.icon}
               </div>
               <div>
-                <h3 className="flex flex-wrap items-center gap-2 text-xl font-bold text-text-primary">
+                <h3 className="flex flex-wrap items-center gap-1 sm:gap-2 text-lg sm:text-xl font-bold text-text-primary">
                   <span>{`Step ${index + 1}`}</span>
                   <span>: </span>
                   <span>{step.title}</span>
@@ -101,7 +101,7 @@ export default function TutorialPage() {
 
         <GlassCard className="bg-sprout-50/50 border-sprout-200">
           <h3 className="text-lg font-bold text-sprout-800 mb-2">Pro Tips for Success</h3>
-          <ul className="grid md:grid-cols-2 gap-4">
+          <ul className="grid gap-3 sm:gap-4 min-[480px]:grid-cols-2">
             <li className="bg-white/60 p-3 rounded-lg border border-sprout-100 text-sm text-text-primary">
               <span className="font-semibold block mb-1">Ventilation is key</span>
               Ensure there is decent airflow in the room to prevent mold growth on the dense root mats.

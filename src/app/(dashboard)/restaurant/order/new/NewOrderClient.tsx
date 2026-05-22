@@ -112,16 +112,16 @@ export function NewOrderClient() {
   };
 
   return (
-    <div className="grid gap-6 lg:grid-cols-3 lg:gap-8">
+    <div className="grid gap-5 sm:gap-6 lg:grid-cols-3 lg:gap-8">
       {/* Crop Catalog */}
       <div className="lg:col-span-2 space-y-6">
-        <div className="grid gap-5 md:grid-cols-2 md:gap-6">
+        <div className="grid gap-4 sm:gap-5 min-[480px]:grid-cols-2 md:gap-6">
           {CROP_TYPES.map((crop) => {
             const cartItem = cart.find((item) => item.cropType === crop);
             return (
               <GlassCard key={crop} className="overflow-hidden p-0 flex flex-col h-full group hover:shadow-sprout-800/10 hover:border-sprout-700/30 transition-all duration-300">
                 {/* Product Image */}
-                <div className="relative h-44 w-full overflow-hidden bg-sprout-50">
+                <div className="relative h-36 sm:h-44 w-full overflow-hidden bg-sprout-50">
                   <Image
                     src={CROP_IMAGES[crop]}
                     alt={CROP_DISPLAY_NAMES[crop]}

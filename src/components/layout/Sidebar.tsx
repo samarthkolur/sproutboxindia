@@ -183,7 +183,8 @@ export function Sidebar({ userName, userRole }: SidebarProps) {
       {/* Mobile hamburger trigger */}
       <button
         onClick={() => setMobileOpen(true)}
-        className="fixed left-4 top-4 z-50 flex h-10 w-10 items-center justify-center rounded-xl glass-card shadow-lg lg:hidden"
+        className="fixed left-3 top-3 z-50 flex h-11 w-11 items-center justify-center rounded-xl bg-white/80 backdrop-blur-xl border border-white/50 shadow-lg lg:hidden active:scale-95 transition-transform"
+        aria-label="Open navigation menu"
       >
         <Menu className="w-5 h-5 text-text-primary" />
       </button>

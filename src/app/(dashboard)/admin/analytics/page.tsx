@@ -36,15 +36,15 @@ export default async function AnalyticsPage() {
 
   return (
     <div>
-      <div className="mb-8">
-        <div className="flex items-center gap-3 mb-1">
-          <BarChart3 className="w-7 h-7 text-sprout-700" />
-          <h1 className="text-3xl font-black text-text-primary tracking-tight">Analytics</h1>
+      <div className="mb-6 sm:mb-8">
+        <div className="flex items-center gap-2 sm:gap-3 mb-1">
+          <BarChart3 className="w-6 h-6 sm:w-7 sm:h-7 text-sprout-700 flex-shrink-0" />
+          <h1 className="text-2xl sm:text-3xl font-black text-text-primary tracking-tight">Analytics</h1>
         </div>
-        <p className="text-text-secondary">Platform-wide performance metrics</p>
+        <p className="text-sm sm:text-base text-text-secondary">Platform-wide performance metrics</p>
       </div>
 
-      <div className="mb-8 grid gap-4 min-[480px]:grid-cols-2 lg:grid-cols-5">
+      <div className="mb-6 sm:mb-8 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-5">
         {metrics.map((m) => (
           <GlassCard key={m.label}>
             <div className={`w-12 h-12 ${m.bg} rounded-xl flex items-center justify-center mb-3`}>

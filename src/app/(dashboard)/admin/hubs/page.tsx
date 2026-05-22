@@ -8,9 +8,9 @@ export default async function AdminHubsPage() {
 
   return (
     <div>
-      <h1 className="mb-6 text-3xl font-black text-text-primary">Hubs</h1>
+      <h1 className="mb-6 text-2xl sm:text-3xl font-black text-text-primary">Hubs</h1>
       {hubs.length ? (
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid gap-3 sm:gap-4 grid-cols-1 min-[480px]:grid-cols-2">
           {hubs.map((hub) => (
             <Link key={hub.id} href={`/admin/hubs/${hub.id}`}>
               <GlassCard hover>

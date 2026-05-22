@@ -35,14 +35,14 @@ export default async function GrowerProfilePage() {
 
   return (
     <div>
-      <div className="mb-8">
-        <h1 className="text-3xl font-black text-text-primary tracking-tight">Profile</h1>
-        <p className="text-text-secondary mt-1">Your account and payment details</p>
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-2xl sm:text-3xl font-black text-text-primary tracking-tight">Profile</h1>
+        <p className="text-sm sm:text-base text-text-secondary mt-1">Your account and payment details</p>
       </div>
 
       {/* Score cards */}
       {grower && (
-        <div className="mb-6 grid gap-4 min-[480px]:grid-cols-3">
+        <div className="mb-6 grid grid-cols-3 gap-3 sm:gap-4">
           {[
             { label: "Yield Score", value: Math.round(grower.yieldScore * 100) },
             { label: "Quality Score", value: Math.round(grower.qualityScore * 100) },

@@ -54,12 +54,12 @@ export default async function RestaurantDashboard() {
   return (
     <RestaurantDashboardClient>
       {/* Header */}
-      <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="mb-6 sm:mb-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-3xl font-black text-text-primary tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-black text-text-primary tracking-tight">
             Welcome back
           </h1>
-          <p className="text-text-secondary mt-1">
+          <p className="text-sm sm:text-base text-text-secondary mt-1">
             Manage your microgreen orders and deliveries
           </p>
         </div>
@@ -73,7 +73,7 @@ export default async function RestaurantDashboard() {
       </div>
 
       {/* Stats Grid */}
-      <div className="mb-8 grid gap-4 min-[480px]:grid-cols-2 lg:grid-cols-4">
+      <div className="mb-6 sm:mb-8 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
         <StatCard
           label="Active Orders"
           value={data.activeOrders}
@@ -103,7 +103,7 @@ export default async function RestaurantDashboard() {
         />
       </div>
 
-      <div className="grid lg:grid-cols-3 gap-6">
+      <div className="grid gap-5 sm:gap-6 lg:grid-cols-3">
         {/* Recent Orders — 2 cols */}
         <div className="lg:col-span-2">
           <GlassCard>
