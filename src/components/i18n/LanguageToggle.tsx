@@ -39,7 +39,7 @@ export function LanguageToggle({ className }: { className?: string }) {
 
 export function FloatingLanguageToggle() {
   return (
-    <div className="fixed bottom-4 right-4 z-[70]">
+    <div className="fixed bottom-4 right-4 z-[70] hidden lg:block">
       <LanguageToggle />
     </div>
   );

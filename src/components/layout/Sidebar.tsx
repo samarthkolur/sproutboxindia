@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { BrandLogo } from "@/components/layout/BrandLogo";
+import { LanguageToggle } from "@/components/i18n/LanguageToggle";
 import { cn } from "@/lib/utils";
 import {
   LayoutDashboard,
@@ -148,7 +149,11 @@ export function Sidebar({ userName, userRole }: SidebarProps) {
       </nav>
 
       {/* User section */}
-      <div className="px-4 py-4 border-t border-sprout-200/30">
+      <div className="px-4 py-4 border-t border-sprout-200/30 space-y-3">
+        {/* Language toggle — visible on mobile inside sidebar */}
+        <div className="lg:hidden px-2">
+          <LanguageToggle className="w-full justify-center" />
+        </div>
         <div className="flex items-center gap-3 px-2">
           <div
             className={cn(
