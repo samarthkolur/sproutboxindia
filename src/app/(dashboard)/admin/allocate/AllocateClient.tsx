@@ -371,12 +371,20 @@ export function AllocateClient({
                   </span>
                 </p>
               </div>
-              <button
-                onClick={handleAutoAllocate}
-                className="flex-shrink-0 rounded-lg bg-sprout-100 px-3 py-1.5 text-xs font-semibold text-sprout-700 transition-colors hover:bg-sprout-200"
-              >
-                Auto-Allocate
-              </button>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setAllocations(allocations.map(a => ({ ...a, trayCount: 0 })))}
+                  className="flex-shrink-0 rounded-lg bg-red-50 px-3 py-1.5 text-xs font-semibold text-red-600 transition-colors hover:bg-red-100"
+                >
+                  Clear All
+                </button>
+                <button
+                  onClick={handleAutoAllocate}
+                  className="flex-shrink-0 rounded-lg bg-sprout-100 px-3 py-1.5 text-xs font-semibold text-sprout-700 transition-colors hover:bg-sprout-200"
+                >
+                  Auto-Allocate
+                </button>
+              </div>
             </div>
 
             {/* Direct delivery notice */}

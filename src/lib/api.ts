@@ -15,5 +15,6 @@ export function parseError(error: unknown) {
   }
 
   console.error(error);
-  return fail("Internal server error", "INTERNAL_SERVER_ERROR", 500);
+  const message = error instanceof Error ? error.message : "Internal server error";
+  return fail(message, "INTERNAL_SERVER_ERROR", 500);
 }

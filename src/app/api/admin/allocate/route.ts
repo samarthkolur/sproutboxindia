@@ -41,11 +41,9 @@ export async function POST(request: Request) {
             sowDate: plan.sowDate,
             harvestDate: plan.harvestDate,
             batches: {
-              createMany: {
-                data: Array.from({ length: allocation.trayCount }, (_, index) => ({
-                  trayNumber: index + 1,
-                })),
-              },
+              create: Array.from({ length: allocation.trayCount }, (_, index) => ({
+                trayNumber: index + 1,
+              })),
             },
           },
           include: { batches: true },
