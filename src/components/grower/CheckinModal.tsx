@@ -11,6 +11,8 @@ export function CheckinModal({ batchId, day }: { batchId: string; day: number })
   const [open, setOpen] = useState(false);
   const [top, setTop] = useState("");
   const [side, setSide] = useState("");
+  const [topUploading, setTopUploading] = useState(false);
+  const [sideUploading, setSideUploading] = useState(false);
   const [notes, setNotes] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -105,8 +107,18 @@ export function CheckinModal({ batchId, day }: { batchId: string; day: number })
               <>
                 {/* Image uploaders */}
                 <div className="grid gap-4 sm:grid-cols-2 mb-4">
-                  <ImageUploader label="Top View" onChange={setTop} />
-                  <ImageUploader label="Side View" onChange={setSide} />
+                  <ImageUploader
+                    label="Top View"
+                    endpoint="growerCheckin"
+                    onChange={setTop}
+                    onUploadingChange={setTopUploading}
+                  />
+                  <ImageUploader
+                    label="Side View"
+                    endpoint="growerCheckin"
+                    onChange={setSide}
+                    onUploadingChange={setSideUploading}
+                  />
                 </div>
 
                 {/* Notes */}
@@ -141,7 +153,7 @@ export function CheckinModal({ batchId, day }: { batchId: string; day: number })
                   </Button>
                   <Button
                     type="button"
-                    disabled={submitting}
+                    disabled={submitting || topUploading || sideUploading}
                     className="bg-sprout-800 text-white hover:bg-sprout-900 flex items-center gap-2"
                     onClick={submit}
                   >
@@ -149,6 +161,8 @@ export function CheckinModal({ batchId, day }: { batchId: string; day: number })
                       <>
                         <Loader2 className="w-4 h-4 animate-spin" /> Submitting…
                       </>
+                    ) : topUploading || sideUploading ? (
+                      "Uploading photos…"
                     ) : (
                       "Submit Check-In"
                     )}

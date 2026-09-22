@@ -1,18 +1,42 @@
 "use client";
 
-import { useRef, useState } from "react";
-import { ImagePlus, X } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { ImagePlus, Loader2, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useUploadThing } from "@/lib/uploadthing-client";
+import type { UploadRouter } from "@/lib/uploadthing";
 
 interface ImageUploaderProps {
   label: string;
+  endpoint: keyof UploadRouter;
   value?: string;
   onChange?: (url: string) => void;
+  onUploadingChange?: (uploading: boolean) => void;
 }
 
-export function ImageUploader({ label, value, onChange }: ImageUploaderProps) {
+export function ImageUploader({ label, endpoint, value, onChange, onUploadingChange }: ImageUploaderProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [preview, setPreview] = useState(value || "");
+  const [error, setError] = useState<string | null>(null);
+
+  const { startUpload, isUploading } = useUploadThing(endpoint, {
+    onClientUploadComplete: (res) => {
+      const url = res?.[0]?.url;
+      if (url) {
+        setPreview(url);
+        onChange?.(url);
+      }
+    },
+    onUploadError: (err) => {
+      setError(err.message || "Upload failed");
+      setPreview("");
+      onChange?.("");
+    },
+  });
+
+  useEffect(() => {
+    onUploadingChange?.(isUploading);
+  }, [isUploading, onUploadingChange]);
 
   return (
     <div className="rounded-xl border border-sprout-800/15 bg-white/60 p-4">
@@ -33,13 +57,19 @@ export function ImageUploader({ label, value, onChange }: ImageUploaderProps) {
       </div>
       <button
         type="button"
+        disabled={isUploading}
         className={cn(
-          "flex min-h-[132px] w-full flex-col items-center justify-center rounded-xl border border-dashed border-sprout-800/20 bg-sprout-50/40 text-sm text-text-muted",
+          "flex min-h-[132px] w-full flex-col items-center justify-center rounded-xl border border-dashed border-sprout-800/20 bg-sprout-50/40 text-sm text-text-muted disabled:opacity-60",
           preview && "border-solid bg-white"
         )}
         onClick={() => inputRef.current?.click()}
       >
-        {preview ? (
+        {isUploading ? (
+          <>
+            <Loader2 className="mb-2 h-6 w-6 animate-spin text-sprout-700" />
+            Uploading…
+          </>
+        ) : preview ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={preview} alt={label} className="max-h-32 rounded-lg object-cover" />
         ) : (
@@ -49,6 +79,7 @@ export function ImageUploader({ label, value, onChange }: ImageUploaderProps) {
           </>
         )}
       </button>
+      {error && <p className="mt-2 text-xs text-red-600">{error}</p>}
       <input
         ref={inputRef}
         type="file"
@@ -57,9 +88,9 @@ export function ImageUploader({ label, value, onChange }: ImageUploaderProps) {
         onChange={(event) => {
           const file = event.target.files?.[0];
           if (!file) return;
-          const url = URL.createObjectURL(file);
-          setPreview(url);
-          onChange?.(url);
+          setError(null);
+          startUpload([file]);
+          event.target.value = "";
         }}
       />
     </div>

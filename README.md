@@ -102,7 +102,7 @@ Provide these values in `.env.local` (do not commit this file):
 - `AUTH_SECRET` or `NEXTAUTH_SECRET` — session/auth secret
 - `STRIPE_SECRET_KEY` — server-side Stripe secret key
 - `STRIPE_WEBHOOK_SECRET` — stripe webhook signing secret
-- `UPLOADTHING_SECRET` — UploadThing secret (if used)
+- `UPLOADTHING_TOKEN` — UploadThing v7 API token (required for grower check-in/QC photo uploads)
 - `GOOGLE_CLIENT_ID` & `GOOGLE_CLIENT_SECRET` — for Google OAuth (optional)
 
 Tip: Use your cloud provider or GitHub Actions / Vercel secrets to store production values.
