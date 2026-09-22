@@ -101,6 +101,7 @@ Provide these values in `.env.local` (do not commit this file):
 - `DATABASE_URL` — Postgres connection string (example: `postgresql://user:pass@host:5432/dbname`)
 - `AUTH_SECRET` or `NEXTAUTH_SECRET` — session/auth secret
 - `STRIPE_SECRET_KEY` — server-side Stripe secret key
+- `NEXT_PUBLIC_STRIPE_PUBLIC_KEY` — client-side Stripe publishable key (must be `NEXT_PUBLIC_`-prefixed to reach the browser; required for the restaurant checkout UI to render)
 - `STRIPE_WEBHOOK_SECRET` — stripe webhook signing secret
 - `UPLOADTHING_TOKEN` — UploadThing v7 API token (required for grower check-in/QC photo uploads)
 - `GOOGLE_CLIENT_ID` & `GOOGLE_CLIENT_SECRET` — for Google OAuth (optional)

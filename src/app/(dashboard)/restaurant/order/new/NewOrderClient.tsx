@@ -13,6 +13,7 @@ import {
 } from "@/lib/constants";
 import { ShoppingCart, Calendar, Info, Loader2, Minus, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { CheckoutModal, type PendingPayment } from "@/components/restaurant/CheckoutModal";
 
 interface CartItem {
   cropType: CropType;
@@ -25,6 +26,7 @@ export function NewOrderClient() {
   const [deliveryDate, setDeliveryDate] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [pendingPayments, setPendingPayments] = useState<PendingPayment[] | null>(null);
 
   // Get tomorrow's date + 10 days as the minimum delivery date
   const minDeliveryDate = new Date();
@@ -97,11 +99,35 @@ export function NewOrderClient() {
       const responses = await Promise.all(promises);
       const allOk = responses.every((r) => r.ok);
 
-      if (allOk) {
+      if (!allOk) {
+        setError("Failed to place one or more orders. Please try again.");
+        return;
+      }
+
+      const payloads = await Promise.all(responses.map((r) => r.json()));
+      const payments: PendingPayment[] = payloads
+        .map((payload, i) => {
+          const clientSecret = payload?.data?.clientSecret;
+          if (!clientSecret) return null;
+          const item = cart[i];
+          return {
+            orderId: payload.data.order.id,
+            clientSecret,
+            label: `${CROP_DISPLAY_NAMES[item.cropType]} — ${item.quantityKg}kg`,
+            amount: payload.data.order.totalPrice,
+          };
+        })
+        .filter((p): p is PendingPayment => p !== null);
+
+      if (payments.length > 0) {
+        // Stripe is configured server-side: orders are held as
+        // PENDING_PAYMENT until each PaymentIntent is confirmed here.
+        setPendingPayments(payments);
+      } else {
+        // No Stripe keys configured — orders were auto-confirmed
+        // server-side (dev/local fallback), nothing left to collect.
         router.push("/restaurant/orders");
         router.refresh();
-      } else {
-        setError("Failed to place one or more orders. Please try again.");
       }
     } catch (err) {
       console.error("Order submission error:", err);
@@ -111,7 +137,14 @@ export function NewOrderClient() {
     }
   };
 
+  const finishCheckout = () => {
+    setPendingPayments(null);
+    router.push("/restaurant/orders");
+    router.refresh();
+  };
+
   return (
+    <>
     <div className="grid gap-5 sm:gap-6 lg:grid-cols-3 lg:gap-8">
       {/* Crop Catalog */}
       <div className="lg:col-span-2 space-y-6">
@@ -294,5 +327,14 @@ export function NewOrderClient() {
         </GlassCard>
       </div>
     </div>
+
+    {pendingPayments && (
+      <CheckoutModal
+        payments={pendingPayments}
+        onComplete={finishCheckout}
+        onCancel={finishCheckout}
+      />
+    )}
+    </>
   );
 }
