@@ -28,6 +28,7 @@ import {
   X,
   Send,
   BookOpen,
+  Gauge,
   type LucideIcon,
 } from "lucide-react";
 
@@ -62,6 +63,7 @@ const roleNavItems: Record<string, NavItem[]> = {
     { label: "Restaurants", href: "/admin/restaurants", icon: Store },
     { label: "Deliveries", href: "/admin/deliveries", icon: Truck },
     { label: "Analytics", href: "/admin/analytics", icon: BarChart3 },
+    { label: "KPI Scorecard", href: "/admin/kpis", icon: Gauge },
     { label: "Payouts", href: "/admin/payouts", icon: CreditCard },
   ],
 };
