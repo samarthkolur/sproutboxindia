@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { GlassCard } from "@/components/shared/GlassCard";
 import { StepProgress } from "@/components/onboarding/StepProgress";
+import { trackSignUp } from "@/lib/gtag";
 
 const steps = ["Personal", "Location", "Space", "Kit", "Compliance", "Review"];
 
@@ -35,7 +36,10 @@ export function GrowerOnboardingForm() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(form),
     });
-    if (response.ok) router.push("/login");
+    if (response.ok) {
+      trackSignUp("grower", { city: form.city, kit: form.kit });
+      router.push("/login");
+    }
   }
 
   return (

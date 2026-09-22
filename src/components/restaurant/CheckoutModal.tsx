@@ -16,6 +16,8 @@ export interface PendingPayment {
   clientSecret: string;
   label: string;
   amount: number;
+  cropType: string;
+  quantityKg: number;
 }
 
 function PaymentStep({

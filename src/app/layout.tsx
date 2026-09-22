@@ -6,6 +6,7 @@ import { LanguageProvider } from "@/components/i18n/LanguageProvider";
 import { FloatingLanguageToggle } from "@/components/i18n/LanguageToggle";
 import { GlobalLoadingIndicator } from "@/components/shared/GlobalLoadingIndicator";
 import { GoogleAnalytics } from "@/components/shared/GoogleAnalytics";
+import { GoogleAnalyticsPageview } from "@/components/shared/GoogleAnalyticsPageview";
 
 export const metadata: Metadata = {
   title: {
@@ -39,6 +40,7 @@ export default function RootLayout({
     <html lang="en">
       <body className="min-h-screen antialiased overflow-x-hidden">
         <GoogleAnalytics />
+        <GoogleAnalyticsPageview />
         <Analytics />
         <LanguageProvider>
           {children}

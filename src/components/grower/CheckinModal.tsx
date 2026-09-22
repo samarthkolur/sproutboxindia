@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { ImageUploader } from "@/components/shared/ImageUploader";
 import { CheckCircle2, Loader2, X } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { trackGrowerEngagement } from "@/lib/gtag";
 
 export function CheckinModal({ batchId, day }: { batchId: string; day: number }) {
   const router = useRouter();
@@ -37,6 +38,7 @@ export function CheckinModal({ batchId, day }: { batchId: string; day: number })
         const data = await res.json();
         throw new Error(data?.error || "Submission failed");
       }
+      trackGrowerEngagement("checkin_submitted", { batch_id: batchId, day });
       setSuccess(true);
       setTimeout(() => {
         setOpen(false);

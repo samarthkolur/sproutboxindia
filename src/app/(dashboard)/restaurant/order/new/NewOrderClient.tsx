@@ -14,6 +14,7 @@ import {
 import { ShoppingCart, Calendar, Info, Loader2, Minus, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CheckoutModal, type PendingPayment } from "@/components/restaurant/CheckoutModal";
+import { trackPurchase } from "@/lib/gtag";
 
 interface CartItem {
   cropType: CropType;
@@ -106,7 +107,7 @@ export function NewOrderClient() {
 
       const payloads = await Promise.all(responses.map((r) => r.json()));
       const payments: PendingPayment[] = payloads
-        .map((payload, i) => {
+        .map((payload, i): PendingPayment | null => {
           const clientSecret = payload?.data?.clientSecret;
           if (!clientSecret) return null;
           const item = cart[i];
@@ -115,6 +116,8 @@ export function NewOrderClient() {
             clientSecret,
             label: `${CROP_DISPLAY_NAMES[item.cropType]} — ${item.quantityKg}kg`,
             amount: payload.data.order.totalPrice,
+            cropType: item.cropType,
+            quantityKg: item.quantityKg,
           };
         })
         .filter((p): p is PendingPayment => p !== null);
@@ -122,10 +125,20 @@ export function NewOrderClient() {
       if (payments.length > 0) {
         // Stripe is configured server-side: orders are held as
         // PENDING_PAYMENT until each PaymentIntent is confirmed here.
+        // purchase is tracked once payment actually completes, not here.
         setPendingPayments(payments);
       } else {
         // No Stripe keys configured — orders were auto-confirmed
-        // server-side (dev/local fallback), nothing left to collect.
+        // server-side (dev/local fallback), so they're already "paid".
+        payloads.forEach((payload, i) => {
+          const item = cart[i];
+          trackPurchase({
+            transactionId: payload.data.order.id,
+            value: payload.data.order.totalPrice,
+            cropType: item.cropType,
+            quantityKg: item.quantityKg,
+          });
+        });
         router.push("/restaurant/orders");
         router.refresh();
       }
@@ -137,7 +150,23 @@ export function NewOrderClient() {
     }
   };
 
-  const finishCheckout = () => {
+  const handlePaymentComplete = () => {
+    pendingPayments?.forEach((payment) => {
+      trackPurchase({
+        transactionId: payment.orderId,
+        value: payment.amount,
+        cropType: payment.cropType,
+        quantityKg: payment.quantityKg,
+      });
+    });
+    setPendingPayments(null);
+    router.push("/restaurant/orders");
+    router.refresh();
+  };
+
+  const handlePaymentCancel = () => {
+    // Order stays PENDING_PAYMENT — not a completed purchase, so no
+    // trackPurchase call here. The restaurant can still pay later.
     setPendingPayments(null);
     router.push("/restaurant/orders");
     router.refresh();
@@ -331,8 +360,8 @@ export function NewOrderClient() {
     {pendingPayments && (
       <CheckoutModal
         payments={pendingPayments}
-        onComplete={finishCheckout}
-        onCancel={finishCheckout}
+        onComplete={handlePaymentComplete}
+        onCancel={handlePaymentCancel}
       />
     )}
     </>

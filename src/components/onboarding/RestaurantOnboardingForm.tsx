@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { GlassCard } from "@/components/shared/GlassCard";
 import { StepProgress } from "@/components/onboarding/StepProgress";
+import { trackSignUp } from "@/lib/gtag";
 
 const steps = ["Business", "Crops", "Schedule", "Payment"];
 
@@ -29,7 +30,10 @@ export function RestaurantOnboardingForm() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(form),
     });
-    if (response.ok) router.push("/login");
+    if (response.ok) {
+      trackSignUp("restaurant", { city: form.city, cuisine_type: form.cuisineType });
+      router.push("/login");
+    }
   }
 
   return (

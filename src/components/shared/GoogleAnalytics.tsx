@@ -1,10 +1,7 @@
 import Script from "next/script";
-
-const GA_MEASUREMENT_ID = "G-3S2T96R14P";
+import { GA_MEASUREMENT_ID } from "@/lib/gtag";
 
 export function GoogleAnalytics() {
-  // if (process.env.NODE_ENV !== "production") return null;
-
   return (
     <>
       <Script
@@ -21,6 +18,7 @@ export function GoogleAnalytics() {
             gtag('js', new Date());
             gtag('config', '${GA_MEASUREMENT_ID}', {
               page_path: window.location.pathname,
+              send_page_view: true,
             });
           `,
         }}

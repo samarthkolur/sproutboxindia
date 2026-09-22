@@ -104,6 +104,7 @@ Provide these values in `.env.local` (do not commit this file):
 - `NEXT_PUBLIC_STRIPE_PUBLIC_KEY` — client-side Stripe publishable key (must be `NEXT_PUBLIC_`-prefixed to reach the browser; required for the restaurant checkout UI to render)
 - `STRIPE_WEBHOOK_SECRET` — stripe webhook signing secret
 - `UPLOADTHING_TOKEN` — UploadThing v7 API token (required for grower check-in/QC photo uploads)
+- `NEXT_PUBLIC_GA_MEASUREMENT_ID` — GA4 Measurement ID (`G-XXXXXXXXXX`) for Google Analytics; see "Analytics" below
 - `GOOGLE_CLIENT_ID` & `GOOGLE_CLIENT_SECRET` — for Google OAuth (optional)
 
 Tip: Use your cloud provider or GitHub Actions / Vercel secrets to store production values.
@@ -128,6 +129,32 @@ npm run lint
 ```
 
 - (Add test commands here if/when tests are added)
+
+## Analytics
+
+The app loads Google Analytics 4 (`src/components/shared/GoogleAnalytics.tsx`, ID from
+`NEXT_PUBLIC_GA_MEASUREMENT_ID`) and tracks pageviews across client-side App Router
+navigation (`src/components/shared/GoogleAnalyticsPageview.tsx` — the base gtag config
+only covers the first load, so this listens for `pathname`/`searchParams` changes and
+fires the rest).
+
+Custom events (`src/lib/gtag.ts`) map to the product's Acquisition / Conversion /
+Engagement KPI categories:
+
+| Event | Fired from | Maps to |
+|---|---|---|
+| `sign_up` (`method: grower`) | `GrowerOnboardingForm` | Active Certified Growers (Acquisition) |
+| `sign_up` (`method: restaurant`) | `RestaurantOnboardingForm` | Restaurant partner count (Acquisition) |
+| `purchase` | `NewOrderClient` (no-Stripe path) / `NewOrderClient` on `CheckoutModal` completion (Stripe path) | MRR / Revenue |
+| `checkin_submitted` | `CheckinModal` | Grower engagement (proxy — see note below) |
+| `pickup_requested` | `RequestPickupButton` | Grower engagement |
+
+Note: GA4 tracks the acquisition/engagement/conversion *funnel* (who signs up, who
+orders, who stays active) — it does not compute operational KPIs like QC Pass Rate,
+Kg Delivered/Week, or On-Time Delivery Rate, which live in the product database and
+are already surfaced in `/admin/analytics`. There is also no explicit grower
+task-accept/reject step in the product yet, so `checkin_submitted` is used as an
+engagement proxy rather than a literal "Grower Acceptance Rate" event.
 
 ## Deployment
 

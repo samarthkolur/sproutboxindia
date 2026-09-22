@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Truck } from "lucide-react";
 import { toast } from "sonner";
+import { trackGrowerEngagement } from "@/lib/gtag";
 
 export function RequestPickupButton({ taskId, disabled }: { taskId: string; disabled?: boolean }) {
   const router = useRouter();
@@ -23,6 +24,7 @@ export function RequestPickupButton({ taskId, disabled }: { taskId: string; disa
         throw new Error(data.error || "Failed to request pickup");
       }
 
+      trackGrowerEngagement("pickup_requested", { task_id: taskId });
       toast.success("Pickup Requested!", {
         description: "Admin has been notified for dispatch.",
       });
