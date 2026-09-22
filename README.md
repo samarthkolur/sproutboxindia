@@ -131,13 +131,11 @@ npm run lint
 
 ## Deployment
 
-Recommended platforms: Vercel, Cloud Run, or any container host that supports Node.js. Ensure you set the environment variables in the deployment environment and provide a Postgres database.
+The project is deployed on Vercel, deploying automatically from `main`.
 
-Example Vercel notes:
-- Set `DATABASE_URL`, `NEXTAUTH_SECRET`, `STRIPE_SECRET_KEY`, and `STRIPE_WEBHOOK_SECRET` in the Vercel project settings.
+Vercel project settings:
+- Set `DATABASE_URL`, `AUTH_SECRET`/`NEXTAUTH_SECRET`, `STRIPE_SECRET_KEY`, `NEXT_PUBLIC_STRIPE_PUBLIC_KEY`, `STRIPE_WEBHOOK_SECRET`, and `UPLOADTHING_TOKEN` in the Vercel project's environment variables.
 - Use `npm run build` as the build command.
-
-GitHub Actions & GCR (example): the repo contains a `.github/workflows/deploy.yml` that can push a Docker image to GCR and deploy it to a Kubernetes/GKE or Cloud Run setup. Replace all secrets with repository or environment secrets.
 
 ## Security notes (important)
 
