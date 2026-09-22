@@ -217,7 +217,7 @@ export default function LandingPage() {
           >
             <div className="w-2 h-2 bg-sprout-600 rounded-full animate-pulse" />
             <span className="text-xs font-semibold text-sprout-800 uppercase tracking-wider">
-              Now live in 3 cities
+              Now onboarding growers &amp; restaurants
             </span>
           </div>
 
@@ -266,6 +266,9 @@ export default function LandingPage() {
 
           {/* Dashboard Preview */}
           <div className="relative mt-12 animate-in fade-in slide-in-from-bottom-12 duration-1000 delay-500 sm:mt-16">
+            <p className="mb-3 text-center text-xs font-medium uppercase tracking-wider text-text-muted">
+              Sample dashboard — illustrative preview
+            </p>
             <div className="glass-strong mx-auto max-w-3xl p-4 glow-green sm:p-8">
               <div className="mb-4 grid gap-3 sm:grid-cols-3 sm:gap-4">
                 {[
@@ -328,18 +331,18 @@ export default function LandingPage() {
         <div className="flex whitespace-nowrap relative">
           <div className="marquee flex items-center gap-12 px-6">
             {[
-              { value: 200, suffix: "+", label: "Active Growers" },
-              { value: 3, suffix: "", label: "Cities" },
-              { value: 500, suffix: "kg", label: "Delivered/Week" },
-              { value: 12, suffix: "", label: "Restaurant Partners" },
-              { value: 94, suffix: "%", label: "QC Pass Rate" },
-              { value: 50, suffix: "₹", label: "Per Tray Payout" },
-              { value: 200, suffix: "+", label: "Active Growers" },
-              { value: 3, suffix: "", label: "Cities" },
-              { value: 500, suffix: "kg", label: "Delivered/Week" },
-              { value: 12, suffix: "", label: "Restaurant Partners" },
-              { value: 94, suffix: "%", label: "QC Pass Rate" },
-              { value: 50, suffix: "₹", label: "Per Tray Payout" },
+              { value: 6, suffix: "", label: "Microgreen Varieties" },
+              { value: 7, suffix: "-10", label: "Day Grow Cycles" },
+              { value: 25, suffix: "%", label: "Production Buffer" },
+              { value: 3, suffix: "", label: "Stage Quality Checks" },
+              { value: 50, suffix: "₹+", label: "Per Tray Payout" },
+              { value: 5, suffix: "", label: "Trays to Start Growing" },
+              { value: 6, suffix: "", label: "Microgreen Varieties" },
+              { value: 7, suffix: "-10", label: "Day Grow Cycles" },
+              { value: 25, suffix: "%", label: "Production Buffer" },
+              { value: 3, suffix: "", label: "Stage Quality Checks" },
+              { value: 50, suffix: "₹+", label: "Per Tray Payout" },
+              { value: 5, suffix: "", label: "Trays to Start Growing" },
             ].map((stat, i) => (
               <div key={i} className="flex items-center gap-3">
                 <span className="text-2xl font-black text-sprout-800">
@@ -689,41 +692,41 @@ export default function LandingPage() {
         <div className="relative z-10 max-w-6xl mx-auto">
           <div className="text-center mb-16 reveal">
             <h2 className="text-3xl font-black tracking-tight text-text-primary sm:text-5xl">
-              Built for <span className="gradient-text">scale</span>
+              Built on a real <span className="gradient-text">system</span>
             </h2>
             <p className="mx-auto mt-4 max-w-md text-base text-text-secondary sm:text-lg">
-              Numbers that define our growing ecosystem
+              A demand engine and QC process, not just a pitch
             </p>
           </div>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
               {
-                value: 200,
-                suffix: "+",
-                label: "Active Growers",
-                desc: "Across 3 cities",
+                value: 25,
+                suffix: "%",
+                label: "Production Buffer",
+                desc: "Built into every plan",
                 icon: "🌱",
               },
               {
-                value: 500,
-                suffix: "kg",
-                label: "Weekly Output",
-                desc: "And growing 18% MoM",
+                value: 6,
+                suffix: "",
+                label: "Microgreen Varieties",
+                desc: "Sunflower to fenugreek",
                 icon: "📊",
               },
               {
-                value: 94,
-                suffix: "%",
-                label: "QC Pass Rate",
-                desc: "Multi-stage inspection",
+                value: 3,
+                suffix: "",
+                label: "Stage QC",
+                desc: "Digital, hub & delivery checks",
                 icon: "✅",
               },
               {
-                value: 7,
-                suffix: "min",
-                label: "Avg Response",
-                desc: "Task allocation speed",
+                value: 5,
+                suffix: "",
+                label: "Trays to Start",
+                desc: "Low barrier grower onboarding",
                 icon: "⚡",
               },
             ].map((stat, i) => (
