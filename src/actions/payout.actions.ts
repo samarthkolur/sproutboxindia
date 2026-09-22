@@ -17,24 +17,17 @@ export async function markPayoutAsPaid(payoutId: string) {
       throw new Error("Payout is already marked as paid");
     }
 
-    await prisma.$transaction([
-      prisma.payout.update({
-        where: { id: payoutId },
-        data: {
-          status: "PAID",
-          paidAt: new Date(),
-        },
-      }),
-      // We could also update the grower's totalEarnings here, 
-      // but it might already be calculated differently or updated during QC.
-      // Let's assume it's safe to increment totalEarnings:
-      prisma.grower.update({
-        where: { id: payout.growerId },
-        data: {
-          totalEarnings: { increment: payout.amount },
-        },
-      }),
-    ]);
+    // grower.totalEarnings is already incremented once, at accrual time,
+    // in createHarvestPayout() (src/lib/business.ts). Marking a payout PAID
+    // only settles it — it must not increment totalEarnings again, or a
+    // grower's lifetime earnings figure doubles once the admin pays them.
+    await prisma.payout.update({
+      where: { id: payoutId },
+      data: {
+        status: "PAID",
+        paidAt: new Date(),
+      },
+    });
 
     revalidatePath("/admin/payouts");
     return { success: true };
