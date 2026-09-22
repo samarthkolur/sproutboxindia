@@ -12,3 +12,22 @@ export async function getCurrentGrowerTasks() {
   });
   return grower?.tasks || [];
 }
+
+export async function verifyGrowerFssai(growerId: string) {
+  const session = await auth();
+  if (!session?.user || session.user.role !== "ADMIN") {
+    return { error: "Unauthorized" };
+  }
+
+  const grower = await prisma.grower.findUnique({ where: { id: growerId } });
+  if (!grower?.fssaiRegNumber) {
+    return { error: "Grower has not submitted an FSSAI registration number yet" };
+  }
+
+  await prisma.grower.update({
+    where: { id: growerId },
+    data: { fssaiVerifiedAt: new Date() },
+  });
+
+  return { success: true };
+}

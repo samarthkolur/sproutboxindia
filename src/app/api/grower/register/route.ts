@@ -37,6 +37,7 @@ export async function POST(request: Request) {
             spaceAvailable: input.spaceAvailable || input.areaSize || null,
             spacePhotoUrl: input.spacePhotoUrl || null,
             upiId: input.upiId || null,
+            fssaiRegNumber: input.fssaiRegNumber || null,
           },
         },
       },

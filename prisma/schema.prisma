@@ -39,6 +39,8 @@ model Grower {
   bankAccount     String?
   bankIFSC        String?
   upiId           String?
+  fssaiRegNumber  String?
+  fssaiVerifiedAt DateTime?
   yieldScore      Float    @default(0.5)
   qualityScore    Float    @default(0.5)
   timelinessScore Float    @default(0.5)

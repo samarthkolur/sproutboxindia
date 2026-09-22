@@ -1,7 +1,7 @@
 import { GlassCard } from "@/components/shared/GlassCard";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { UserCircle, MapPin, CreditCard, Phone } from "lucide-react";
+import { UserCircle, MapPin, CreditCard, Phone, ShieldCheck, ShieldAlert } from "lucide-react";
 
 async function getGrowerProfile(userId: string) {
   try {
@@ -28,6 +28,7 @@ export default async function GrowerProfilePage() {
     { label: "City", value: grower?.city || "—", icon: MapPin },
     { label: "Pincode", value: grower?.pincode || "—", icon: MapPin },
     { label: "Kit Size", value: grower?.kitSize ? `${grower.kitSize} trays` : "—", icon: CreditCard },
+    { label: "FSSAI Registration Number", value: grower?.fssaiRegNumber || "—", icon: ShieldCheck },
     { label: "UPI ID", value: grower?.upiId || "—", icon: CreditCard },
     { label: "Bank Account", value: grower?.bankAccount || "—", icon: CreditCard },
     { label: "IFSC", value: grower?.bankIFSC || "—", icon: CreditCard },
@@ -39,6 +40,39 @@ export default async function GrowerProfilePage() {
         <h1 className="text-2xl sm:text-3xl font-black text-text-primary tracking-tight">Profile</h1>
         <p className="text-sm sm:text-base text-text-secondary mt-1">Your account and payment details</p>
       </div>
+
+      {/* FSSAI compliance status */}
+      {grower && (
+        <GlassCard className="mb-6">
+          <div className="flex items-start gap-4">
+            <div
+              className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${
+                grower.fssaiVerifiedAt ? "bg-sprout-100" : "bg-amber-50"
+              }`}
+            >
+              {grower.fssaiVerifiedAt ? (
+                <ShieldCheck className="h-5 w-5 text-sprout-700" />
+              ) : (
+                <ShieldAlert className="h-5 w-5 text-amber-600" />
+              )}
+            </div>
+            <div className="min-w-0">
+              <p className="text-sm font-bold text-text-primary">
+                {grower.fssaiVerifiedAt
+                  ? "FSSAI compliance verified"
+                  : grower.fssaiRegNumber
+                    ? "FSSAI number on file — pending admin verification"
+                    : "FSSAI registration required"}
+              </p>
+              <p className="mt-1 text-xs text-text-muted">
+                {grower.fssaiRegNumber || "Not submitted yet."} Indian food safety law requires
+                every home-based grower to hold an FSSAI registration before supplying
+                restaurants commercially.
+              </p>
+            </div>
+          </div>
+        </GlassCard>
+      )}
 
       {/* Score cards */}
       {grower && (

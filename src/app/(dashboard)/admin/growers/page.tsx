@@ -14,7 +14,20 @@ export default async function AdminGrowersPage() {
           {growers.map((grower) => (
             <Link key={grower.id} href={`/admin/growers/${grower.id}`}>
               <GlassCard hover>
-                <h2 className="font-bold text-text-primary">{grower.user.name || grower.user.email}</h2>
+                <div className="flex items-start justify-between gap-2">
+                  <h2 className="font-bold text-text-primary">{grower.user.name || grower.user.email}</h2>
+                  <span
+                    className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold ${
+                      grower.fssaiVerifiedAt
+                        ? "bg-sprout-100 text-sprout-700"
+                        : grower.fssaiRegNumber
+                          ? "bg-amber-50 text-amber-600"
+                          : "bg-red-50 text-red-600"
+                    }`}
+                  >
+                    {grower.fssaiVerifiedAt ? "FSSAI verified" : grower.fssaiRegNumber ? "FSSAI pending" : "No FSSAI"}
+                  </span>
+                </div>
                 <p className="text-sm text-text-muted">{grower.city} · {grower.kitSize} trays</p>
                 <p className="mt-3 text-2xl font-black text-sprout-800">{Math.round(grower.compositeScore * 100)}%</p>
               </GlassCard>

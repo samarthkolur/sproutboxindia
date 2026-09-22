@@ -23,6 +23,7 @@ export const growerRegisterSchema = z.object({
   spacePhotoUrl: z.string().url().optional(),
   kit: z.enum(["Starter", "Standard", "Pro"]).default("Starter"),
   upiId: z.string().trim().optional(),
+  fssaiRegNumber: z.string().trim().optional(),
 });
 
 export const restaurantRegisterSchema = z.object({
@@ -100,6 +101,7 @@ export const growerProfileSchema = z.object({
   bankAccount: z.string().optional(),
   bankIFSC: z.string().optional(),
   upiId: z.string().optional(),
+  fssaiRegNumber: z.string().optional(),
 });
 
 export const hubCheckinSchema = z.object({

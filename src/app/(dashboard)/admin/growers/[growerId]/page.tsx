@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { GlassCard } from "@/components/shared/GlassCard";
+import { GrowerComplianceCard } from "@/components/admin/GrowerComplianceCard";
 import { prisma } from "@/lib/prisma";
 import { formatCurrency } from "@/lib/utils";
 
@@ -22,6 +23,11 @@ export default async function AdminGrowerDetailPage({ params }: { params: { grow
         <GlassCard><p className="text-sm text-text-muted">Quality</p><p className="text-2xl font-black">{Math.round(grower.qualityScore * 100)}%</p></GlassCard>
         <GlassCard><p className="text-sm text-text-muted">Earnings</p><p className="text-2xl font-black">{formatCurrency(grower.totalEarnings)}</p></GlassCard>
       </div>
+      <GrowerComplianceCard
+        growerId={grower.id}
+        fssaiRegNumber={grower.fssaiRegNumber}
+        fssaiVerifiedAt={grower.fssaiVerifiedAt}
+      />
     </div>
   );
 }
