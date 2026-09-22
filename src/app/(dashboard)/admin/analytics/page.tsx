@@ -1,25 +1,53 @@
 import { GlassCard } from "@/components/shared/GlassCard";
 import { prisma } from "@/lib/prisma";
-import { BarChart3, IndianRupee, Package, Users, Star, Sprout } from "lucide-react";
+import { BarChart3, IndianRupee, Package, Users, Star, Sprout, TrendingUp } from "lucide-react";
+import { OrderStatus } from "@prisma/client";
 
 async function getAnalytics() {
   try {
-    const [orderCount, totalRevenue, growerCount, avgRating, trayCount] = await Promise.all([
+    const [orderCount, totalRevenue, fulfilledRevenue, growerPayouts, growerCount, avgRating, trayCount] = await Promise.all([
       prisma.order.count(),
       prisma.order.aggregate({ _sum: { totalPrice: true } }),
+      // Commission is only earned on orders that actually got paid for —
+      // PENDING_PAYMENT/cancelled orders never converted to real revenue.
+      prisma.order.aggregate({
+        _sum: { totalPrice: true },
+        where: { status: { notIn: [OrderStatus.PENDING_PAYMENT, OrderStatus.CANCELLED] } },
+      }),
+      prisma.payout.aggregate({ _sum: { amount: true } }),
       prisma.grower.count({ where: { isActive: true } }),
       prisma.feedback.aggregate({ _avg: { rating: true } }),
       prisma.batch.count(),
     ]);
+
+    const fulfilled = fulfilledRevenue._sum.totalPrice || 0;
+    const payouts = growerPayouts._sum.amount || 0;
+    const commission = fulfilled - payouts;
+    const commissionRate = fulfilled > 0 ? (commission / fulfilled) * 100 : 0;
+
     return {
       orderCount,
       totalRevenue: totalRevenue._sum.totalPrice || 0,
+      fulfilledRevenue: fulfilled,
+      growerPayouts: payouts,
+      commission,
+      commissionRate,
       growerCount,
       avgRating: avgRating._avg.rating || 0,
       trayCount,
     };
   } catch {
-    return { orderCount: 0, totalRevenue: 0, growerCount: 0, avgRating: 0, trayCount: 0 };
+    return {
+      orderCount: 0,
+      totalRevenue: 0,
+      fulfilledRevenue: 0,
+      growerPayouts: 0,
+      commission: 0,
+      commissionRate: 0,
+      growerCount: 0,
+      avgRating: 0,
+      trayCount: 0,
+    };
   }
 }
 
@@ -57,11 +85,45 @@ export default async function AnalyticsPage() {
       </div>
 
       <GlassCard>
-        <div className="text-center py-12">
-          <BarChart3 className="w-12 h-12 text-text-muted/30 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-text-primary mb-1">Detailed charts coming soon</h3>
-          <p className="text-sm text-text-muted">Revenue trends, production volume, QC rates, and leaderboards</p>
+        <div className="mb-5 flex items-center gap-2">
+          <TrendingUp className="h-5 w-5 text-sprout-700" />
+          <h2 className="text-lg font-bold text-text-primary">Revenue Breakdown</h2>
         </div>
+        <div className="grid gap-4 sm:grid-cols-3">
+          <div className="rounded-xl border border-white/50 bg-white/50 p-4">
+            <p className="text-xs font-semibold uppercase tracking-wider text-text-muted mb-1">
+              Fulfilled Order Revenue
+            </p>
+            <p className="text-2xl font-black text-text-primary">
+              ₹{data.fulfilledRevenue.toLocaleString("en-IN")}
+            </p>
+            <p className="mt-1 text-xs text-text-muted">Excludes unpaid / cancelled orders</p>
+          </div>
+          <div className="rounded-xl border border-white/50 bg-white/50 p-4">
+            <p className="text-xs font-semibold uppercase tracking-wider text-text-muted mb-1">
+              Grower Payouts
+            </p>
+            <p className="text-2xl font-black text-text-primary">
+              ₹{data.growerPayouts.toLocaleString("en-IN")}
+            </p>
+            <p className="mt-1 text-xs text-text-muted">Sum of all created payouts</p>
+          </div>
+          <div className="rounded-xl border border-sprout-200/60 bg-sprout-50/60 p-4">
+            <p className="text-xs font-semibold uppercase tracking-wider text-sprout-800 mb-1">
+              Platform Commission
+            </p>
+            <p className="text-2xl font-black text-sprout-800">
+              ₹{data.commission.toLocaleString("en-IN")}
+            </p>
+            <p className="mt-1 text-xs text-sprout-700">
+              {data.commissionRate.toFixed(1)}% of fulfilled revenue
+            </p>
+          </div>
+        </div>
+        <p className="mt-4 text-xs text-text-muted">
+          Commission = fulfilled order revenue − grower payouts. It is not yet split out per-order
+          or per-crop; this is a platform-wide figure.
+        </p>
       </GlassCard>
     </div>
   );
