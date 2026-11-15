@@ -752,6 +752,14 @@ export const translations: Record<string, TranslationEntry> = {
   "Days to harvest": { kn: "ಕೊಯ್ಲಿಗೆ ದಿನಗಳು", hi: "कटाई तक के दिन" },
   "Digital, hub & delivery checks": { kn: "ಡಿಜಿಟಲ್, ಹಬ್ ಮತ್ತು ವಿತರಣಾ ಪರಿಶೀಲನೆಗಳು", hi: "डिजिटल, हब और डिलीवरी जांच" },
   "Farm-to-fork, door to door.": { kn: "ಜಮೀನಿನಿಂದ ತಟ್ಟೆಗೆ, ಬಾಗಿಲಿಂದ ಬಾಗಿಲಿಗೆ.", hi: "खेत से थाली तक, दरवाज़े से दरवाज़े तक।" },
+  "What you have earned, and what is on its way.": { kn: "ನೀವು ಗಳಿಸಿದ್ದು ಮತ್ತು ಬರಲಿರುವ ಮೊತ್ತ.", hi: "आपने जो कमाया और जो आने वाला है।" },
+  "Nothing is pending right now.": { kn: "ಈಗ ಯಾವುದೂ ಬಾಕಿ ಇಲ್ಲ.", hi: "अभी कुछ भी लंबित नहीं है।" },
+  "Payout history": { kn: "ಪಾವತಿ ಇತಿಹಾಸ", hi: "भुगतान का इतिहास" },
+  "Task": { kn: "ಕೆಲಸ", hi: "काम" },
+  "Date": { kn: "ದಿನಾಂಕ", hi: "तारीख" },
+  "Status": { kn: "ಸ್ಥಿತಿ", hi: "स्थिति" },
+  "Amount": { kn: "ಮೊತ್ತ", hi: "राशि" },
+  "Earnings from trays that pass quality control will appear here.": { kn: "ಗುಣಮಟ್ಟ ಪರಿಶೀಲನೆಯಲ್ಲಿ ತೇರ್ಗಡೆಯಾಗುವ ಟ್ರೇಗಳ ಗಳಿಕೆ ಇಲ್ಲಿ ಕಾಣಿಸುತ್ತದೆ.", hi: "गुणवत्ता जांच पास करने वाली ट्रे की कमाई यहां दिखेगी।" },
   "Breadcrumb": { kn: "ಬ್ರೆಡ್‌ಕ್ರಂಬ್", hi: "ब्रेडक्रंब" },
   "Check-in photos": { kn: "ಚೆಕ್-ಇನ್ ಫೋಟೋಗಳು", hi: "चेक-इन फोटो" },
   "Day by day": { kn: "ದಿನದಿನದ ಯೋಜನೆ", hi: "दिन-प्रतिदिन योजना" },
@@ -979,6 +987,25 @@ const MONTH_SHORT = {
 const MONTH_SHORT_EN = MONTHS.map((month) => month.slice(0, 3));
 
 const regexTranslations = [
+  {
+    pattern: /^(.+), tray (\d+), (₹[\d,]+)$/,
+    replace: (language: Exclude<LanguageCode, "en">, crop: string, tray: string, amount: string) =>
+      language === "kn"
+        ? `${translateToken(crop, language)}, ಟ್ರೇ ${tray}, ${amount}`
+        : `${translateToken(crop, language)}, ट्रे ${tray}, ${amount}`,
+  },
+  {
+    pattern: /^(₹[\d,]+) is pending and will be paid after quality control\.$/,
+    replace: (language: Exclude<LanguageCode, "en">, amount: string) =>
+      language === "kn"
+        ? `${amount} ಬಾಕಿ ಇದೆ ಮತ್ತು ಗುಣಮಟ್ಟ ಪರಿಶೀಲನೆಯ ನಂತರ ಪಾವತಿಸಲಾಗುತ್ತದೆ.`
+        : `${amount} लंबित है और गुणवत्ता जांच के बाद चुकाया जाएगा।`,
+  },
+  {
+    pattern: /^(₹[\d,]+) still pending$/,
+    replace: (language: Exclude<LanguageCode, "en">, amount: string) =>
+      language === "kn" ? `${amount} ಇನ್ನೂ ಬಾಕಿ ಇದೆ` : `${amount} अभी लंबित`,
+  },
   {
     pattern: /^Tray (\d+)$/,
     replace: (language: Exclude<LanguageCode, "en">, value: string) =>
