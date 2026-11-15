@@ -1,9 +1,13 @@
-import { CardSkeleton } from "@/components/shared/LoadingSkeleton";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function AuthLoading() {
   return (
-    <main className="mx-auto max-w-md px-4 py-16">
-      <CardSkeleton />
-    </main>
+    <div role="status" aria-label="Loading page" className="space-y-4">
+      <Skeleton className="h-9 w-2/3" />
+      <Skeleton className="h-4 w-1/2" />
+      <Skeleton className="mt-6 h-12 w-full" />
+      <Skeleton className="h-12 w-full" />
+      <Skeleton className="h-12 w-full" />
+    </div>
   );
 }
