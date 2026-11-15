@@ -4,12 +4,17 @@ import { Suspense, useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { CheckCircle2, Loader2 } from "lucide-react";
 import { BrandLogo } from "@/components/layout/BrandLogo";
+import { Button } from "@/components/ui/button";
+import { TextField } from "@/components/ui/field";
+import { safeCallbackUrl } from "@/lib/validation";
 
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
+  const callbackUrl = safeCallbackUrl(searchParams.get("callbackUrl"));
+  const justRegistered = searchParams.get("registered") === "true";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -21,14 +26,10 @@ function LoginForm() {
     setLoading(true);
 
     try {
-      const result = await signIn("credentials", {
-        email,
-        password,
-        redirect: false,
-      });
+      const result = await signIn("credentials", { email, password, redirect: false });
 
       if (result?.error) {
-        setError("Invalid email or password");
+        setError("Email or password is incorrect. Check them and try again.");
       } else {
         router.push(callbackUrl);
         router.refresh();
@@ -42,101 +43,73 @@ function LoginForm() {
 
   return (
     <div>
-      {/* Logo */}
       <BrandLogo className="mb-8" markClassName="h-10 w-10" textClassName="text-xl" />
 
-      <h1 className="text-3xl font-black text-text-primary mb-1 tracking-tight">
-        Welcome back
-      </h1>
-      <p className="text-text-secondary text-sm mb-8">
-        Sign in to your account to continue
-      </p>
+      <h1 className="mb-1 text-3xl font-semibold tracking-tight text-ink">Welcome back</h1>
+      <p className="mb-8 text-sm text-ink-soft">Sign in to your account to continue</p>
+
+      {justRegistered && !error && (
+        <div role="status" className="mb-6 flex items-start gap-2.5 rounded-tile bg-good-soft px-4 py-3 text-sm text-good">
+          <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
+          <p>Account created. Sign in to continue.</p>
+        </div>
+      )}
 
       {error && (
-        <div className="bg-status-error/10 border border-status-error/20 text-status-error rounded-xl px-4 py-3 mb-6 text-sm animate-in fade-in slide-in-from-top-2 duration-300">
+        <div role="alert" className="mb-6 rounded-tile bg-risk-soft px-4 py-3 text-sm text-risk">
           {error}
         </div>
       )}
 
       <form onSubmit={handleSubmit} className="space-y-5">
-        <div>
-          <label
-            htmlFor="email"
-            className="block text-xs font-semibold text-text-primary mb-2 uppercase tracking-wider"
-          >
-            Email
-          </label>
-          <input
-            id="email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full bg-white/60 border border-white/50 rounded-xl px-4 py-3 text-sm text-text-primary placeholder:text-text-muted outline-none focus:border-sprout-500 focus:ring-2 focus:ring-sprout-500/20 transition-all backdrop-blur-sm"
-            placeholder="you@example.com"
-            required
-          />
-        </div>
+        <TextField
+          label="Email"
+          type="email"
+          autoComplete="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="you@example.com"
+          required
+        />
+        <TextField
+          label="Password"
+          type="password"
+          autoComplete="current-password"
+          revealable
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          placeholder="••••••••"
+          required
+        />
 
-        <div>
-          <label
-            htmlFor="password"
-            className="block text-xs font-semibold text-text-primary mb-2 uppercase tracking-wider"
-          >
-            Password
-          </label>
-          <input
-            id="password"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full bg-white/60 border border-white/50 rounded-xl px-4 py-3 text-sm text-text-primary placeholder:text-text-muted outline-none focus:border-sprout-500 focus:ring-2 focus:ring-sprout-500/20 transition-all backdrop-blur-sm"
-            placeholder="••••••••"
-            required
-          />
-        </div>
-
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full bg-sprout-800 text-white py-3 rounded-xl text-sm font-semibold hover:bg-sprout-900 transition-all hover:shadow-lg hover:shadow-sprout-800/25 active:scale-[0.98] disabled:opacity-60 disabled:pointer-events-none flex items-center justify-center gap-2"
-        >
+        <Button type="submit" size="lg" disabled={loading} className="w-full rounded-full">
           {loading ? (
-            <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-          ) : (
             <>
-              Sign In
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-              </svg>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin motion-reduce:animate-none" aria-hidden="true" />
+              Signing in…
             </>
+          ) : (
+            "Sign In"
           )}
-        </button>
+        </Button>
       </form>
 
-      <div className="relative my-8">
-        <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-white/40" />
-        </div>
-        <div className="relative flex justify-center">
-          <span className="bg-transparent px-4 text-xs text-text-muted">
-            New to SproutBox?
-          </span>
-        </div>
+      <div className="my-8 flex items-center gap-4 text-xs text-ink-muted">
+        <span className="h-px flex-1 bg-hairline" />
+        <span>New to SproutBox?</span>
+        <span className="h-px flex-1 bg-hairline" />
       </div>
 
-      <Link
-        href="/register"
-        className="block w-full text-center border-2 border-sprout-800/15 text-sprout-800 py-3 rounded-xl text-sm font-semibold hover:bg-sprout-50/50 hover:border-sprout-800/30 transition-all active:scale-[0.98]"
-      >
-        Create an account
-      </Link>
+      <Button asChild variant="outline" size="lg" className="w-full rounded-full border-hairline bg-transparent">
+        <Link href="/register">Create an account</Link>
+      </Button>
     </div>
   );
 }
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={<div className="text-center text-text-muted py-10">Loading...</div>}>
+    <Suspense fallback={<div role="status" className="py-10 text-center text-ink-muted">Loading…</div>}>
       <LoginForm />
     </Suspense>
   );
