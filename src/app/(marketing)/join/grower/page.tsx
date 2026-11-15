@@ -3,24 +3,52 @@
 import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { BrandLogo } from "@/components/layout/BrandLogo";
 import { AddressMapPicker, type SelectedAddress } from "@/components/onboarding/AddressMapPicker";
-import { StepProgress } from "@/components/onboarding/StepProgress";
-import { KIT_OPTIONS } from "@/lib/constants";
+import { ReviewList, type ReviewSection } from "@/components/join/ReviewList";
+import { SummaryPanel, SummaryRow } from "@/components/join/Summary";
+import { WizardShell } from "@/components/join/WizardShell";
+import { Button } from "@/components/ui/button";
+import { ChoiceGroup } from "@/components/ui/choice-group";
+import { TextField } from "@/components/ui/field";
+import { SegmentedControl } from "@/components/ui/segmented-control";
+import { KIT_OPTIONS, PAYOUT_PER_TRAY } from "@/lib/constants";
+import { trackSignUp } from "@/lib/gtag";
+import {
+  GROWER_STEPS,
+  firstInvalidStep,
+  fssaiDigits,
+  validateGrowerStep,
+  type FieldErrors,
+  type GrowerFormData,
+} from "@/lib/join-validation";
 import { clearRegistrationPrefill, readRegistrationPrefill } from "@/lib/registration-prefill";
 
-const steps = ["Personal", "Location", "Space", "Kit", "Review"];
+type SpaceType = "terrace" | "balcony" | "room" | "backyard";
+type LightAccess = "natural" | "artificial" | "both";
+type KitName = (typeof KIT_OPTIONS)[number]["name"];
 
-function GrowerOnboardingForm() {
+const STEP = { personal: 0, location: 1, space: 2, kit: 3, compliance: 4, review: 5 } as const;
+
+const SPACE_LABEL: Record<SpaceType, string> = {
+  terrace: "Terrace",
+  balcony: "Balcony",
+  room: "Room",
+  backyard: "Backyard",
+};
+const LIGHT_LABEL: Record<LightAccess, string> = { natural: "Natural", artificial: "Artificial", both: "Both" };
+
+function GrowerWizard() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [step, setStep] = useState(0);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [serverError, setServerError] = useState("");
+  const [emailTaken, setEmailTaken] = useState(false);
+  const [errors, setErrors] = useState<FieldErrors>({});
   const [selectedAddress, setSelectedAddress] = useState<SelectedAddress | null>(null);
-  const [hasPrefilledPassword, setHasPrefilledPassword] = useState(false);
+  const [passwordPrefilled, setPasswordPrefilled] = useState(false);
 
-  const [data, setData] = useState({
+  const [data, setData] = useState<GrowerFormData & { spaceType: SpaceType; lightAccess: LightAccess; kit: KitName }>({
     name: searchParams.get("name") || "",
     email: searchParams.get("email") || "",
     password: "",
@@ -28,320 +56,298 @@ function GrowerOnboardingForm() {
     city: "",
     address: "",
     pincode: "",
-    spaceType: "terrace" as "terrace" | "balcony" | "room" | "backyard",
+    spaceType: "terrace",
     areaSize: "",
-    lightAccess: "natural" as "natural" | "artificial" | "both",
-    kit: "Starter" as "Starter" | "Standard" | "Pro",
-    bankAccount: "",
-    ifsc: "",
+    lightAccess: "natural",
+    kit: "Starter",
     upiId: "",
+    fssaiRegNumber: "",
   });
 
-  const update = (field: string, value: string) =>
-    setData((prev) => ({ ...prev, [field]: value }));
-
+  // Details entered on /register arrive through sessionStorage, so nothing is typed twice.
   useEffect(() => {
     const prefill = readRegistrationPrefill("GROWER");
     if (!prefill) return;
-
-    setData((prev) => ({
-      ...prev,
-      name: prefill.name,
-      email: prefill.email,
-      password: prefill.password,
-    }));
-    setHasPrefilledPassword(Boolean(prefill.password));
+    setData((prev) => ({ ...prev, name: prefill.name, email: prefill.email, password: prefill.password }));
+    setPasswordPrefilled(Boolean(prefill.password));
   }, []);
+
+  const set = (field: keyof typeof data) => (value: string) => {
+    setData((prev) => ({ ...prev, [field]: value }));
+    setErrors((prev) => (prev[field] ? { ...prev, [field]: undefined } : prev));
+  };
+  const onText = (field: keyof typeof data) => (e: React.ChangeEvent<HTMLInputElement>) => set(field)(e.target.value);
 
   const updateAddress = (address: SelectedAddress) => {
     setSelectedAddress(address);
-    setData((prev) => ({
-      ...prev,
-      address: address.address,
-      city: address.city,
-      pincode: address.pincode,
-    }));
+    setData((prev) => ({ ...prev, address: address.address, city: address.city, pincode: address.pincode }));
+    setErrors((prev) => ({ ...prev, address: undefined }));
   };
 
-  const validateStep = () => {
-    if (step === 0) {
-      if (!data.name.trim() || !data.email.trim() || (!hasPrefilledPassword && !data.password)) {
-        setError("Please fill in all required fields.");
-        return false;
-      }
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(data.email.trim())) {
-        setError("Please enter a valid email address.");
-        return false;
-      }
-    }
-
-    if (step === 1 && (!data.address || !data.city || !data.pincode)) {
-      setError("Choose a location on the map so address, city, and PIN code can be fetched.");
-      return false;
-    }
-
-    if (step === 2 && (!data.areaSize || Number(data.areaSize) <= 0)) {
-      setError("Enter a valid growing area greater than 0 sq ft.");
-      return false;
-    }
-
-    setError("");
-    return true;
-  };
+  const kit = KIT_OPTIONS.find((option) => option.name === data.kit) ?? KIT_OPTIONS[0];
+  const validate = (target: number) => validateGrowerStep(target, data, { passwordPrefilled });
 
   const next = () => {
-    if (!validateStep()) return;
-    setStep((s) => Math.min(s + 1, steps.length - 1));
+    const found = validate(step);
+    setErrors(found);
+    if (Object.keys(found).length > 0) {
+      // After the re-render the first invalid field exists in the DOM: focus it.
+      requestAnimationFrame(() =>
+        document.querySelector<HTMLElement>('form [aria-invalid="true"]')?.focus()
+      );
+      return;
+    }
+    setStep((current) => Math.min(current + 1, GROWER_STEPS.length - 1));
   };
-  const back = () => setStep((s) => Math.max(s - 1, 0));
+  const back = () => {
+    setErrors({});
+    setServerError("");
+    setStep((current) => Math.max(current - 1, 0));
+  };
+  const goTo = (target: number) => {
+    setErrors({});
+    setStep(target);
+  };
 
-  const handleSubmit = async () => {
-    if (!data.areaSize || Number(data.areaSize) <= 0) {
-      setError("Enter a valid growing area greater than 0 sq ft.");
-      setStep(2);
+  const submit = async () => {
+    // Every earlier step was checked on the way here, but "Edit" lets people change them.
+    const broken = firstInvalidStep(validate, STEP.review);
+    if (broken !== null) {
+      setErrors(validate(broken));
+      setStep(broken);
       return;
     }
 
     setLoading(true);
-    setError("");
+    setServerError("");
+    setEmailTaken(false);
     try {
-      const payload = {
-        ...data,
-        areaSize: Number(data.areaSize),
-      };
       const res = await fetch("/api/grower/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+        body: JSON.stringify({ ...data, areaSize: Number(data.areaSize), fssaiRegNumber: fssaiDigits(data.fssaiRegNumber) || undefined }),
       });
-      const result = await res.json();
-      if (!res.ok) throw new Error(result.error || "Registration failed");
+      const result = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        if (result.code === "EMAIL_EXISTS") {
+          setEmailTaken(true);
+          setStep(STEP.personal);
+        }
+        setServerError(result.error || "Registration failed");
+        return;
+      }
+      // Fired only once the account really exists (the assignment's Acquisition KPI).
+      trackSignUp("grower", { city: data.city, kit: data.kit, has_fssai: Boolean(data.fssaiRegNumber.trim()) });
       clearRegistrationPrefill();
       router.push("/login?registered=true");
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (err: any) {
-      setError(err.message);
+    } catch {
+      setServerError("Something went wrong. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
-  const inputClass =
-    "w-full bg-white/60 border border-white/50 rounded-xl px-4 py-3 text-sm text-text-primary placeholder:text-text-muted outline-none focus:border-sprout-500 focus:ring-2 focus:ring-sprout-500/20 transition-all backdrop-blur-sm";
-  const labelClass =
-    "block text-xs font-semibold text-text-primary mb-2 uppercase tracking-wider";
+  const review: ReviewSection[] = [
+    {
+      title: "Personal",
+      step: STEP.personal,
+      rows: [
+        { label: "Name", value: data.name },
+        { label: "Email", value: data.email },
+        { label: "Phone", value: data.phone },
+      ],
+    },
+    {
+      title: "Location",
+      step: STEP.location,
+      rows: [
+        { label: "City", value: data.city },
+        { label: "PIN", value: data.pincode },
+        { label: "Address", value: data.address },
+      ],
+    },
+    {
+      title: "Space",
+      step: STEP.space,
+      rows: [
+        { label: "Space", value: `${SPACE_LABEL[data.spaceType]}, ${data.areaSize} sq ft` },
+        { label: "Light", value: LIGHT_LABEL[data.lightAccess] },
+      ],
+    },
+    {
+      title: "Kit",
+      step: STEP.kit,
+      rows: [
+        { label: "Kit", value: data.kit },
+        { label: "UPI", value: data.upiId || "Not provided" },
+      ],
+    },
+    {
+      title: "Compliance",
+      step: STEP.compliance,
+      rows: [{ label: "FSSAI number", value: data.fssaiRegNumber.trim() || "Not provided" }],
+    },
+  ];
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center overflow-hidden px-4 py-8 sm:py-12">
-      <div className="absolute inset-0 bg-grid bg-grid-fade" />
-      <div className="absolute inset-0 bg-dots opacity-30" />
-      <div className="blob blob-animated w-[500px] h-[500px] bg-sprout-200/60 -top-40 -left-20" />
-      <div className="blob blob-animated-alt w-[400px] h-[400px] bg-sprout-300/40 bottom-0 right-0" />
-
-      <div className="glass-strong relative z-10 w-full max-w-lg p-5 sm:p-10">
-        <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent rounded-[24px]" />
-        <div className="relative z-10">
-          {/* Logo */}
-          <BrandLogo className="mb-6" />
-
-          <h1 className="text-2xl font-black text-text-primary tracking-tight mb-1">
-            Join as Grower 🌱
-          </h1>
-          <p className="text-text-secondary text-sm mb-6">
-            Set up your growing profile in a few steps
-          </p>
-
-          <StepProgress steps={steps} currentStep={step} />
-
-          {error && (
-            <div className="bg-status-error/10 border border-status-error/20 text-status-error rounded-xl px-4 py-3 mb-4 text-sm">
-              {error}
-            </div>
+    <WizardShell
+      title="Join as Grower"
+      subtitle="Set up your growing profile in a few steps"
+      steps={[...GROWER_STEPS]}
+      step={step}
+      error={serverError}
+      errorAction={
+        emailTaken ? (
+          <Button asChild size="sm" variant="outline" className="rounded-full border-risk/40 bg-transparent text-risk hover:bg-risk/10">
+            <Link href="/login">Sign in instead</Link>
+          </Button>
+        ) : undefined
+      }
+      loading={loading}
+      submitLabel="Submit Application"
+      backHref="/register"
+      backLabel="Register"
+      onBack={back}
+      onNext={next}
+      onSubmit={submit}
+      summary={
+        <SummaryPanel title="Your starter kit">
+          <SummaryRow label="Kit" value={kit.name} caption={kit.description} />
+          <SummaryRow label="Trays" value={String(kit.trays)} caption="Grown at home, one crop per tray" />
+          <SummaryRow label="Kit price" value={kit.price === 0 ? "Free" : `₹${kit.price}`} />
+          <SummaryRow
+            label="Payout per tray"
+            value={`₹${PAYOUT_PER_TRAY}`}
+            caption="For every tray that passes quality control"
+          />
+          <SummaryRow
+            label="Potential earnings per cycle"
+            value={`₹${PAYOUT_PER_TRAY * kit.trays}`}
+            caption="If every tray passes quality control"
+          />
+        </SummaryPanel>
+      }
+    >
+      {step === STEP.personal && (
+        <>
+          <TextField label="Full Name" autoComplete="name" value={data.name} onChange={onText("name")} error={errors.name} placeholder="Your full name" />
+          <TextField label="Email" type="email" autoComplete="email" value={data.email} onChange={onText("email")} error={errors.email} placeholder="you@example.com" />
+          {!passwordPrefilled && (
+            <TextField label="Password" type="password" autoComplete="new-password" revealable value={data.password} onChange={onText("password")} error={errors.password} hint="At least 6 characters" />
           )}
+          <TextField label="Phone" type="tel" autoComplete="tel" value={data.phone} onChange={onText("phone")} error={errors.phone} placeholder="+91 9876543210" />
+        </>
+      )}
 
-          {/* Step 0: Personal */}
-          {step === 0 && (
-            <div className="space-y-4">
-              <div>
-                <label className={labelClass}>Full Name</label>
-                <input className={inputClass} value={data.name} onChange={(e) => update("name", e.target.value)} placeholder="Your full name" required />
-              </div>
-              <div>
-                <label className={labelClass}>Email</label>
-                <input className={inputClass} type="email" value={data.email} onChange={(e) => update("email", e.target.value)} placeholder="you@example.com" required />
-              </div>
-              {!hasPrefilledPassword && (
-                <div>
-                  <label className={labelClass}>Password</label>
-                  <input className={inputClass} type="password" value={data.password} onChange={(e) => update("password", e.target.value)} placeholder="Min. 6 characters" required />
-                </div>
-              )}
-              <div>
-                <label className={labelClass}>Phone</label>
-                <input className={inputClass} type="tel" value={data.phone} onChange={(e) => update("phone", e.target.value)} placeholder="+91 9876543210" />
-              </div>
-            </div>
+      {step === STEP.location && (
+        <>
+          <AddressMapPicker value={selectedAddress} onChange={updateAddress} />
+          {errors.address && (
+            <p role="alert" className="text-sm font-medium text-risk">
+              {errors.address}
+            </p>
           )}
+        </>
+      )}
 
-          {/* Step 1: Location */}
-          {step === 1 && (
-            <div className="space-y-4">
-              <AddressMapPicker value={selectedAddress} onChange={updateAddress} />
-            </div>
-          )}
-
-          {/* Step 2: Space */}
-          {step === 2 && (
-            <div className="space-y-4">
-              <div>
-                <label className={labelClass}>Space Type</label>
-                <div className="grid gap-3 min-[420px]:grid-cols-2">
-                  {(["terrace", "balcony", "room", "backyard"] as const).map((type) => (
-                    <button
-                      key={type}
-                      type="button"
-                      onClick={() => update("spaceType", type)}
-                      className={`p-3 rounded-xl border text-center transition-all text-sm font-medium capitalize ${data.spaceType === type
-                          ? "border-sprout-600 bg-sprout-50/80 text-sprout-800 shadow-md"
-                          : "border-white/50 bg-white/40 text-text-secondary hover:bg-white/60"
-                        }`}
-                    >
-                      {type}
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <div>
-                <label className={labelClass}>Area (sq ft)</label>
-                <input className={inputClass} type="number" value={data.areaSize} onChange={(e) => update("areaSize", e.target.value)} placeholder="e.g. 100" />
-              </div>
-              <div>
-                <label className={labelClass}>Light Access</label>
-                <div className="grid gap-3 min-[520px]:grid-cols-3">
-                  {(["natural", "artificial", "both"] as const).map((type) => (
-                    <button
-                      key={type}
-                      type="button"
-                      onClick={() => update("lightAccess", type)}
-                      className={`p-3 rounded-xl border text-center transition-all text-sm font-medium capitalize ${data.lightAccess === type
-                          ? "border-sprout-600 bg-sprout-50/80 text-sprout-800 shadow-md"
-                          : "border-white/50 bg-white/40 text-text-secondary hover:bg-white/60"
-                        }`}
-                    >
-                      {type}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Step 3: Kit */}
-          {step === 3 && (
-            <div className="space-y-4">
-              <div>
-                <label className={labelClass}>Choose Your Kit</label>
-                <div className="space-y-3">
-                  {KIT_OPTIONS.map((kit) => (
-                    <button
-                      key={kit.name}
-                      type="button"
-                      onClick={() => update("kit", kit.name)}
-                      className={`w-full p-4 rounded-xl border text-left transition-all ${data.kit === kit.name
-                          ? "border-sprout-600 bg-sprout-50/80 shadow-md"
-                          : "border-white/50 bg-white/40 hover:bg-white/60"
-                        }`}
-                    >
-                      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                        <div>
-                          <p className="text-sm font-bold text-text-primary">{kit.name}</p>
-                          <p className="text-xs text-text-muted">{kit.description} — {kit.trays} trays</p>
-                        </div>
-                        <span className="text-sm font-bold text-sprout-800">
-                          {kit.price === 0 ? "Free" : `₹${kit.price}`}
-                        </span>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <div>
-                <label className={labelClass}>UPI ID (for payouts)</label>
-                <input className={inputClass} value={data.upiId} onChange={(e) => update("upiId", e.target.value)} placeholder="name@upi" />
-              </div>
-            </div>
-          )}
-
-          {/* Step 4: Review */}
-          {step === 4 && (
-            <div className="space-y-3">
-              {[
-                { label: "Name", value: data.name },
-                { label: "Email", value: data.email },
-                { label: "Phone", value: data.phone || "—" },
-                { label: "City", value: data.city || "—" },
-                { label: "PIN", value: data.pincode || "—" },
-                { label: "Address", value: data.address || "—" },
-                { label: "Space", value: `${data.spaceType}, ${data.areaSize || "—"} sq ft` },
-                { label: "Light", value: data.lightAccess },
-                { label: "Kit", value: data.kit },
-                { label: "UPI", value: data.upiId || "—" },
-              ].map((item) => (
-                <div key={item.label} className="flex flex-col gap-1 rounded-xl border border-white/40 bg-white/50 p-3 min-[420px]:flex-row min-[420px]:items-center min-[420px]:justify-between">
-                  <span className="text-xs font-semibold text-text-muted uppercase tracking-wider">{item.label}</span>
-                  <span className="break-words text-sm font-medium capitalize text-text-primary min-[420px]:text-right">{item.value}</span>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {/* Nav buttons */}
-          <div className="mt-8 flex items-center justify-between gap-3">
-            {step > 0 ? (
-              <button onClick={back} className="text-sm font-semibold text-text-secondary hover:text-sprout-800 transition-colors">
-                ← Back
-              </button>
-            ) : (
-              <Link href="/register" className="text-sm font-semibold text-text-secondary hover:text-sprout-800 transition-colors">
-                ← Register
-              </Link>
-            )}
-
-            {step < steps.length - 1 ? (
-              <button
-                onClick={next}
-                className="inline-flex items-center gap-2 bg-sprout-800 text-white px-6 py-2.5 rounded-xl text-sm font-semibold hover:bg-sprout-900 transition-all active:scale-[0.98]"
-              >
-                Continue
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-                </svg>
-              </button>
-            ) : (
-              <button
-                onClick={handleSubmit}
-                disabled={loading}
-                className="inline-flex items-center gap-2 bg-sprout-800 text-white px-6 py-2.5 rounded-xl text-sm font-semibold hover:bg-sprout-900 transition-all active:scale-[0.98] disabled:opacity-60"
-              >
-                {loading ? (
-                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                ) : (
-                  "Submit Application"
-                )}
-              </button>
-            )}
+      {step === STEP.space && (
+        <>
+          <div>
+            <p className="mb-1.5 text-sm font-medium text-ink">Space Type</p>
+            <ChoiceGroup
+              ariaLabel="Space Type"
+              compact
+              choices={(Object.keys(SPACE_LABEL) as SpaceType[]).map((value) => ({ value, label: SPACE_LABEL[value] }))}
+              value={data.spaceType}
+              onChange={set("spaceType")}
+            />
           </div>
-        </div>
-      </div>
-    </div>
+          <TextField
+            label="Area (sq ft)"
+            type="number"
+            inputMode="numeric"
+            min={1}
+            value={data.areaSize}
+            onChange={onText("areaSize")}
+            error={errors.areaSize}
+            placeholder="e.g. 100"
+          />
+          <div>
+            <p className="mb-1.5 text-sm font-medium text-ink">Light Access</p>
+            <SegmentedControl
+              ariaLabel="Light Access"
+              className="w-full [&>button]:flex-1"
+              options={(Object.keys(LIGHT_LABEL) as LightAccess[]).map((value) => ({ value, label: LIGHT_LABEL[value] }))}
+              value={data.lightAccess}
+              onChange={set("lightAccess")}
+            />
+          </div>
+        </>
+      )}
+
+      {step === STEP.kit && (
+        <>
+          <div>
+            <p className="mb-1.5 text-sm font-medium text-ink">Choose Your Kit</p>
+            <ChoiceGroup
+              ariaLabel="Choose Your Kit"
+              columns={1}
+              choices={KIT_OPTIONS.map((option) => ({
+                value: option.name,
+                label: option.name,
+                description: option.description,
+                trailing: (
+                  <span className="block text-right">
+                    {option.price === 0 ? "Free" : `₹${option.price}`}
+                    <span className="block text-micro font-normal text-ink-muted">{`${option.trays} trays`}</span>
+                  </span>
+                ),
+              }))}
+              value={data.kit}
+              onChange={set("kit")}
+            />
+          </div>
+          <TextField
+            label="UPI ID (for payouts)"
+            optional
+            autoComplete="off"
+            value={data.upiId}
+            onChange={onText("upiId")}
+            error={errors.upiId}
+            placeholder="name@upi"
+            hint="We pay you here. You can add it later."
+          />
+        </>
+      )}
+
+      {step === STEP.compliance && (
+        <>
+          <p className="text-sm text-ink-soft">
+            Indian food safety law (FSSAI) requires a registration before you can supply restaurants commercially. You
+            can leave this blank for now and add it later. Our team checks each number we receive.
+          </p>
+          <TextField
+            label="FSSAI Registration Number"
+            optional
+            inputMode="numeric"
+            autoComplete="off"
+            value={data.fssaiRegNumber}
+            onChange={onText("fssaiRegNumber")}
+            error={errors.fssaiRegNumber}
+            hint="14 digits, printed on your FSSAI certificate"
+          />
+        </>
+      )}
+
+      {step === STEP.review && <ReviewList sections={review} onEdit={goTo} />}
+    </WizardShell>
   );
 }
 
-export default function GrowerOnboardingPage() {
+export default function GrowerJoinPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center text-text-muted">Loading...</div>}>
-      <GrowerOnboardingForm />
+    <Suspense fallback={<div role="status" className="py-24 text-center text-ink-muted">Loading…</div>}>
+      <GrowerWizard />
     </Suspense>
   );
 }
