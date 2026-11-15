@@ -6,7 +6,8 @@ export interface TimelineItem {
   title: string;
   description?: React.ReactNode;
   meta?: React.ReactNode;
-  state: "done" | "current" | "upcoming";
+  /** "step" is a plain numbered step in a guide, where nothing is done or upcoming. */
+  state: "done" | "current" | "upcoming" | "step";
 }
 
 // A real sequence (delivery steps, grow days), so the order carries information.
@@ -28,7 +29,8 @@ export function Timeline({ items, className }: { items: TimelineItem[]; classNam
                 "relative z-10 flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-micro font-semibold",
                 item.state === "done" && "bg-leaf text-white",
                 item.state === "current" && "bg-brand text-brand-ink ring-4 ring-brand/15",
-                item.state === "upcoming" && "bg-inset text-ink-muted"
+                item.state === "upcoming" && "bg-inset text-ink-muted",
+                item.state === "step" && "bg-leaf-soft text-ink"
               )}
             >
               {item.state === "done" ? <Check className="h-3.5 w-3.5" strokeWidth={3} /> : index + 1}
