@@ -752,6 +752,19 @@ export const translations: Record<string, TranslationEntry> = {
   "Days to harvest": { kn: "ಕೊಯ್ಲಿಗೆ ದಿನಗಳು", hi: "कटाई तक के दिन" },
   "Digital, hub & delivery checks": { kn: "ಡಿಜಿಟಲ್, ಹಬ್ ಮತ್ತು ವಿತರಣಾ ಪರಿಶೀಲನೆಗಳು", hi: "डिजिटल, हब और डिलीवरी जांच" },
   "Farm-to-fork, door to door.": { kn: "ಜಮೀನಿನಿಂದ ತಟ್ಟೆಗೆ, ಬಾಗಿಲಿಂದ ಬಾಗಿಲಿಗೆ.", hi: "खेत से थाली तक, दरवाज़े से दरवाज़े तक।" },
+  "For": { kn: "ಇವರಿಗೆ", hi: "के लिए" },
+  "Mark all delivered": { kn: "ಎಲ್ಲವನ್ನೂ ತಲುಪಿದೆ ಎಂದು ಗುರುತಿಸಿ", hi: "सभी डिलीवर चिह्नित करें" },
+  "Mark seeds delivered": { kn: "ಬೀಜಗಳು ತಲುಪಿವೆ ಎಂದು ಗುರುತಿಸಿ", hi: "बीज डिलीवर चिह्नित करें" },
+  "Allocated just now": { kn: "ಈಗತಾನೇ ಹಂಚಲಾಗಿದೆ", hi: "अभी आवंटित किया" },
+  "Dispatch supplies": { kn: "ಸರಬರಾಜು ಕಳುಹಿಸಿ", hi: "सामग्री भेजें" },
+  "Seeds and trays owed to growers. Mark them delivered once they have them.": { kn: "ಬೆಳೆಗಾರರಿಗೆ ಬರಬೇಕಾದ ಬೀಜ ಮತ್ತು ಟ್ರೇಗಳು. ಅವರಿಗೆ ಸಿಕ್ಕ ನಂತರ ತಲುಪಿದೆ ಎಂದು ಗುರುತಿಸಿ.", hi: "उत्पादकों को देने वाले बीज और ट्रे। उन्हें मिलने पर डिलीवर चिह्नित करें।" },
+  "No supplies waiting": { kn: "ಯಾವುದೇ ಸರಬರಾಜು ಕಾಯುತ್ತಿಲ್ಲ", hi: "कोई सामग्री इंतज़ार में नहीं" },
+  "Every allocated task has had its seeds and trays delivered.": { kn: "ಹಂಚಿದ ಪ್ರತಿ ಕೆಲಸಕ್ಕೂ ಬೀಜ ಮತ್ತು ಟ್ರೇಗಳನ್ನು ತಲುಪಿಸಲಾಗಿದೆ.", hi: "आवंटित हर काम के बीज और ट्रे पहुंचा दिए गए हैं।" },
+  "Supplies marked delivered": { kn: "ಸರಬರಾಜು ತಲುಪಿದೆ ಎಂದು ಗುರುತಿಸಲಾಗಿದೆ", hi: "सामग्री डिलीवर चिह्नित की गई" },
+  "Undo": { kn: "ರದ್ದುಮಾಡಿ", hi: "पूर्ववत करें" },
+  "Could not mark delivered": { kn: "ತಲುಪಿದೆ ಎಂದು ಗುರುತಿಸಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ", hi: "डिलीवर चिह्नित नहीं हो सका" },
+  "This can no longer be undone": { kn: "ಇದನ್ನು ಇನ್ನು ರದ್ದುಮಾಡಲು ಸಾಧ್ಯವಿಲ್ಲ", hi: "इसे अब पूर्ववत नहीं किया जा सकता" },
+  "The grower has already started.": { kn: "ಬೆಳೆಗಾರರು ಈಗಾಗಲೇ ಪ್ರಾರಂಭಿಸಿದ್ದಾರೆ.", hi: "उत्पादक पहले ही शुरू कर चुका है।" },
   "All cities": { kn: "ಎಲ್ಲಾ ನಗರಗಳು", hi: "सभी शहर" },
   "Auto-allocate": { kn: "ಸ್ವಯಂ ಹಂಚಿಕೆ", hi: "अपने-आप आवंटन" },
   "FSSAI verified only": { kn: "FSSAI ಪರಿಶೀಲಿತರು ಮಾತ್ರ", hi: "केवल FSSAI सत्यापित" },
@@ -1233,6 +1246,29 @@ const MONTH_SHORT = {
 const MONTH_SHORT_EN = MONTHS.map((month) => month.slice(0, 3));
 
 const regexTranslations = [
+  {
+    pattern: /^Allocated (\d+) (hour|day)s? ago$/,
+    replace: (language: Exclude<LanguageCode, "en">, n: string, unit: string) =>
+      language === "kn" ? `${n} ${unit === "hour" ? "ಗಂಟೆ" : "ದಿನ"} ಹಿಂದೆ ಹಂಚಲಾಗಿದೆ` : `${n} ${unit === "hour" ? "घंटे" : "दिन"} पहले आवंटित`,
+  },
+  {
+    pattern: /^(.+), (\d+) trays$/,
+    replace: (language: Exclude<LanguageCode, "en">, crop: string, n: string) =>
+      language === "kn" ? `${translateToken(crop, language)}, ${n} ಟ್ರೇಗಳು` : `${translateToken(crop, language)}, ${n} ट्रे`,
+  },
+  {
+    pattern: /^(\d+) tasks? · (\d+) trays$/,
+    replace: (language: Exclude<LanguageCode, "en">, tasks: string, trays: string) =>
+      language === "kn" ? `${tasks} ಕೆಲಸಗಳು · ${trays} ಟ್ರೇಗಳು` : `${tasks} काम · ${trays} ट्रे`,
+  },
+  {
+    pattern: /^(\d+) tasks marked delivered$/,
+    replace: (language: Exclude<LanguageCode, "en">, n: string) => (language === "kn" ? `${n} ಕೆಲಸಗಳು ತಲುಪಿವೆ ಎಂದು ಗುರುತಿಸಲಾಗಿದೆ` : `${n} काम डिलीवर चिह्नित किए गए`),
+  },
+  {
+    pattern: /^(.+) has been told\.$/,
+    replace: (language: Exclude<LanguageCode, "en">, who: string) => (language === "kn" ? `${who} ಅವರಿಗೆ ತಿಳಿಸಲಾಗಿದೆ.` : `${who} को बता दिया गया है।`),
+  },
   {
     pattern: /^Score (\d+)%$/,
     replace: (language: Exclude<LanguageCode, "en">, n: string) => (language === "kn" ? `ಅಂಕ ${n}%` : `स्कोर ${n}%`),

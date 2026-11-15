@@ -82,3 +82,27 @@ export async function markGrowerSuppliesDelivered(growerId: string) {
   revalidatePath("/admin/dashboard");
   return { count: tasks.length };
 }
+
+/**
+ * Take back a "supplies delivered" click made by mistake. Only tasks no grower has started
+ * (no tray has checked in) go back to ASSIGNED, and the notification sent a moment ago is withdrawn.
+ */
+export async function undoSuppliesDelivered(taskIds: string[]) {
+  if (!(await requireAdmin())) return { ...NOT_ADMIN, count: 0 };
+  const tasks = await prisma.task.findMany({
+    where: { id: { in: taskIds.slice(0, 200) }, status: "IN_PROGRESS", batches: { every: { currentDay: 0 } } },
+    include: { grower: { select: { userId: true } } },
+  });
+  if (tasks.length === 0) return { count: 0 };
+
+  const since = new Date(Date.now() - 15 * 60 * 1000);
+  await prisma.$transaction([
+    prisma.task.updateMany({ where: { id: { in: tasks.map((t) => t.id) } }, data: { status: "ASSIGNED" } }),
+    prisma.notification.deleteMany({
+      where: { type: "SUPPLIES_DELIVERED", createdAt: { gte: since }, userId: { in: Array.from(new Set(tasks.map((t) => t.grower.userId))) } },
+    }),
+  ]);
+  revalidatePath("/admin/dispatch");
+  revalidatePath("/admin/dashboard");
+  return { count: tasks.length };
+}

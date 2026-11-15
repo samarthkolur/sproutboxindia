@@ -1,44 +1,34 @@
-import { GlassCard } from "@/components/shared/GlassCard";
+import { PageHeader } from "@/components/ui/page-header";
 import { getPendingDispatches } from "@/actions/dispatch.actions";
-import { DispatchClient } from "./DispatchClient";
-import { Truck } from "lucide-react";
+import { DispatchClient, type DispatchGroup } from "./DispatchClient";
 
 export default async function DispatchPage() {
-  const dispatches = await getPendingDispatches();
+  const tasks = await getPendingDispatches();
+
+  // One group per grower, the longest-waiting first, so one trip covers everything they are owed.
+  const byGrower = new Map<string, DispatchGroup>();
+  for (const task of tasks) {
+    const group = byGrower.get(task.growerId) ?? {
+      growerId: task.growerId,
+      name: task.grower.user.name ?? "Grower",
+      city: task.grower.city,
+      tasks: [],
+    };
+    group.tasks.push({
+      id: task.id,
+      cropType: task.cropType,
+      trayCount: task.trayCount,
+      allocatedAt: task.allocatedAt,
+      restaurant: task.plan.order.restaurant.businessName,
+    });
+    byGrower.set(task.growerId, group);
+  }
+  const groups = Array.from(byGrower.values()).sort((a, b) => a.tasks[0].allocatedAt.getTime() - b.tasks[0].allocatedAt.getTime());
 
   return (
-    <div>
-      <div className="mb-6 sm:mb-8">
-        <div className="flex items-center gap-2 sm:gap-3 mb-1">
-          <Truck className="w-6 h-6 sm:w-7 sm:h-7 text-sprout-700 flex-shrink-0" />
-          <h1 className="text-2xl sm:text-3xl font-black text-text-primary tracking-tight">
-            Dispatch Supplies
-          </h1>
-        </div>
-        <p className="text-sm sm:text-base text-text-secondary">
-          Manage and track seed and tray deliveries to growers
-        </p>
-      </div>
-
-      <GlassCard>
-        {dispatches.length > 0 ? (
-          <div className="space-y-4">
-            {dispatches.map((dispatch) => (
-              <DispatchClient key={dispatch.id} dispatch={dispatch} />
-            ))}
-          </div>
-        ) : (
-          <div className="text-center py-16">
-            <Truck className="w-12 h-12 text-text-muted/30 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-text-primary mb-1">
-              No pending dispatches
-            </h3>
-            <p className="text-sm text-text-muted">
-              All allocated tasks have received their supplies.
-            </p>
-          </div>
-        )}
-      </GlassCard>
-    </div>
+    <>
+      <PageHeader title="Dispatch supplies" subtitle="Seeds and trays owed to growers. Mark them delivered once they have them." />
+      <DispatchClient groups={groups} />
+    </>
   );
 }
