@@ -752,6 +752,22 @@ export const translations: Record<string, TranslationEntry> = {
   "Days to harvest": { kn: "ಕೊಯ್ಲಿಗೆ ದಿನಗಳು", hi: "कटाई तक के दिन" },
   "Digital, hub & delivery checks": { kn: "ಡಿಜಿಟಲ್, ಹಬ್ ಮತ್ತು ವಿತರಣಾ ಪರಿಶೀಲನೆಗಳು", hi: "डिजिटल, हब और डिलीवरी जांच" },
   "Farm-to-fork, door to door.": { kn: "ಜಮೀನಿನಿಂದ ತಟ್ಟೆಗೆ, ಬಾಗಿಲಿಂದ ಬಾಗಿಲಿಗೆ.", hi: "खेत से थाली तक, दरवाज़े से दरवाज़े तक।" },
+  "Filter restaurants": { kn: "ರೆಸ್ಟೋರೆಂಟ್‌ಗಳನ್ನು ಫಿಲ್ಟರ್ ಮಾಡಿ", hi: "रेस्टोरेंट फ़िल्टर करें" },
+  "Search restaurants": { kn: "ರೆಸ್ಟೋರೆಂಟ್‌ಗಳನ್ನು ಹುಡುಕಿ", hi: "रेस्टोरेंट खोजें" },
+  "Search by name, city or contact": { kn: "ಹೆಸರು, ನಗರ ಅಥವಾ ಸಂಪರ್ಕದ ಮೂಲಕ ಹುಡುಕಿ", hi: "नाम, शहर या संपर्क से खोजें" },
+  "Never": { kn: "ಎಂದಿಗೂ ಇಲ್ಲ", hi: "कभी नहीं" },
+  "Never ordered": { kn: "ಎಂದಿಗೂ ಆರ್ಡರ್ ಮಾಡಿಲ್ಲ", hi: "कभी ऑर्डर नहीं किया" },
+  "Every restaurant that orders from SproutBox.": { kn: "SproutBox ನಿಂದ ಆರ್ಡರ್ ಮಾಡುವ ಪ್ರತಿ ರೆಸ್ಟೋರೆಂಟ್.", hi: "SproutBox से ऑर्डर करने वाला हर रेस्टोरेंट।" },
+  "No restaurants yet": { kn: "ಇನ್ನೂ ರೆಸ್ಟೋರೆಂಟ್‌ಗಳಿಲ್ಲ", hi: "अभी कोई रेस्टोरेंट नहीं" },
+  "Restaurant accounts appear here after they join.": { kn: "ರೆಸ್ಟೋರೆಂಟ್ ಖಾತೆಗಳು ಸೇರಿದ ನಂತರ ಇಲ್ಲಿ ಕಾಣಿಸುತ್ತವೆ.", hi: "रेस्टोरेंट खाते जुड़ने के बाद यहां दिखेंगे।" },
+  "No restaurants match": { kn: "ಯಾವುದೇ ರೆಸ್ಟೋರೆಂಟ್ ಹೊಂದಿಕೆಯಾಗುತ್ತಿಲ್ಲ", hi: "कोई रेस्टोरेंट मेल नहीं खाता" },
+  "Last order": { kn: "ಕೊನೆಯ ಆರ್ಡರ್", hi: "अंतिम ऑर्डर" },
+  "Order history": { kn: "ಆರ್ಡರ್ ಇತಿಹಾಸ", hi: "ऑर्डर का इतिहास" },
+  "What this kitchen said about deliveries": { kn: "ಈ ಅಡುಗೆಮನೆ ವಿತರಣೆಗಳ ಬಗ್ಗೆ ಹೇಳಿದ್ದು", hi: "इस रसोई ने डिलीवरी के बारे में क्या कहा" },
+  "Has not ordered yet": { kn: "ಇನ್ನೂ ಆರ್ಡರ್ ಮಾಡಿಲ್ಲ", hi: "अभी ऑर्डर नहीं किया" },
+  "No ratings yet": { kn: "ಇನ್ನೂ ರೇಟಿಂಗ್‌ಗಳಿಲ್ಲ", hi: "अभी कोई रेटिंग नहीं" },
+  "No feedback yet.": { kn: "ಇನ್ನೂ ಪ್ರತಿಕ್ರಿಯೆಗಳಿಲ್ಲ.", hi: "अभी कोई प्रतिक्रिया नहीं।" },
+  "This restaurant has not placed an order yet.": { kn: "ಈ ರೆಸ್ಟೋರೆಂಟ್ ಇನ್ನೂ ಆರ್ಡರ್ ಮಾಡಿಲ್ಲ.", hi: "इस रेस्टोरेंट ने अभी कोई ऑर्डर नहीं दिया।" },
   "Tray": { kn: "ಟ್ರೇ", hi: "ट्रे" },
   "Filter growers": { kn: "ಬೆಳೆಗಾರರನ್ನು ಫಿಲ್ಟರ್ ಮಾಡಿ", hi: "उत्पादक फ़िल्टर करें" },
   "Search by name, email or city": { kn: "ಹೆಸರು, ಇಮೇಲ್ ಅಥವಾ ನಗರದ ಮೂಲಕ ಹುಡುಕಿ", hi: "नाम, ईमेल या शहर से खोजें" },
@@ -1312,6 +1328,19 @@ const MONTH_SHORT = {
 const MONTH_SHORT_EN = MONTHS.map((month) => month.slice(0, 3));
 
 const regexTranslations = [
+  {
+    pattern: /^(\d+) dormant and (\d+) never ordered\. Open one to see its history\.$/,
+    replace: (language: Exclude<LanguageCode, "en">, a: string, b: string) =>
+      language === "kn" ? `${a} ನಿಷ್ಕ್ರಿಯ ಮತ್ತು ${b} ಎಂದಿಗೂ ಆರ್ಡರ್ ಮಾಡಿಲ್ಲ. ಇತಿಹಾಸ ನೋಡಲು ಒಂದನ್ನು ತೆರೆಯಿರಿ.` : `${a} निष्क्रिय और ${b} ने कभी ऑर्डर नहीं किया। इतिहास देखने के लिए एक खोलें।`,
+  },
+  {
+    pattern: /^(.+) · ([A-Z0-9]{8})$/,
+    replace: (language: Exclude<LanguageCode, "en">, crop: string, ref: string) => `${translateToken(crop, language)} · ${ref}`,
+  },
+  {
+    pattern: /^(\d+) paid$/,
+    replace: (language: Exclude<LanguageCode, "en">, n: string) => (language === "kn" ? `${n} ಪಾವತಿಸಲಾಗಿದೆ` : `${n} भुगतान हुए`),
+  },
   {
     pattern: /^(\d+) FSSAI numbers are waiting to be verified\.$/,
     replace: (language: Exclude<LanguageCode, "en">, n: string) => (language === "kn" ? `${n} FSSAI ಸಂಖ್ಯೆಗಳು ಪರಿಶೀಲನೆಗಾಗಿ ಕಾಯುತ್ತಿವೆ.` : `${n} FSSAI नंबर सत्यापन की प्रतीक्षा में हैं।`),

@@ -134,3 +134,38 @@ export async function getAdminGrower(growerId: string) {
   const scoredTrays = await prisma.batch.count({ where: { task: { growerId }, status: { in: ["HARVESTED", "REJECTED"] } } });
   return { grower, scoredTrays };
 }
+
+// ── Restaurants ─────────────────────────────────────────────────────────────
+
+/** One aggregate query per figure, instead of loading every order just to count them. */
+export async function getAdminRestaurants() {
+  const [restaurants, counts, paid] = await Promise.all([
+    prisma.restaurant.findMany({ include: { user: { select: { email: true } } }, orderBy: { businessName: "asc" } }),
+    prisma.order.groupBy({ by: ["restaurantId"], _count: true, _max: { createdAt: true } }),
+    prisma.order.groupBy({ by: ["restaurantId"], _sum: { totalPrice: true }, where: { status: { notIn: ["PENDING_PAYMENT", "CANCELLED"] } } }),
+  ]);
+  const countOf = new Map(counts.map((c) => [c.restaurantId, c]));
+  const revenueOf = new Map(paid.map((p) => [p.restaurantId, p._sum.totalPrice ?? 0]));
+  return restaurants.map((r) => ({
+    id: r.id,
+    name: r.businessName,
+    email: r.user.email,
+    city: r.city,
+    contactName: r.contactName,
+    phone: r.phone,
+    isActive: r.isActive,
+    orders: countOf.get(r.id)?._count ?? 0,
+    revenue: revenueOf.get(r.id) ?? 0,
+    lastOrderAt: countOf.get(r.id)?._max.createdAt ?? null,
+  }));
+}
+
+export async function getAdminRestaurant(restaurantId: string) {
+  return prisma.restaurant.findUnique({
+    where: { id: restaurantId },
+    include: {
+      user: { select: { email: true } },
+      orders: { orderBy: { createdAt: "desc" }, include: { feedback: { select: { id: true, rating: true, notes: true, createdAt: true } } } },
+    },
+  });
+}
