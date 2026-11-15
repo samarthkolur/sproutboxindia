@@ -67,6 +67,15 @@ Deviations from the plan, on purpose:
 - **Floating language toggle** still shows on marketing and auth pages (it hides itself inside dashboards) until Phase 1 gives them their own chrome.
 - **Dev server:** `.claude/launch.json` now runs `node node_modules/next/dist/bin/next dev -p 3001` with `NEXTAUTH_URL=http://localhost:3001`, because the `.bin` shims are not executable on this drive and port 3000 is taken.
 
+### Phase 0 tests (done 2026-11-15)
+
+`npm test` runs Vitest (jsdom + Testing Library): 129 tests in 13 files, all passing.
+- **Logic:** `lib/tasks` (day maths, check-in vs pickup are never both offered), `lib/nav` (every nav link has a `page.tsx`, unique badges, dock is a subset of the nav, admin pipeline is steps 1 to 5), `lib/shell-data` (badge/pinned mapping per role, falls back instead of throwing), STATUS_MAP covers every Prisma status enum, every new UI string has kn/hi.
+- **Coverage guard:** `tests/pages.test.ts` fails if a `page.tsx` is missing from this file, or this file plans a page that does not exist (apart from the new admin restaurant detail page).
+- **Components:** StatusChip, DataTable (links, selection, mobile cards, empty), FilterChips, SegmentedControl, Meter, Ring, Sparkline, StatTile, BarPairChart (screen-reader table, tooltip), Modal (Esc, backdrop, non-dismissible, focus and scroll restore), ThemeProvider, Sidebar, BottomDock.
+- **Each later phase** adds tests for its own pages and flows before it is pushed.
+- On this drive esbuild's binary loses its execute bit, so run `ESBUILD_BINARY_PATH=<an executable copy of esbuild> npm test`. Not needed on a normal filesystem.
+
 **Must not break:** GA4 events (`sign_up`, `purchase`, `checkin_submitted`, `pickup_requested` in `src/lib/gtag.ts`), middleware role routing, Stripe and UploadThing flows, every API route.
 
 ## 1. Layouts and states
