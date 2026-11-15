@@ -29,7 +29,7 @@ const COLUMNS: Column<Row>[] = [
     ),
   },
   { key: "city", header: "City", cell: (g) => <span data-i18n-ignore>{g.city}</span> },
-  { key: "kit", header: "Kit", cell: (g) => `${g.activeTrays} of ${g.kitSize} trays` },
+  { key: "kit", header: "Kit", cell: (g) => <span className="whitespace-nowrap">{`${g.activeTrays} of ${g.kitSize} trays`}</span> },
   {
     key: "score",
     header: "Score",

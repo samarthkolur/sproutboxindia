@@ -90,6 +90,7 @@ export function QCClient({ queue: initial }: { queue: QueueItem[] }) {
   return (
     <DetailLayout
       asidePosition="left"
+      compact
       aside={
         <Panel padding="none" className="overflow-hidden lg:sticky lg:top-24">
           <div className="flex flex-wrap items-center gap-2 border-b border-hairline/70 p-3">

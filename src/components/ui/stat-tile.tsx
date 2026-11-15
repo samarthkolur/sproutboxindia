@@ -38,7 +38,7 @@ export function StatTile({
         {icon ? <span className="text-ink-muted [&>svg]:h-4 [&>svg]:w-4">{icon}</span> : null}
         <span className="truncate">{label}</span>
       </div>
-      <div className="mt-2 flex items-end justify-between gap-3">
+      <div className="mt-2 flex flex-wrap items-end justify-between gap-x-3 gap-y-2">
         <p className="text-3xl font-light leading-none tracking-tight text-ink tabular-nums break-words">{value}</p>
         {trailing ? <div className="shrink-0">{trailing}</div> : null}
       </div>

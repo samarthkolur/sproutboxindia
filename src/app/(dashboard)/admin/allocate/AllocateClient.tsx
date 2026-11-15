@@ -123,6 +123,7 @@ export function AllocateClient({ plans: initial, growers }: { plans: Allocatable
   return (
     <DetailLayout
       asidePosition="left"
+      compact
       aside={
         <Panel padding="none" className="overflow-hidden lg:sticky lg:top-24">
           <div className="px-4 pt-4">
