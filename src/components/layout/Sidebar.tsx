@@ -1,227 +1,175 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
-import { BrandLogo } from "@/components/layout/BrandLogo";
-import { LanguageToggle } from "@/components/i18n/LanguageToggle";
+import { LogOut, PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
-  LayoutDashboard,
-  ClipboardList,
-  Wallet,
-  UserCircle,
-  ShoppingCart,
-  Package,
-  RotateCw,
-  Settings2,
-  Target,
-  CheckCircle2,
-  Truck,
-  BarChart3,
-  CreditCard,
-  Warehouse,
-  Users,
-  Store,
-  LogOut,
-  Menu,
-  X,
-  Send,
-  BookOpen,
-  Gauge,
-  type LucideIcon,
-} from "lucide-react";
-
-interface NavItem {
-  label: string;
-  href: string;
-  icon: LucideIcon;
-}
-
-const roleNavItems: Record<string, NavItem[]> = {
-  GROWER: [
-    { label: "Dashboard", href: "/grower/dashboard", icon: LayoutDashboard },
-    { label: "My Tasks", href: "/grower/tasks", icon: ClipboardList },
-    { label: "Earnings", href: "/grower/earnings", icon: Wallet },
-    { label: "Profile", href: "/grower/profile", icon: UserCircle },
-    { label: "Tutorial", href: "/grower/tutorial", icon: BookOpen },
-  ],
-  RESTAURANT: [
-    { label: "Dashboard", href: "/restaurant/dashboard", icon: LayoutDashboard },
-    { label: "New Order", href: "/restaurant/order/new", icon: ShoppingCart },
-    { label: "My Orders", href: "/restaurant/orders", icon: Package },
-    { label: "Subscriptions", href: "/restaurant/subscriptions", icon: RotateCw },
-  ],
-  ADMIN: [
-    { label: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
-    { label: "Demand Engine", href: "/admin/demand", icon: Settings2 },
-    { label: "Allocations", href: "/admin/allocate", icon: Target },
-    { label: "Dispatch", href: "/admin/dispatch", icon: Send },
-    { label: "QC Review", href: "/admin/qc", icon: CheckCircle2 },
-    { label: "Hubs", href: "/admin/hubs", icon: Warehouse },
-    { label: "Growers", href: "/admin/growers", icon: Users },
-    { label: "Restaurants", href: "/admin/restaurants", icon: Store },
-    { label: "Deliveries", href: "/admin/deliveries", icon: Truck },
-    { label: "Analytics", href: "/admin/analytics", icon: BarChart3 },
-    { label: "KPI Scorecard", href: "/admin/kpis", icon: Gauge },
-    { label: "Payouts", href: "/admin/payouts", icon: CreditCard },
-  ],
-};
+  NAV_GROUPS,
+  ROLE_LABEL,
+  isNavActive,
+  type NavBadges,
+  type NavItem,
+  type Role,
+} from "@/lib/nav";
+import type { PinnedCard } from "@/lib/shell-data";
 
 interface SidebarProps {
+  role: Role;
   userName: string;
-  userRole: string;
+  workspace: string;
+  badges: NavBadges;
+  pinned: PinnedCard;
+  collapsed: boolean;
+  onToggle: () => void;
 }
 
-export function Sidebar({ userName, userRole }: SidebarProps) {
-  const pathname = usePathname();
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const navItems = roleNavItems[userRole] || [];
-
-  const roleLabels: Record<string, string> = {
-    GROWER: "Grower",
-    RESTAURANT: "Restaurant",
-    ADMIN: "Admin",
-  };
-
-  const roleColors: Record<string, string> = {
-    GROWER: "from-sprout-600 to-sprout-800",
-    RESTAURANT: "from-blue-600 to-blue-800",
-    ADMIN: "from-purple-600 to-purple-800",
-  };
-
-  const sidebarContent = (
-    <div className="relative z-10 flex flex-col h-full">
-      {/* Logo */}
-      <div className="flex items-center justify-between px-6 py-5 border-b border-sprout-200/30">
-        <BrandLogo />
-        {/* Mobile close button */}
-        <button
-          onClick={() => setMobileOpen(false)}
-          className="lg:hidden w-8 h-8 rounded-lg flex items-center justify-center text-text-muted hover:bg-sprout-50 transition-colors"
+function NavLink({
+  item,
+  active,
+  count,
+  collapsed,
+}: {
+  item: NavItem;
+  active: boolean;
+  count: number;
+  collapsed: boolean;
+}) {
+  const Icon = item.icon;
+  return (
+    <Link
+      href={item.href}
+      title={collapsed ? item.label : undefined}
+      aria-current={active ? "page" : undefined}
+      className={cn(
+        "group relative flex items-center gap-3 rounded-full px-3.5 py-2.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50",
+        collapsed && "justify-center px-0",
+        // V1: the active item is the one solid fill in the sidebar.
+        active
+          ? "bg-brand text-brand-ink shadow-panel"
+          : "text-ink-soft hover:bg-inset/70 hover:text-ink"
+      )}
+    >
+      {item.step ? (
+        <span
+          aria-hidden="true"
+          className={cn(
+            "w-3 shrink-0 text-center text-micro tabular-nums",
+            collapsed && "hidden",
+            active ? "text-brand-ink/70" : "text-ink-muted"
+          )}
         >
-          <X className="w-5 h-5" />
+          {item.step}
+        </span>
+      ) : null}
+      <Icon className="h-[18px] w-[18px] shrink-0" strokeWidth={active ? 2.2 : 1.8} />
+      {!collapsed && <span className="min-w-0 flex-1 truncate">{item.label}</span>}
+      {count > 0 && (
+        <span
+          className={cn(
+            "inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-micro font-semibold tabular-nums",
+            collapsed && "absolute right-1 top-1 h-4 min-w-4 px-1",
+            active ? "bg-brand-ink/20 text-brand-ink" : "bg-leaf-soft text-good"
+          )}
+        >
+          {count > 99 ? "99+" : count}
+        </span>
+      )}
+    </Link>
+  );
+}
+
+export function Sidebar({ role, userName, workspace, badges, pinned, collapsed, onToggle }: SidebarProps) {
+  const pathname = usePathname();
+  const groups = NAV_GROUPS[role];
+
+  return (
+    <aside
+      className={cn(
+        "panel fixed bottom-3 left-3 top-3 z-30 hidden flex-col rounded-shell transition-[width] duration-200 lg:flex",
+        collapsed ? "w-[72px]" : "w-[240px]"
+      )}
+      aria-label="Main navigation"
+    >
+      {/* Brand */}
+      <div className={cn("flex items-center gap-3 px-4 pb-3 pt-4", collapsed && "flex-col px-2")}>
+        <span className="relative block h-10 w-10 shrink-0 overflow-hidden rounded-xl bg-brand/10 p-1.5">
+          <Image src="/logo.png" alt="" fill sizes="40px" className="object-contain p-1" priority />
+        </span>
+        {!collapsed && (
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-base font-semibold leading-tight text-ink">SproutBox</p>
+            <p className="truncate text-micro text-ink-muted">{workspace}</p>
+          </div>
+        )}
+        <button
+          type="button"
+          onClick={onToggle}
+          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+          data-no-global-loading
+          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-ink-muted transition-colors hover:bg-inset/70 hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50"
+        >
+          {collapsed ? <PanelLeftOpen className="h-4 w-4" /> : <PanelLeftClose className="h-4 w-4" />}
         </button>
       </div>
 
-      {/* Role tag */}
-      <div className="px-6 pt-4 pb-2">
-        <span
-          className={cn(
-            "inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold text-white uppercase tracking-wider bg-gradient-to-r",
-            roleColors[userRole] || "from-gray-600 to-gray-800"
-          )}
-        >
-          {roleLabels[userRole] || userRole}
-        </span>
-      </div>
-
       {/* Navigation */}
-      <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-        {navItems.map((item) => {
-          const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
-          const Icon = item.icon;
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              onClick={() => setMobileOpen(false)}
-              className={cn(
-                "flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group relative",
-                isActive
-                  ? "bg-sprout-800 text-white shadow-md shadow-sprout-800/20"
-                  : "text-text-secondary hover:bg-sprout-50 hover:text-sprout-800"
-              )}
-            >
-              {/* Active indicator glow */}
-              {isActive && (
-                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-sprout-400 rounded-r-full shadow-[0_0_12px_rgba(82,183,136,0.6)]" />
-              )}
-              <Icon
-                className={cn(
-                  "w-[18px] h-[18px] flex-shrink-0",
-                  !isActive && "group-hover:scale-110 transition-transform duration-200"
-                )}
-                strokeWidth={isActive ? 2.2 : 1.8}
+      <nav className="scrollbar-none flex-1 space-y-4 overflow-y-auto px-3 py-2">
+        {groups.map((group, index) => (
+          <div key={group.label ?? `group-${index}`} className="space-y-1">
+            {group.label && !collapsed && (
+              <p className="px-3.5 pb-1 text-micro font-medium uppercase tracking-wider text-ink-muted">
+                {group.label}
+              </p>
+            )}
+            {group.items.map((item) => (
+              <NavLink
+                key={item.href}
+                item={item}
+                active={isNavActive(pathname, item.href)}
+                count={item.badge ? badges[item.badge] ?? 0 : 0}
+                collapsed={collapsed}
               />
-              {item.label}
-            </Link>
-          );
-        })}
+            ))}
+          </div>
+        ))}
       </nav>
 
-      {/* User section */}
-      <div className="px-4 py-4 border-t border-sprout-200/30 space-y-3">
-        {/* Language toggle — visible on mobile inside sidebar */}
-        <div className="lg:hidden px-2">
-          <LanguageToggle className="w-full justify-center" />
-        </div>
-        <div className="flex items-center gap-3 px-2">
-          <div
-            className={cn(
-              "w-9 h-9 rounded-full flex items-center justify-center text-white text-sm font-semibold bg-gradient-to-br",
-              roleColors[userRole] || "from-gray-600 to-gray-800"
-            )}
-          >
-            {userName?.[0]?.toUpperCase() || "U"}
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold text-text-primary truncate">
-              {userName}
-            </p>
-            <p className="text-[11px] text-text-muted">
-              {roleLabels[userRole] || userRole}
-            </p>
-          </div>
-          <Link
-            href="/signout"
-            className="w-8 h-8 rounded-lg flex items-center justify-center text-text-muted hover:bg-red-50 hover:text-red-600 transition-colors"
-            title="Sign out"
-          >
-            <LogOut className="w-4 h-4" />
-          </Link>
-        </div>
-      </div>
-    </div>
-  );
-
-  return (
-    <>
-      {/* Mobile hamburger trigger */}
-      <button
-        onClick={() => setMobileOpen(true)}
-        className="fixed left-3 top-3 z-50 flex h-11 w-11 items-center justify-center rounded-xl bg-white/80 backdrop-blur-xl border border-white/50 shadow-lg lg:hidden active:scale-95 transition-transform"
-        aria-label="Open navigation menu"
-      >
-        <Menu className="w-5 h-5 text-text-primary" />
-      </button>
-
-      {/* Mobile overlay */}
-      {mobileOpen && (
-        <div
-          className="lg:hidden fixed inset-0 bg-black/30 backdrop-blur-sm z-40"
-          onClick={() => setMobileOpen(false)}
-        />
+      {/* V6: the pinned card says what to do next without opening a page. */}
+      {!collapsed && (
+        <Link
+          href={pinned.href}
+          className="mx-3 mb-3 block rounded-2xl bg-inset/80 p-3.5 transition-colors hover:bg-inset focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50"
+        >
+          <p className="text-micro text-ink-muted">{pinned.label}</p>
+          <p className="mt-0.5 text-2xl font-medium leading-tight text-ink">{pinned.value}</p>
+          <p className="mt-0.5 text-micro text-ink-soft">{pinned.caption}</p>
+        </Link>
       )}
 
-      {/* Mobile drawer */}
-      <aside
-        className={cn(
-          "fixed inset-y-0 left-0 z-50 w-[min(86vw,280px)] transform transition-transform duration-300 ease-out lg:hidden",
-          mobileOpen ? "translate-x-0" : "-translate-x-full"
+      {/* User chip */}
+      <div className={cn("flex items-center gap-3 border-t border-hairline/70 px-4 py-3", collapsed && "justify-center px-2")}>
+        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand text-sm font-semibold text-brand-ink">
+          {userName?.[0]?.toUpperCase() || "U"}
+        </span>
+        {!collapsed && (
+          <>
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm font-semibold text-ink">{userName}</p>
+              <p className="truncate text-micro text-ink-muted">{ROLE_LABEL[role]}</p>
+            </div>
+            <Link
+              href="/signout"
+              aria-label="Sign out"
+              title="Sign out"
+              className="flex h-8 w-8 items-center justify-center rounded-lg text-ink-muted transition-colors hover:bg-risk-soft hover:text-risk focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50"
+            >
+              <LogOut className="h-4 w-4" />
+            </Link>
+          </>
         )}
-      >
-        <div className="absolute inset-0 bg-white/90 backdrop-blur-xl border-r border-white/40" />
-        <div className="absolute inset-0 bg-dots opacity-20" />
-        {sidebarContent}
-      </aside>
-
-      {/* Desktop sidebar */}
-      <aside className="hidden lg:flex lg:w-[260px] lg:flex-col fixed inset-y-0 left-0 z-30">
-        <div className="absolute inset-0 bg-white/70 backdrop-blur-xl border-r border-white/40" />
-        <div className="absolute inset-0 bg-dots opacity-20" />
-        {sidebarContent}
-      </aside>
-    </>
+      </div>
+    </aside>
   );
 }
