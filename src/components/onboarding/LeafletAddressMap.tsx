@@ -75,7 +75,7 @@ export default function LeafletAddressMap({
     () =>
       L.divIcon({
         className: "",
-        html: `<div style="height:34px;width:34px;border-radius:9999px;background:#2D6A4F;color:white;display:grid;place-items:center;box-shadow:0 10px 24px rgba(45,106,79,.35);border:3px solid white;font-size:18px;">⌖</div>`,
+        html: `<div style="height:34px;width:34px;border-radius:9999px;background:rgb(var(--c-brand));color:rgb(var(--c-brand-ink));display:grid;place-items:center;box-shadow:0 10px 24px rgb(var(--c-shadow) / .35);border:3px solid white;font-size:18px;">⌖</div>`,
         iconSize: [34, 34],
         iconAnchor: [17, 17],
       }),
@@ -148,13 +148,13 @@ export default function LeafletAddressMap({
         type="button"
         onClick={useCurrentLocation}
         disabled={loading}
-        className="absolute right-3 top-3 z-[500] inline-flex items-center gap-2 rounded-xl bg-white/95 px-3 py-2 text-xs font-bold text-sprout-800 shadow-lg shadow-sprout-900/10 transition-colors hover:bg-sprout-50 disabled:opacity-60"
+        className="absolute right-3 top-3 z-[500] inline-flex items-center gap-2 rounded-full bg-panel-solid px-3.5 py-2 text-sm font-medium text-ink shadow-pop transition-colors hover:bg-inset focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50 disabled:opacity-60"
       >
         <LocateFixed className="h-4 w-4" />
         {loading ? "Fetching..." : "Use current"}
       </button>
 
-      <div className="absolute bottom-3 left-3 right-3 z-[500] rounded-xl bg-white/90 px-3 py-2 text-[11px] font-semibold text-text-secondary shadow-lg shadow-sprout-900/10 sm:text-xs">
+      <div className="absolute bottom-3 left-3 right-3 z-[500] rounded-xl bg-panel-solid/95 px-3 py-2 text-micro text-ink-soft shadow-pop">
         {error || "Click anywhere on the map to auto-fill address and PIN code."}
       </div>
     </div>
