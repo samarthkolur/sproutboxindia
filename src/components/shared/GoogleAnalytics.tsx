@@ -1,5 +1,5 @@
 import Script from "next/script";
-import { GA_MEASUREMENT_ID } from "@/lib/gtag";
+import { GA_MEASUREMENT_ID, UI_VARIANT } from "@/lib/gtag";
 
 export function GoogleAnalytics() {
   return (
@@ -16,6 +16,7 @@ export function GoogleAnalytics() {
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
+            gtag('set', 'user_properties', { ui_variant: '${UI_VARIANT}' });
             gtag('config', '${GA_MEASUREMENT_ID}', {
               page_path: window.location.pathname,
               send_page_view: true,

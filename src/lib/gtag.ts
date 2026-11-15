@@ -1,6 +1,10 @@
 export const GA_MEASUREMENT_ID =
   process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || "G-3S2T96R14P";
 
+// Which UI this build is. Sent as a GA4 user property so the two deployments
+// (main = no property, this branch = "v2") can be compared in reports.
+export const UI_VARIANT = process.env.NEXT_PUBLIC_UI_VARIANT || "v2";
+
 declare global {
   interface Window {
     dataLayer: unknown[];
