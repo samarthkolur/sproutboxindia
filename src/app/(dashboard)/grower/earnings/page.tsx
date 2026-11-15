@@ -5,9 +5,10 @@ import { EarningsChartCard } from "@/components/grower/EarningsChartCard";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { DataTable, type Column } from "@/components/ui/data-table";
 import { PageHeader } from "@/components/ui/page-header";
-import { Panel } from "@/components/ui/panel";
+import { Panel, PanelHeader } from "@/components/ui/panel";
 import { StatusChip } from "@/components/ui/status-chip";
-import { earningsSummary, rupees, weeklyEarnings } from "@/lib/grower";
+import { InvoiceLink, invoiceHref } from "@/components/shared/InvoiceLink";
+import { earningsSummary, payoutStatements, rupees, weeklyEarnings } from "@/lib/grower";
 import { getGrowerEarnings } from "@/lib/grower-data";
 import { cropName } from "@/lib/tasks";
 
@@ -35,6 +36,7 @@ export default async function GrowerEarningsPage() {
   const session = await auth();
   const payouts = await getGrowerEarnings(session?.user?.id ?? "");
   const { paid, pending } = earningsSummary(payouts ?? []);
+  const statements = payoutStatements(payouts ?? []);
 
   return (
     <>
@@ -50,6 +52,34 @@ export default async function GrowerEarningsPage() {
 
       <div className="space-y-4">
         <EarningsChartCard buckets={weeklyEarnings(payouts ?? [], new Date(), 12)} />
+
+        {statements.length > 0 ? (
+          <Panel>
+            <PanelHeader title="Payout statements" subtitle="One for each task you were paid for. Download it for your records." />
+            <ul className="divide-y divide-hairline/70">
+              {statements.map((row) => (
+                <li key={row.taskId} className="flex flex-wrap items-center justify-between gap-3 py-3 first:pt-0 last:pb-0">
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium text-ink">{cropName(row.cropType)}</p>
+                    <p className="mt-0.5 flex flex-wrap items-center gap-x-2 text-micro text-ink-muted">
+                      <span>{`${row.trays} ${row.trays === 1 ? "tray" : "trays"} · ${rupees(row.amount)}`}</span>
+                      <time dateTime={row.date.toISOString()}>{format(row.date, "d MMM yyyy")}</time>
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <StatusChip status={row.status} />
+                    <InvoiceLink
+                      href={invoiceHref.grower(row.taskId)}
+                      label="Statement"
+                      ariaLabel={`Download payout statement for ${cropName(row.cropType)}`}
+                      size="sm"
+                    />
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </Panel>
+        ) : null}
 
         <section aria-labelledby="payouts-heading">
           <h2 id="payouts-heading" className="mb-3 text-base font-semibold text-ink">

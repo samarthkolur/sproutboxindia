@@ -129,6 +129,8 @@ describe("grower portal patterns that start with a number", () => {
     "12 weeks",
     "8 Nov",
     "8 Nov 2026",
+    "6 trays · ₹300",
+    "1 tray · ₹50",
   ])("translates %s", (text) => {
     expect(translateText(text, "kn")).not.toBe(text);
     expect(translateText(text, "hi")).not.toBe(text);

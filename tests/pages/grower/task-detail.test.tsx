@@ -158,6 +158,16 @@ describe("grower task detail", () => {
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   });
 
+  it("links the payout statement once a tray has been paid, and not before", async () => {
+    getGrowerTask.mockResolvedValue(task({ batches: [batch({ status: "HARVESTED", payout: { amount: 50, status: "PAID" } })] }));
+    const { unmount } = await renderPage();
+    expect(screen.getByRole("link", { name: "Payout statement" })).toHaveAttribute("href", "/api/invoices/grower/task-1");
+    unmount();
+    getGrowerTask.mockResolvedValue(task());
+    await renderPage();
+    expect(screen.queryByRole("link", { name: "Payout statement" })).not.toBeInTheDocument();
+  });
+
   it("explains an empty history", async () => {
     getGrowerTask.mockResolvedValue(task());
     await renderPage();

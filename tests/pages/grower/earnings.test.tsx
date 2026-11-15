@@ -68,6 +68,23 @@ describe("grower earnings", () => {
     expect(screen.getByRole("radio", { name: "12 weeks" })).toBeInTheDocument();
   });
 
+  it("offers one downloadable payout statement per task, linking to the document", async () => {
+    getGrowerEarnings.mockResolvedValue([paid, payout({ id: "p9", batchId: "b9", amount: 50 }), pending]);
+    await renderPage();
+    const panel = screen.getByRole("heading", { name: "Payout statements" }).closest(".panel") as HTMLElement;
+    const sunflower = within(panel).getByRole("link", { name: "Download payout statement for Sunflower Shoots" });
+    expect(sunflower).toHaveAttribute("href", "/api/invoices/grower/task-1");
+    expect(sunflower).toHaveAttribute("download");
+    expect(within(panel).getByText("2 trays · ₹170".replace("170", "170"))).toBeInTheDocument();
+    expect(within(panel).getByRole("link", { name: "Download payout statement for Radish" })).toHaveAttribute("href", "/api/invoices/grower/task-2");
+  });
+
+  it("shows no statements panel before the first payout", async () => {
+    getGrowerEarnings.mockResolvedValue([]);
+    await renderPage();
+    expect(screen.queryByRole("heading", { name: "Payout statements" })).not.toBeInTheDocument();
+  });
+
   it("explains the first-run state", async () => {
     getGrowerEarnings.mockResolvedValue([]);
     await renderPage();

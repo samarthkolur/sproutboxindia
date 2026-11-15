@@ -1,4 +1,6 @@
 import { GlassCard } from "@/components/shared/GlassCard";
+import { InvoiceLink, invoiceHref } from "@/components/shared/InvoiceLink";
+import { isInvoiceable } from "@/lib/invoices";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -49,6 +51,7 @@ export default async function RestaurantOrdersPage() {
             };
             return (
               <GlassCard key={order.id} padding="sm">
+                <div className="flex flex-col gap-3 min-[520px]:flex-row min-[520px]:items-center">
                 <Link
                   href={`/restaurant/orders/${order.id}`}
                   className="flex w-full flex-col gap-3 rounded-xl row-hover cursor-pointer group min-[520px]:flex-row min-[520px]:items-center min-[520px]:gap-4"
@@ -68,6 +71,16 @@ export default async function RestaurantOrdersPage() {
                   <p className="text-sm font-bold text-text-primary min-[520px]:text-right">₹{order.totalPrice.toLocaleString("en-IN")}</p>
                   <ChevronRight className="hidden h-4 w-4 text-text-muted transition-all group-hover:text-sprout-800 min-[520px]:block" />
                 </Link>
+                {isInvoiceable(order.status) ? (
+                  <InvoiceLink
+                    href={invoiceHref.restaurant(order.id)}
+                    label="Invoice"
+                    ariaLabel={`Download invoice for order ${order.id.slice(0, 8).toUpperCase()}`}
+                    size="sm"
+                    className="shrink-0 self-start min-[520px]:self-center"
+                  />
+                ) : null}
+                </div>
               </GlassCard>
             );
           })}

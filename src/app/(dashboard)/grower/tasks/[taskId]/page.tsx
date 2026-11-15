@@ -6,6 +6,7 @@ import { AlertTriangle, ChevronRight } from "lucide-react";
 import { auth } from "@/lib/auth";
 import { CheckInHistory, type CheckInEntry } from "@/components/grower/CheckInHistory";
 import { TaskAction } from "@/components/grower/TaskAction";
+import { InvoiceLink, invoiceHref } from "@/components/shared/InvoiceLink";
 import { DetailLayout } from "@/components/ui/detail-layout";
 import { Panel, PanelHeader } from "@/components/ui/panel";
 import { Ring } from "@/components/ui/ring";
@@ -121,7 +122,15 @@ export default async function GrowerTaskDetailPage({ params }: { params: { taskI
         ))}
 
         <Panel>
-          <PanelHeader title="Trays" subtitle="Each tray is checked and paid on its own" />
+          <PanelHeader
+            title="Trays"
+            subtitle="Each tray is checked and paid on its own"
+            actions={
+              task.batches.some((b) => b.payout) ? (
+                <InvoiceLink href={invoiceHref.grower(task.id)} label="Payout statement" size="sm" />
+              ) : undefined
+            }
+          />
           <ul className="divide-y divide-hairline/70">
             {task.batches.map((batch) => (
               <li key={batch.id} className="flex flex-wrap items-center justify-between gap-2 py-2.5 first:pt-0 last:pb-0">

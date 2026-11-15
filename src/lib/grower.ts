@@ -121,3 +121,34 @@ export function sentenceForCheckins(due: number, activeTrays: number) {
   if (activeTrays > 0) return "You are all caught up. Nothing is due today.";
   return "No trays are growing yet. New tasks appear here when they are assigned to you.";
 }
+
+// ── Payout statements ───────────────────────────────────────────────────────
+
+export interface StatementRow {
+  taskId: string;
+  cropType: string;
+  trays: number;
+  amount: number;
+  /** PAID once every payout of the task is paid, otherwise PENDING. */
+  status: "PAID" | "PENDING";
+  /** When it was paid (the latest payout), or when it was earned while pending. */
+  date: Date;
+}
+
+/** One statement per task that has payouts, newest first. */
+export function payoutStatements(
+  payouts: { amount: number; status: string; paidAt: Date | null; createdAt: Date; batch: { task: { id: string; cropType: string } } }[]
+): StatementRow[] {
+  const byTask = new Map<string, StatementRow>();
+  for (const payout of payouts) {
+    const { id, cropType } = payout.batch.task;
+    const when = payout.paidAt ?? payout.createdAt;
+    const row = byTask.get(id) ?? { taskId: id, cropType, trays: 0, amount: 0, status: "PAID" as const, date: when };
+    row.trays += 1;
+    row.amount += payout.amount;
+    if (payout.status !== "PAID") row.status = "PENDING";
+    if (when > row.date) row.date = when;
+    byTask.set(id, row);
+  }
+  return Array.from(byTask.values()).sort((a, b) => b.date.getTime() - a.date.getTime());
+}

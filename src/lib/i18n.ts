@@ -752,6 +752,12 @@ export const translations: Record<string, TranslationEntry> = {
   "Days to harvest": { kn: "ಕೊಯ್ಲಿಗೆ ದಿನಗಳು", hi: "कटाई तक के दिन" },
   "Digital, hub & delivery checks": { kn: "ಡಿಜಿಟಲ್, ಹಬ್ ಮತ್ತು ವಿತರಣಾ ಪರಿಶೀಲನೆಗಳು", hi: "डिजिटल, हब और डिलीवरी जांच" },
   "Farm-to-fork, door to door.": { kn: "ಜಮೀನಿನಿಂದ ತಟ್ಟೆಗೆ, ಬಾಗಿಲಿಂದ ಬಾಗಿಲಿಗೆ.", hi: "खेत से थाली तक, दरवाज़े से दरवाज़े तक।" },
+  "Payout statement": { kn: "ಪಾವತಿ ಹೇಳಿಕೆ", hi: "भुगतान विवरण" },
+  "Payout statements": { kn: "ಪಾವತಿ ಹೇಳಿಕೆಗಳು", hi: "भुगतान विवरण" },
+  "Statement": { kn: "ಹೇಳಿಕೆ", hi: "विवरण" },
+  "One for each task you were paid for. Download it for your records.": { kn: "ನಿಮಗೆ ಪಾವತಿಸಿದ ಪ್ರತಿ ಕೆಲಸಕ್ಕೂ ಒಂದು. ನಿಮ್ಮ ದಾಖಲೆಗಾಗಿ ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ.", hi: "आपको भुगतान किए गए हर काम के लिए एक। अपने रिकॉर्ड के लिए डाउनलोड करें।" },
+  "Download invoice": { kn: "ಇನ್‌ವಾಯ್ಸ್ ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ", hi: "इनवॉइस डाउनलोड करें" },
+  "Invoice": { kn: "ಇನ್‌ವಾಯ್ಸ್", hi: "इनवॉइस" },
   "Choose a crop": { kn: "ಬೆಳೆ ಆರಿಸಿ", hi: "फसल चुनें" },
   "Give light and air": { kn: "ಬೆಳಕು ಮತ್ತು ಗಾಳಿ ನೀಡಿ", hi: "रोशनी और हवा दें" },
   "Good habits for every crop": { kn: "ಪ್ರತಿ ಬೆಳೆಗೂ ಒಳ್ಳೆಯ ಅಭ್ಯಾಸಗಳು", hi: "हर फसल के लिए अच्छी आदतें" },
@@ -1049,6 +1055,21 @@ const MONTH_SHORT = {
 const MONTH_SHORT_EN = MONTHS.map((month) => month.slice(0, 3));
 
 const regexTranslations = [
+  {
+    pattern: /^Download payout statement for (.+)$/,
+    replace: (language: Exclude<LanguageCode, "en">, what: string) =>
+      language === "kn" ? `${translateToken(what, language)} ಪಾವತಿ ಹೇಳಿಕೆ ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ` : `${translateToken(what, language)} का भुगतान विवरण डाउनलोड करें`,
+  },
+  {
+    pattern: /^Download invoice for order (.+)$/,
+    replace: (language: Exclude<LanguageCode, "en">, what: string) =>
+      language === "kn" ? `ಆರ್ಡರ್ ${what} ಇನ್‌ವಾಯ್ಸ್ ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ` : `ऑर्डर ${what} का इनवॉइस डाउनलोड करें`,
+  },
+  {
+    pattern: /^(\d+) trays? · (₹[\d,]+)$/,
+    replace: (language: Exclude<LanguageCode, "en">, trays: string, amount: string) =>
+      language === "kn" ? `${trays} ಟ್ರೇಗಳು · ${amount}` : `${trays} ट्रे · ${amount}`,
+  },
   {
     pattern: /^(\d+) trays · Day (\d+) of (\d+)$/,
     replace: (language: Exclude<LanguageCode, "en">, trays: string, day: string, total: string) =>

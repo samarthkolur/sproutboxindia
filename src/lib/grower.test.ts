@@ -5,6 +5,7 @@ import {
   earningsSummary,
   fssaiState,
   greetingFor,
+  payoutStatements,
   maskValue,
   qcTile,
   sentenceForCheckins,
@@ -149,5 +150,36 @@ describe("sentenceForCheckins", () => {
     expect(sentenceForCheckins(2, 3)).toBe("2 tasks need a check-in today.");
     expect(sentenceForCheckins(0, 3)).toMatch(/all caught up/);
     expect(sentenceForCheckins(0, 0)).toMatch(/No trays are growing/);
+  });
+});
+
+describe("payoutStatements", () => {
+  const payout = (task: string, crop: string, status: string, paidAt: Date | null, createdAt = daysAgo(20), amount = 50) => ({
+    amount, status, paidAt, createdAt, batch: { task: { id: task, cropType: crop } },
+  });
+
+  it("makes one statement per task, counting trays and summing the amount", () => {
+    const rows = payoutStatements([payout("t1", "sunflower", "PAID", daysAgo(5)), payout("t1", "sunflower", "PAID", daysAgo(5)), payout("t2", "radish", "PAID", daysAgo(9))]);
+    expect(rows).toHaveLength(2);
+    expect(rows[0]).toMatchObject({ taskId: "t1", trays: 2, amount: 100, status: "PAID" });
+  });
+
+  it("lists the newest first", () => {
+    const rows = payoutStatements([payout("old", "radish", "PAID", daysAgo(30)), payout("new", "mustard", "PAID", daysAgo(2))]);
+    expect(rows.map((r) => r.taskId)).toEqual(["new", "old"]);
+  });
+
+  it("is pending until every payout of the task is paid", () => {
+    const rows = payoutStatements([payout("t1", "sunflower", "PAID", daysAgo(5)), payout("t1", "sunflower", "PENDING", null)]);
+    expect(rows[0].status).toBe("PENDING");
+  });
+
+  it("dates a statement by its latest payout, falling back to when it was earned", () => {
+    expect(payoutStatements([payout("t1", "sunflower", "PAID", daysAgo(5)), payout("t1", "sunflower", "PAID", daysAgo(3))])[0].date).toEqual(daysAgo(3));
+    expect(payoutStatements([payout("t1", "sunflower", "PENDING", null, daysAgo(4))])[0].date).toEqual(daysAgo(4));
+  });
+
+  it("is empty with no payouts", () => {
+    expect(payoutStatements([])).toEqual([]);
   });
 });

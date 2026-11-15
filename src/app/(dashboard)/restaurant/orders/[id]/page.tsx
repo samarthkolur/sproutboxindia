@@ -1,6 +1,8 @@
 import { notFound } from "next/navigation";
 import { DeliveryTracker } from "@/components/restaurant/DeliveryTracker";
 import { GlassCard } from "@/components/shared/GlassCard";
+import { InvoiceLink, invoiceHref } from "@/components/shared/InvoiceLink";
+import { isInvoiceable } from "@/lib/invoices";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { formatCurrency, formatDate } from "@/lib/utils";
@@ -20,6 +22,11 @@ export default async function RestaurantOrderDetailPage({ params }: { params: { 
         <h1 className="text-2xl font-black text-text-primary">Order {order.id.slice(0, 8).toUpperCase()}</h1>
         <p className="mt-2 text-text-muted">{order.cropType} · {order.quantityKg}kg · {formatCurrency(order.totalPrice)}</p>
         <p className="text-sm text-text-muted">Delivery {formatDate(order.deliveryDate)}</p>
+        {isInvoiceable(order.status) ? (
+          <div className="mt-4">
+            <InvoiceLink href={invoiceHref.restaurant(order.id)} label="Download invoice" />
+          </div>
+        ) : null}
       </GlassCard>
       <GlassCard>
         <h2 className="mb-4 font-bold text-text-primary">Delivery status</h2>
