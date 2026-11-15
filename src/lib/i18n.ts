@@ -728,6 +728,21 @@ export const translations: Record<string, TranslationEntry> = {
   "Open menu": { kn: "ಮೆನು ತೆರೆಯಿರಿ", hi: "मेन्यू खोलें" },
   "Close menu": { kn: "ಮೆನು ಮುಚ್ಚಿ", hi: "मेन्यू बंद करें" },
   "Skip to content": { kn: "ವಿಷಯಕ್ಕೆ ಹೋಗಿ", hi: "सामग्री पर जाएं" },
+  // ── Phase 1: auth ──
+  "Account created. Sign in to continue.": { kn: "ಖಾತೆ ರಚಿಸಲಾಗಿದೆ. ಮುಂದುವರಿಯಲು ಸೈನ್ ಇನ್ ಮಾಡಿ.", hi: "खाता बन गया है। जारी रखने के लिए साइन इन करें।" },
+  "Email or password is incorrect. Check them and try again.": { kn: "ಇಮೇಲ್ ಅಥವಾ ಪಾಸ್‌ವರ್ಡ್ ತಪ್ಪಾಗಿದೆ. ಪರಿಶೀಲಿಸಿ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.", hi: "ईमेल या पासवर्ड गलत है। उन्हें जांचें और फिर कोशिश करें।" },
+  "Signing in…": { kn: "ಸೈನ್ ಇನ್ ಆಗುತ್ತಿದೆ…", hi: "साइन इन हो रहा है…" },
+  "Signing out…": { kn: "ಸೈನ್ ಔಟ್ ಆಗುತ್ತಿದೆ…", hi: "साइन आउट हो रहा है…" },
+  "Sign Out": { kn: "ಸೈನ್ ಔಟ್", hi: "साइन आउट" },
+  "Enter your full name.": { kn: "ನಿಮ್ಮ ಪೂರ್ಣ ಹೆಸರನ್ನು ನಮೂದಿಸಿ.", hi: "अपना पूरा नाम दर्ज करें।" },
+  "Enter your email address.": { kn: "ನಿಮ್ಮ ಇಮೇಲ್ ವಿಳಾಸವನ್ನು ನಮೂದಿಸಿ.", hi: "अपना ईमेल पता दर्ज करें।" },
+  "Enter a valid email address.": { kn: "ಮಾನ್ಯವಾದ ಇಮೇಲ್ ವಿಳಾಸವನ್ನು ನಮೂದಿಸಿ.", hi: "मान्य ईमेल पता दर्ज करें।" },
+  "Password must be at least 6 characters.": { kn: "ಪಾಸ್‌ವರ್ಡ್ ಕನಿಷ್ಠ 6 ಅಕ್ಷರಗಳಿರಬೇಕು.", hi: "पासवर्ड कम से कम 6 अक्षरों का होना चाहिए।" },
+  "Re-enter your password.": { kn: "ನಿಮ್ಮ ಪಾಸ್‌ವರ್ಡ್ ಅನ್ನು ಮತ್ತೆ ನಮೂದಿಸಿ.", hi: "अपना पासवर्ड फिर से दर्ज करें।" },
+  "Passwords do not match.": { kn: "ಪಾಸ್‌ವರ್ಡ್‌ಗಳು ಹೊಂದಿಕೆಯಾಗುತ್ತಿಲ್ಲ.", hi: "पासवर्ड मेल नहीं खाते।" },
+  "At least 6 characters": { kn: "ಕನಿಷ್ಠ 6 ಅಕ್ಷರಗಳು", hi: "कम से कम 6 अक्षर" },
+  "Next, tell us about your space and kit. Your account is created when you submit the last step.": { kn: "ಮುಂದೆ, ನಿಮ್ಮ ಸ್ಥಳ ಮತ್ತು ಕಿಟ್ ಬಗ್ಗೆ ತಿಳಿಸಿ. ಕೊನೆಯ ಹಂತವನ್ನು ಸಲ್ಲಿಸಿದಾಗ ನಿಮ್ಮ ಖಾತೆ ರಚಿಸಲಾಗುತ್ತದೆ.", hi: "आगे, हमें अपनी जगह और किट के बारे में बताएं। अंतिम चरण जमा करने पर आपका खाता बन जाएगा।" },
+  "Next, tell us about your kitchen and what you'd like to order. Your account is created when you submit the last step.": { kn: "ಮುಂದೆ, ನಿಮ್ಮ ಅಡುಗೆಮನೆ ಮತ್ತು ನೀವು ಏನನ್ನು ಆರ್ಡರ್ ಮಾಡಲು ಬಯಸುತ್ತೀರಿ ಎಂದು ತಿಳಿಸಿ. ಕೊನೆಯ ಹಂತವನ್ನು ಸಲ್ಲಿಸಿದಾಗ ನಿಮ್ಮ ಖಾತೆ ರಚಿಸಲಾಗುತ್ತದೆ.", hi: "आगे, हमें अपनी रसोई और आप क्या ऑर्डर करना चाहते हैं, इसके बारे में बताएं। अंतिम चरण जमा करने पर आपका खाता बन जाएगा।" },
 };
 
 
