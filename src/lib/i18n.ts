@@ -752,6 +752,22 @@ export const translations: Record<string, TranslationEntry> = {
   "Days to harvest": { kn: "ಕೊಯ್ಲಿಗೆ ದಿನಗಳು", hi: "कटाई तक के दिन" },
   "Digital, hub & delivery checks": { kn: "ಡಿಜಿಟಲ್, ಹಬ್ ಮತ್ತು ವಿತರಣಾ ಪರಿಶೀಲನೆಗಳು", hi: "डिजिटल, हब और डिलीवरी जांच" },
   "Farm-to-fork, door to door.": { kn: "ಜಮೀನಿನಿಂದ ತಟ್ಟೆಗೆ, ಬಾಗಿಲಿಂದ ಬಾಗಿಲಿಗೆ.", hi: "खेत से थाली तक, दरवाज़े से दरवाज़े तक।" },
+  "Demand engine": { kn: "ಬೇಡಿಕೆ ಎಂಜಿನ್", hi: "डिमांड इंजन" },
+  "Turn paid orders into production plans, nearest delivery first.": { kn: "ಪಾವತಿಸಿದ ಆರ್ಡರ್‌ಗಳನ್ನು ಉತ್ಪಾದನಾ ಯೋಜನೆಗಳಾಗಿ ಪರಿವರ್ತಿಸಿ, ಹತ್ತಿರದ ವಿತರಣೆ ಮೊದಲು.", hi: "भुगतान किए गए ऑर्डर को उत्पादन योजनाओं में बदलें, नज़दीकी डिलीवरी पहले।" },
+  "Base trays": { kn: "ಮೂಲ ಟ್ರೇಗಳು", hi: "आधार ट्रे" },
+  "Total trays": { kn: "ಒಟ್ಟು ಟ್ರೇಗಳು", hi: "कुल ट्रे" },
+  "Plan preview": { kn: "ಯೋಜನೆಯ ಮುನ್ನೋಟ", hi: "योजना का पूर्वावलोकन" },
+  "Create production plan": { kn: "ಉತ್ಪಾದನಾ ಯೋಜನೆ ರಚಿಸಿ", hi: "उत्पादन योजना बनाएं" },
+  "Choose an order to see how many trays it needs.": { kn: "ಎಷ್ಟು ಟ್ರೇಗಳು ಬೇಕು ಎಂದು ನೋಡಲು ಆರ್ಡರ್ ಆರಿಸಿ.", hi: "देखने के लिए ऑर्डर चुनें कि कितनी ट्रे चाहिए।" },
+  "Sow from": { kn: "ಬಿತ್ತನೆ ಆರಂಭ", hi: "बुवाई शुरू" },
+  "Filter by crop": { kn: "ಬೆಳೆಯ ಮೂಲಕ ಫಿಲ್ಟರ್ ಮಾಡಿ", hi: "फसल से फ़िल्टर करें" },
+  "Allocate now": { kn: "ಈಗ ಹಂಚಿ", hi: "अभी आवंटित करें" },
+  "No orders waiting for a plan": { kn: "ಯೋಜನೆಗಾಗಿ ಯಾವುದೇ ಆರ್ಡರ್ ಕಾಯುತ್ತಿಲ್ಲ", hi: "योजना की प्रतीक्षा में कोई ऑर्डर नहीं" },
+  "Every paid order already has a production plan.": { kn: "ಪ್ರತಿ ಪಾವತಿಸಿದ ಆರ್ಡರ್‌ಗೆ ಈಗಾಗಲೇ ಉತ್ಪಾದನಾ ಯೋಜನೆ ಇದೆ.", hi: "हर भुगतान किए गए ऑर्डर की उत्पादन योजना पहले से है।" },
+  "Delivery today": { kn: "ಇಂದು ವಿತರಣೆ", hi: "आज डिलीवरी" },
+  "Delivery tomorrow": { kn: "ನಾಳೆ ವಿತರಣೆ", hi: "कल डिलीवरी" },
+  "1 day overdue": { kn: "1 ದಿನ ತಡವಾಗಿದೆ", hi: "1 दिन की देरी" },
+  "1 production plan created": { kn: "1 ಉತ್ಪಾದನಾ ಯೋಜನೆ ರಚಿಸಲಾಗಿದೆ", hi: "1 उत्पादन योजना बनाई गई" },
   "Across all growers": { kn: "ಎಲ್ಲಾ ಬೆಳೆಗಾರರಲ್ಲಿ", hi: "सभी उत्पादकों में" },
   "Below the 90% target": { kn: "90% ಗುರಿಗಿಂತ ಕಡಿಮೆ", hi: "90% लक्ष्य से कम" },
   "By overall score": { kn: "ಒಟ್ಟಾರೆ ಅಂಕದ ಪ್ರಕಾರ", hi: "कुल स्कोर के अनुसार" },
@@ -1200,6 +1216,34 @@ const MONTH_SHORT = {
 const MONTH_SHORT_EN = MONTHS.map((month) => month.slice(0, 3));
 
 const regexTranslations = [
+  {
+    pattern: /^Buffer (\d+)%$/,
+    replace: (language: Exclude<LanguageCode, "en">, n: string) => (language === "kn" ? `ಬಫರ್ ${n}%` : `बफ़र ${n}%`),
+  },
+  {
+    pattern: /^Delivery in (\d+) days$/,
+    replace: (language: Exclude<LanguageCode, "en">, n: string) => (language === "kn" ? `${n} ದಿನಗಳಲ್ಲಿ ವಿತರಣೆ` : `${n} दिन में डिलीवरी`),
+  },
+  {
+    pattern: /^(\d+) days overdue$/,
+    replace: (language: Exclude<LanguageCode, "en">, n: string) => (language === "kn" ? `${n} ದಿನ ತಡವಾಗಿದೆ` : `${n} दिन की देरी`),
+  },
+  {
+    pattern: /^(\d+) production plans created$/,
+    replace: (language: Exclude<LanguageCode, "en">, n: string) => (language === "kn" ? `${n} ಉತ್ಪಾದನಾ ಯೋಜನೆಗಳನ್ನು ರಚಿಸಲಾಗಿದೆ` : `${n} उत्पादन योजनाएं बनाई गईं`),
+  },
+  {
+    pattern: /^Create plans \((\d+)\)$/,
+    replace: (language: Exclude<LanguageCode, "en">, n: string) => (language === "kn" ? `ಯೋಜನೆಗಳನ್ನು ರಚಿಸಿ (${n})` : `योजनाएं बनाएं (${n})`),
+  },
+  {
+    pattern: /^(\d+) selected$/,
+    replace: (language: Exclude<LanguageCode, "en">, n: string) => (language === "kn" ? `${n} ಆಯ್ಕೆ ಮಾಡಲಾಗಿದೆ` : `${n} चुने गए`),
+  },
+  {
+    pattern: /^Select order ([A-Z0-9]{8})$/,
+    replace: (language: Exclude<LanguageCode, "en">, ref: string) => (language === "kn" ? `ಆರ್ಡರ್ ${ref} ಆಯ್ಕೆ ಮಾಡಿ` : `ऑर्डर ${ref} चुनें`),
+  },
   {
     pattern: /^(\d+) orders? needs? a plan$/,
     replace: (language: Exclude<LanguageCode, "en">, n: string) => (language === "kn" ? `${n} ಆರ್ಡರ್‌ಗಳಿಗೆ ಯೋಜನೆ ಬೇಕು` : `${n} ऑर्डर को योजना चाहिए`),
