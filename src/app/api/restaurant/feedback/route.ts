@@ -23,25 +23,21 @@ export async function PATCH(request: Request) {
 
     if (!order) return fail("Order not found", "NOT_FOUND", 404);
 
-    const feedback = await prisma.$transaction(async (tx) => {
-      const saved = await tx.feedback.upsert({
-        where: { orderId: input.orderId },
-        update: { rating: input.rating, notes: input.notes, imageUrl: input.imageUrl },
-        create: {
-          orderId: input.orderId,
-          restaurantId: restaurant.id,
-          rating: input.rating,
-          notes: input.notes,
-          imageUrl: input.imageUrl,
-        },
-      });
+    // Feedback is for a delivered order. (Sending it used to mark any order delivered.)
+    if (order.status !== OrderStatus.DELIVERED) {
+      return fail("You can rate an order once it has been delivered", "NOT_DELIVERED", 409);
+    }
 
-      await tx.order.update({
-        where: { id: input.orderId },
-        data: { status: OrderStatus.DELIVERED },
-      });
-
-      return saved;
+    const feedback = await prisma.feedback.upsert({
+      where: { orderId: input.orderId },
+      update: { rating: input.rating, notes: input.notes, imageUrl: input.imageUrl },
+      create: {
+        orderId: input.orderId,
+        restaurantId: restaurant.id,
+        rating: input.rating,
+        notes: input.notes,
+        imageUrl: input.imageUrl,
+      },
     });
 
     const growerIds = (order.productionPlan?.tasks || []).reduce<string[]>((ids, task) => {
