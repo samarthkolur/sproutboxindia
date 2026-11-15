@@ -1,5 +1,5 @@
-import { fireEvent, render, screen } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { findUntranslated } from "@/test/translation";
 
 vi.mock("next/image", () => ({
@@ -11,21 +11,46 @@ import { FatalErrorPanel } from "@/components/shared/FatalErrorPanel";
 import { NotFoundView } from "@/components/shared/NotFoundView";
 
 describe("404 page", () => {
-  it("sends a visitor to the landing page", () => {
-    render(<NotFoundView signedIn={false} />);
+  const fetchMock = vi.fn();
+  beforeEach(() => vi.stubGlobal("fetch", fetchMock));
+  afterEach(() => vi.unstubAllGlobals());
+
+  it("sends a visitor to the landing page", async () => {
+    fetchMock.mockResolvedValue({ ok: true, json: async () => ({}) });
+    render(<NotFoundView />);
     expect(screen.getByRole("heading", { level: 1, name: "This page doesn't exist" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Back to home" })).toHaveAttribute("href", "/");
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledWith("/api/auth/session"));
+    expect(screen.getByRole("link", { name: "Back to home" })).toBeInTheDocument();
+  });
+
+  it("sends a signed-in person to their own dashboard once the session answers", async () => {
+    fetchMock.mockResolvedValue({ ok: true, json: async () => ({ user: { name: "Asha" } }) });
+    render(<NotFoundView />);
+    expect(await screen.findByRole("link", { name: "Go to your dashboard" })).toHaveAttribute("href", "/dashboard");
+  });
+
+  it("falls back to the landing page if the session lookup fails", async () => {
+    fetchMock.mockRejectedValue(new Error("offline"));
+    render(<NotFoundView />);
+    await waitFor(() => expect(fetchMock).toHaveBeenCalled());
     expect(screen.getByRole("link", { name: "Back to home" })).toHaveAttribute("href", "/");
   });
 
-  it("sends a signed-in person to their own dashboard", () => {
-    render(<NotFoundView signedIn />);
-    expect(screen.getByRole("link", { name: "Go to your dashboard" })).toHaveAttribute("href", "/dashboard");
+  // auth() / cookies() here make Next render every page in the app dynamically, which
+  // turned the static landing and auth pages into server-rendered ones. Found in the build table.
+  it("reads no session on the server, so the rest of the app can stay static", async () => {
+    const { readFileSync } = await import("node:fs");
+    const { join } = await import("node:path");
+    const source = readFileSync(join(process.cwd(), "src/app/not-found.tsx"), "utf8");
+    expect(source).not.toMatch(/from "@\/lib\/auth"|next\/headers|cookies\(|headers\(|auth\(/);
   });
 
-  it("has Kannada and Hindi for everything it says", () => {
-    const { container, rerender } = render(<NotFoundView signedIn={false} />);
+  it("has Kannada and Hindi for everything it says", async () => {
+    fetchMock.mockResolvedValue({ ok: true, json: async () => ({ user: {} }) });
+    const { container } = render(<NotFoundView />);
     expect(findUntranslated(container)).toEqual([]);
-    rerender(<NotFoundView signedIn />);
+    await screen.findByRole("link", { name: "Go to your dashboard" });
     expect(findUntranslated(container)).toEqual([]);
   });
 });

@@ -1,8 +1,7 @@
 import { NotFoundView } from "@/components/shared/NotFoundView";
-import { auth } from "@/lib/auth";
 
-export default async function NotFound() {
-  // A failed session lookup must never turn a 404 into a 500.
-  const session = await auth().catch(() => null);
-  return <NotFoundView signedIn={Boolean(session?.user)} />;
+// Keep this file free of server-side session or cookie reads: they would make every
+// route in the app render dynamically (see NotFoundView).
+export default function NotFound() {
+  return <NotFoundView />;
 }
