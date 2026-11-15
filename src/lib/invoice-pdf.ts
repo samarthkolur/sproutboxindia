@@ -35,13 +35,21 @@ function safe(text: string, font: PDFFont) {
     .join("");
 }
 
+/**
+ * Text width as it is drawn. widthOfTextAtSize applies kerning (pairs like "AY") that drawText
+ * does not, so right-aligned titles would stick out past the margin; summing glyphs does not.
+ */
+function widthOf(font: PDFFont, value: string, size: number) {
+  return Array.from(value).reduce((sum, char) => sum + font.widthOfTextAtSize(char, size), 0);
+}
+
 function wrap(text: string, font: PDFFont, size: number, maxWidth: number) {
   const lines: string[] = [];
   let line = "";
   // Measure the text that will actually be drawn: widthOfTextAtSize throws on characters the font cannot encode.
   for (const word of safe(text, font).split(/\s+/)) {
     const next = line ? `${line} ${word}` : word;
-    if (font.widthOfTextAtSize(next, size) <= maxWidth || !line) line = next;
+    if (widthOf(font, next, size) <= maxWidth || !line) line = next;
     else {
       lines.push(line);
       line = word;
@@ -54,7 +62,7 @@ function wrap(text: string, font: PDFFont, size: number, maxWidth: number) {
 function text(ctx: Ctx, value: string, x: number, y: number, size: number, opts: { bold?: boolean; color?: ReturnType<typeof rgb>; align?: "left" | "right"; maxWidth?: number } = {}) {
   const font = opts.bold ? ctx.bold : ctx.regular;
   const clean = safe(value, font);
-  const width = font.widthOfTextAtSize(clean, size);
+  const width = widthOf(font, clean, size);
   ctx.page.drawText(clean, { x: opts.align === "right" ? x - width : x, y, size, font, color: opts.color ?? INK });
 }
 
@@ -105,9 +113,9 @@ export async function renderInvoicePdf(doc: InvoiceDoc): Promise<Uint8Array> {
   text(ctx, COMPANY.tagline, MARGIN, PAGE.height - 80, 9.5, { color: MUTED });
   text(ctx, doc.title.toUpperCase(), PAGE.width - MARGIN, PAGE.height - 62, 18, { bold: true, align: "right" });
   const badgeColor = doc.status.paid ? GOOD : WATCH;
-  const badgeWidth = bold.widthOfTextAtSize(doc.status.label, 9) + 18;
+  const badgeWidth = widthOf(bold, doc.status.label, 9) + 18;
   page.drawRectangle({ x: PAGE.width - MARGIN - badgeWidth, y: PAGE.height - 90, width: badgeWidth, height: 18, borderColor: badgeColor, borderWidth: 1 });
-  text(ctx, doc.status.label, PAGE.width - MARGIN - badgeWidth / 2 - bold.widthOfTextAtSize(doc.status.label, 9) / 2, PAGE.height - 84, 9, { bold: true, color: badgeColor });
+  text(ctx, doc.status.label, PAGE.width - MARGIN - badgeWidth / 2 - widthOf(bold, doc.status.label, 9) / 2, PAGE.height - 84, 9, { bold: true, color: badgeColor });
 
   // Parties and reference details
   const top = PAGE.height - 124;
@@ -162,16 +170,17 @@ export async function renderInvoicePdf(doc: InvoiceDoc): Promise<Uint8Array> {
     text(ctx, row.rate, colRate, ctx.y, 10, { align: "right" });
     text(ctx, inr(row.amount), colAmount, ctx.y, 10, { align: "right" });
     ctx.y -= height - 4;
-    ctx.page.drawLine({ start: { x: MARGIN, y: ctx.y + 6 }, end: { x: MARGIN + INNER, y: ctx.y + 6 }, thickness: 0.6, color: LINE });
+    ctx.page.drawLine({ start: { x: MARGIN, y: ctx.y + 14 }, end: { x: MARGIN + INNER, y: ctx.y + 14 }, thickness: 0.6, color: LINE });
   }
 
   // Totals
   ctx.y -= 12;
   const totalsLeft = colRate - 70;
   for (const total of doc.totals) {
-    ensure(ctx, 26);
+    ensure(ctx, 34);
     if (total.strong) {
-      ctx.page.drawLine({ start: { x: totalsLeft, y: ctx.y + 15 }, end: { x: MARGIN + INNER, y: ctx.y + 15 }, thickness: 1, color: INK });
+      ctx.y -= 8;
+      ctx.page.drawLine({ start: { x: totalsLeft, y: ctx.y + 17 }, end: { x: MARGIN + INNER, y: ctx.y + 17 }, thickness: 1, color: INK });
     }
     text(ctx, total.label, totalsLeft, ctx.y, total.strong ? 11 : 9.5, { bold: total.strong, color: total.strong ? INK : MUTED });
     text(ctx, inr(total.amount), colAmount, ctx.y, total.strong ? 11 : 9.5, { bold: total.strong, align: "right" });
@@ -194,7 +203,7 @@ export async function renderInvoicePdf(doc: InvoiceDoc): Promise<Uint8Array> {
     p.drawLine({ start: { x: MARGIN, y: MARGIN }, end: { x: MARGIN + INNER, y: MARGIN }, thickness: 0.6, color: LINE });
     const draw = (value: string, x: number, align: "left" | "right") => {
       const clean = safe(value, regular);
-      const width = regular.widthOfTextAtSize(clean, 8);
+      const width = widthOf(regular, clean, 8);
       p.drawText(clean, { x: align === "right" ? x - width : x, y: MARGIN - 14, size: 8, font: regular, color: MUTED });
     };
     draw(`${COMPANY.name}  |  ${COMPANY.email}  |  Issued ${format(doc.issuedOn, "d MMM yyyy")}`, MARGIN, "left");
