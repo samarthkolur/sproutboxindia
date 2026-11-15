@@ -1,287 +1,186 @@
-import { StatCard } from "@/components/shared/StatCard";
-import { GlassCard } from "@/components/shared/GlassCard";
-import { StatusBadge } from "@/components/shared/StatusBadge";
-import { GrowerDashboardClient } from "./client";
-import { RequestPickupButton } from "@/components/grower/RequestPickupButton";
+import Link from "next/link";
+import { format, formatDistanceToNow } from "date-fns";
+import { ArrowRight, BellRing, BookOpen, ClipboardCheck, Sprout, Star, Wallet } from "lucide-react";
+import { getGrowerHome } from "@/lib/grower-data";
 import { auth } from "@/lib/auth";
-import { getGrowerDashboard } from "@/actions/dashboard.actions";
-import {
-  Sprout,
-  ClipboardCheck,
-  Wallet,
-  Star,
-  ChevronRight,
-  CheckCircle2,
-  AlertTriangle,
-  Info,
-  Clock,
-  BookOpen,
-} from "lucide-react";
-import {
-  CROP_DISPLAY_NAMES,
-  type CropType,
-} from "@/lib/constants";
+import { EarningsChartCard } from "@/components/grower/EarningsChartCard";
+import { TaskAction } from "@/components/grower/TaskAction";
+import { EmptyState } from "@/components/shared/EmptyState";
+import { PageHeader } from "@/components/ui/page-header";
+import { Panel, PanelHeader } from "@/components/ui/panel";
+import { Ring } from "@/components/ui/ring";
+import { StatTile } from "@/components/ui/stat-tile";
+import { StatusChip } from "@/components/ui/status-chip";
+import { earningsSummary, greetingFor, qcTile, rupees, sentenceForCheckins, weeklyEarnings } from "@/lib/grower";
+import { cropName, getTaskState } from "@/lib/tasks";
 
 export default async function GrowerDashboard() {
   const session = await auth();
-  const userId = session?.user?.id || "";
-  const data = await getGrowerDashboard(userId);
-
-  // Time-aware greeting (IST)
+  const home = await getGrowerHome(session?.user?.id ?? "");
   const now = new Date();
-  const istTime = new Date(now.getTime() + (5.5 * 60 * 60 * 1000));
-  const hour = istTime.getUTCHours();
-  const greeting =
-    hour < 12
-      ? "Good morning"
-      : hour < 17
-        ? "Good afternoon"
-        : "Good evening";
 
-  // Build activity from tasks
-  const activities = data.tasks.slice(0, 4).map((t) => ({
-    text: `${CROP_DISPLAY_NAMES[t.cropType as CropType] || t.cropType} — Day ${t.currentDay} of ${t.totalDays}`,
-    time: t.status === "assigned" ? "Awaiting start" : "In progress",
-    type: t.status === "assigned" ? "info" : "success",
-  }));
+  if (!home) {
+    return (
+      <>
+        <PageHeader title={greetingFor(now)} subtitle="Your grower profile is not set up yet." />
+        <EmptyState
+          icon={Sprout}
+          title="No grower profile found"
+          description="Finish joining as a grower and your tasks, earnings and tray checks will appear here."
+          action={
+            <Link href="/join/grower" className="rounded-full bg-brand px-4 py-2 text-sm font-medium text-brand-ink">
+              Join as a grower
+            </Link>
+          }
+        />
+      </>
+    );
+  }
 
-  // Weekly earnings chart data
-  const earningsData = data.weeklyEarnings.map((e) => ({
-    label: e.label,
-    value: e.amount,
-    tooltip: `₹${e.amount}`,
-  }));
+  const { grower, payouts, reviewedCheckIns, notifications } = home;
+  const states = grower.tasks.map((task) => ({ task, state: getTaskState(task, now) }));
+  const actionable = states.filter(({ task, state }) => state.canCheckIn || state.canRequestPickup || task.status === "HARVEST_READY");
+  const due = states.filter(({ state }) => state.canCheckIn).length;
+  const activeTrays = grower.tasks.reduce((sum, task) => sum + task.trayCount, 0);
+  const { paid, pending } = earningsSummary(payouts);
+  const qc = qcTile(grower.qualityScore, reviewedCheckIns);
 
-  const totalEarnings = data.totalEarnings;
+  // The grow-cycle ring follows the task furthest along that is still growing.
+  const growing = states
+    .filter(({ task }) => task.status === "IN_PROGRESS" || task.status === "ASSIGNED")
+    .sort((a, b) => b.state.progress - a.state.progress)[0];
 
   return (
-    <GrowerDashboardClient>
-      {/* Header */}
-      <div className="mb-6 sm:mb-8 flex flex-col gap-3 sm:gap-4 md:flex-row md:items-end md:justify-between">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-black text-text-primary tracking-tight">
-            {greeting}
-          </h1>
-          <p className="text-sm sm:text-base text-text-secondary mt-1">
-            Here&apos;s your growing overview for today
-          </p>
-        </div>
-        <a 
-          href="/grower/tutorial"
-          className="flex w-full items-center justify-center gap-2 rounded-xl border border-sprout-200 bg-sprout-50 px-4 py-2.5 text-sm font-semibold text-sprout-800 transition-colors hover:bg-sprout-100 sm:w-auto"
-        >
-          <BookOpen className="w-4 h-4" />
-          How to Grow Guide
-        </a>
+    <>
+      <PageHeader
+        eyebrow={format(now, "EEEE, d MMMM")}
+        title={greetingFor(now)}
+        subtitle={sentenceForCheckins(due, activeTrays)}
+        actions={
+          <Link
+            href="/grower/tutorial"
+            className="inline-flex items-center gap-2 rounded-full border border-hairline bg-panel/60 px-4 py-2 text-sm font-medium text-ink-soft transition-colors hover:text-ink"
+          >
+            <BookOpen className="h-4 w-4" aria-hidden="true" />
+            How to grow guide
+          </Link>
+        }
+      />
+
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+        <StatTile
+          label="Active trays"
+          icon={<Sprout />}
+          value={activeTrays}
+          caption={activeTrays > 0 ? `Growing across ${grower.tasks.length} ${grower.tasks.length === 1 ? "task" : "tasks"}` : "Ready for your next task"}
+          href="/grower/tasks"
+        />
+        <StatTile
+          label="Check-ins due"
+          icon={<ClipboardCheck />}
+          value={due}
+          tone={due > 0 ? "watch" : "good"}
+          caption={due > 0 ? "Photos for today are waiting" : "All caught up for today"}
+          href="/grower/tasks"
+        />
+        <StatTile
+          label="Earned"
+          icon={<Wallet />}
+          value={rupees(paid)}
+          caption={pending > 0 ? `${rupees(pending)} still pending` : "Paid out to you so far"}
+          href="/grower/earnings"
+        />
+        <StatTile label="QC score" icon={<Star />} value={qc.value} tone={qc.tone} caption={qc.caption} />
       </div>
 
-      {/* Stats Grid */}
-      <div className="mb-6 sm:mb-8 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
-        <StatCard
-          label="Active Trays"
-          value={data.activeTrays}
-          change={data.activeTrays > 0 ? "Currently growing" : "Ready for tasks"}
-          changeType="neutral"
-          icon={<Sprout className="w-[18px] h-[18px] text-sprout-700" strokeWidth={2} />}
-        />
-        <StatCard
-          label="Tasks Due"
-          value={data.tasksDue}
-          change={data.tasksDue > 0 ? `${data.tasksDue} pending` : "All clear"}
-          changeType={data.tasksDue > 0 ? "negative" : "positive"}
-          icon={<ClipboardCheck className="w-[18px] h-[18px] text-sprout-700" strokeWidth={2} />}
-        />
-        <StatCard
-          label="Earnings"
-          value={`₹${totalEarnings.toLocaleString("en-IN")}`}
-          change="Total payouts"
-          changeType="neutral"
-          icon={<Wallet className="w-[18px] h-[18px] text-sprout-700" strokeWidth={2} />}
-        />
-        <StatCard
-          label="QC Score"
-          value={`${data.qcScore}%`}
-          change={data.qcScore >= 90 ? "Excellent" : "Needs improvement"}
-          changeType={data.qcScore >= 90 ? "positive" : "negative"}
-          icon={<Star className="w-[18px] h-[18px] text-sprout-700" strokeWidth={2} />}
-        />
-      </div>
-
-      {/* Main content grid */}
-      <div className="grid gap-5 sm:gap-6 lg:grid-cols-3">
-        {/* Active Tasks — 2 cols */}
-        <div className="lg:col-span-2">
-          <GlassCard>
-            <div className="mb-5 flex flex-col gap-2 min-[420px]:flex-row min-[420px]:items-center min-[420px]:justify-between">
-              <h2 className="text-lg font-bold text-text-primary">Active Tasks</h2>
-              <span className="text-xs font-semibold text-sprout-600 bg-sprout-100 px-3 py-1 rounded-full">
-                {data.tasks.length} tasks
-              </span>
+      <div className="mt-4 grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,24rem)] lg:gap-5">
+        <div className="min-w-0 space-y-4">
+          {/* G: the one dark card on the page, with the action inline. */}
+          <section aria-labelledby="today-heading" className="rounded-panel bg-brand p-5 text-brand-ink shadow-pop sm:p-6">
+            <div className="flex flex-wrap items-baseline justify-between gap-2">
+              <h2 id="today-heading" className="text-lg font-medium">
+                Today&apos;s tasks
+              </h2>
+              <Link href="/grower/tasks" className="inline-flex items-center gap-1 text-sm text-brand-ink/80 hover:text-brand-ink">
+                View all tasks
+                <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              </Link>
             </div>
 
-            {data.tasks.length > 0 ? (
-              <div className="space-y-3">
-                {data.tasks.map((task) => {
-                  const progress = task.totalDays > 0
-                    ? Math.round((task.currentDay / task.totalDays) * 100)
-                    : 0;
-                  const cropName = CROP_DISPLAY_NAMES[task.cropType as CropType] || task.cropType;
-
-                  return (
-                    <div
-                      key={task.id}
-                      className="flex flex-col gap-3 rounded-xl border border-white/40 bg-white/50 p-4 row-hover cursor-pointer group min-[520px]:flex-row min-[520px]:items-center min-[520px]:gap-4"
-                    >
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                          <h3 className="text-sm font-semibold text-text-primary group-hover:text-sprout-800 transition-colors">
-                            {cropName}
-                          </h3>
-                          <StatusBadge
-                            status={
-                              task.status === "in-progress"
-                                ? "growing"
-                                : task.status === "assigned"
-                                  ? "sowing"
-                                  : task.status === "harvest-ready"
-                                    ? "ready"
-                                    : "active"
-                            }
-                          />
-                        </div>
-                        <p className="text-xs text-text-muted">
-                          {task.trayCount} trays · Day {task.currentDay} of {task.totalDays}
-                        </p>
-                      </div>
-
-                      {/* Progress bar */}
-                      <div className="w-full flex-shrink-0 min-[520px]:w-32">
-                        <div className="w-full bg-sprout-100 rounded-full h-1.5">
-                          <div
-                            className="bg-gradient-to-r from-sprout-600 to-sprout-500 h-1.5 rounded-full progress-bar-animate"
-                            style={{ width: `${progress}%` }}
-                          />
-                        </div>
-                        <p className="mt-1 text-right text-[10px] text-text-muted">
-                          {progress}%
-                        </p>
-                      </div>
-
-                      <div className="flex items-center justify-end gap-2">
-                        {task.currentDay >= task.totalDays && task.status !== "harvest-ready" && task.status !== "harvested" && (
-                          <RequestPickupButton taskId={task.id} />
-                        )}
-                        <ChevronRight className="w-4 h-4 text-text-muted flex-shrink-0 group-hover:text-sprout-800 group-hover:translate-x-0.5 transition-all" />
-                      </div>
+            {actionable.length > 0 ? (
+              <ul className="mt-4 divide-y divide-brand-ink/15">
+                {actionable.map(({ task, state }) => (
+                  <li key={task.id} className="flex flex-wrap items-center justify-between gap-3 py-3 first:pt-0 last:pb-0">
+                    <div className="min-w-0">
+                      <Link href={`/grower/tasks/${task.id}`} className="text-base font-medium hover:underline">
+                        {cropName(task.cropType)}
+                      </Link>
+                      <p className="mt-0.5 text-sm text-brand-ink/75">{`${task.trayCount} trays · Day ${state.currentDay} of ${state.totalDays}`}</p>
+                      {state.canCheckIn && state.todayInstruction ? (
+                        <p className="mt-1 max-w-md text-sm text-brand-ink/90">{state.todayInstruction}</p>
+                      ) : null}
                     </div>
-                  );
-                })}
-              </div>
+                    <TaskAction task={task} tone="onDark" />
+                  </li>
+                ))}
+              </ul>
             ) : (
-              <div className="text-center py-10">
-                <ClipboardCheck className="w-10 h-10 text-text-muted/30 mx-auto mb-3" />
-                <p className="text-sm text-text-muted">No active tasks</p>
-                <p className="text-xs text-text-muted mt-1">
-                  New tasks will appear here when assigned
-                </p>
-              </div>
+              <p className="mt-4 text-sm text-brand-ink/80">
+                {grower.tasks.length > 0 ? "Nothing needs you right now. Your trays are growing." : "New tasks will show up here as soon as they are assigned to you."}
+              </p>
             )}
-          </GlassCard>
+          </section>
+
+          <EarningsChartCard buckets={weeklyEarnings(payouts, now, 12)} />
         </div>
 
-        {/* Activity Feed — 1 col */}
-        <div>
-          <GlassCard>
-            <h2 className="text-lg font-bold text-text-primary mb-5">Recent Activity</h2>
-            {activities.length > 0 ? (
-              <div className="space-y-4">
-                {activities.map((item, i) => {
-                  const ActivityIcon =
-                    item.type === "success"
-                      ? CheckCircle2
-                      : item.type === "warning"
-                        ? AlertTriangle
-                        : Info;
-                  const iconColor =
-                    item.type === "success"
-                      ? "text-sprout-500"
-                      : item.type === "warning"
-                        ? "text-amber-500"
-                        : "text-blue-500";
-
-                  return (
-                    <div key={i} className="flex items-start gap-3">
-                      <ActivityIcon className={`w-4 h-4 mt-0.5 flex-shrink-0 ${iconColor}`} />
-                      <div>
-                        <p className="text-sm text-text-primary leading-snug">
-                          {item.text}
-                        </p>
-                        <div className="flex items-center gap-1 mt-0.5">
-                          <Clock className="w-3 h-3 text-text-muted" />
-                          <p className="text-[11px] text-text-muted">{item.time}</p>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            ) : (
-              <div className="text-center py-10">
-                <Clock className="w-10 h-10 text-text-muted/30 mx-auto mb-3" />
-                <p className="text-sm text-text-muted">No recent activity</p>
-              </div>
-            )}
-          </GlassCard>
-        </div>
-      </div>
-
-      {/* Earnings overview row */}
-      <div className="mt-6">
-        <GlassCard>
-          <div className="mb-4 flex flex-col gap-1 min-[420px]:flex-row min-[420px]:items-center min-[420px]:justify-between">
-            <h2 className="text-lg font-bold text-text-primary">Weekly Earnings</h2>
-            <span className="text-xs text-text-muted">
-              Last {earningsData.length} periods
-            </span>
-          </div>
-          <div className="flex h-24 sm:h-32 items-end gap-1 sm:gap-3">
-            {earningsData.length > 0 ? (
-              earningsData.map((item, i) => (
-                <div
-                  key={i}
-                  className="flex-1 flex flex-col items-center justify-end h-full group relative"
-                >
-                  <div className="absolute -top-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10">
-                    <div className="bg-text-primary text-white text-[10px] font-semibold px-2 py-1 rounded-lg whitespace-nowrap shadow-lg">
-                      {item.tooltip}
-                    </div>
+        <div className="min-w-0 space-y-4">
+          <Panel>
+            <PanelHeader title="Grow cycle" subtitle={growing ? cropName(growing.task.cropType) : undefined} />
+            {growing ? (
+              <Link href={`/grower/tasks/${growing.task.id}`} className="flex items-center gap-5 rounded-tile focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50">
+                <Ring percent={growing.state.progress} size={104} label={`${growing.state.progress}% of the grow cycle`}>
+                  <span className="text-2xl font-light tabular-nums text-ink">{growing.state.currentDay}</span>
+                  <span className="text-micro text-ink-muted">{`of ${growing.state.totalDays} days`}</span>
+                </Ring>
+                <div className="min-w-0">
+                  <p className="text-sm text-ink-soft">{`Day ${growing.state.currentDay} of ${growing.state.totalDays}`}</p>
+                  <p className="mt-1 text-micro text-ink-muted">{`${growing.task.trayCount} trays, harvest on ${format(growing.task.harvestDate, "d MMM")}`}</p>
+                  <div className="mt-2">
+                    <StatusChip status={growing.task.status} />
                   </div>
-                  <div
-                    className="w-full bg-gradient-to-t from-sprout-600 to-sprout-400 rounded-lg transition-all hover:opacity-80 hover:shadow-lg hover:shadow-sprout-500/20"
-                    style={{
-                      height: `${(item.value / Math.max(...earningsData.map((d) => d.value), 1)) * 100}%`,
-                    }}
-                  />
-                  <p className="text-[10px] text-text-muted mt-1.5 font-medium">
-                    {item.label}
-                  </p>
                 </div>
-              ))
+              </Link>
             ) : (
-              <div className="w-full h-full flex flex-col items-center justify-center text-text-muted">
-                <Wallet className="w-8 h-8 opacity-20 mb-2" />
-                <p className="text-xs">No earnings yet</p>
-              </div>
+              <p className="text-sm text-ink-muted">No tray is growing right now.</p>
             )}
-          </div>
-          <div className="mt-3 flex flex-col gap-1 border-t border-white/30 pt-3 min-[420px]:flex-row min-[420px]:items-center min-[420px]:justify-between">
-            <span className="text-sm text-text-muted">Total earned</span>
-            <span className="text-lg font-black text-sprout-800">
-              ₹{totalEarnings.toLocaleString("en-IN")}
-            </span>
-          </div>
-        </GlassCard>
+          </Panel>
+
+          <Panel>
+            <PanelHeader title="Recent activity" subtitle="Updates from the team" />
+            {notifications.length > 0 ? (
+              <ul className="space-y-4">
+                {notifications.map((item) => (
+                  <li key={item.id} className="flex gap-3">
+                    <span aria-hidden="true" className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-leaf-soft text-ink-soft">
+                      <BellRing className="h-4 w-4" />
+                    </span>
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium text-ink">{item.title}</p>
+                      <p className="text-sm text-ink-soft">{item.message}</p>
+                      <time data-i18n-ignore dateTime={item.createdAt.toISOString()} className="text-micro text-ink-muted">
+                        {formatDistanceToNow(item.createdAt, { addSuffix: true })}
+                      </time>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-sm text-ink-muted">Nothing new yet. Updates about your trays and payouts will appear here.</p>
+            )}
+          </Panel>
+        </div>
       </div>
-    </GrowerDashboardClient>
+    </>
   );
 }

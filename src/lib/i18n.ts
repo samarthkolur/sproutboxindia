@@ -752,6 +752,57 @@ export const translations: Record<string, TranslationEntry> = {
   "Days to harvest": { kn: "ಕೊಯ್ಲಿಗೆ ದಿನಗಳು", hi: "कटाई तक के दिन" },
   "Digital, hub & delivery checks": { kn: "ಡಿಜಿಟಲ್, ಹಬ್ ಮತ್ತು ವಿತರಣಾ ಪರಿಶೀಲನೆಗಳು", hi: "डिजिटल, हब और डिलीवरी जांच" },
   "Farm-to-fork, door to door.": { kn: "ಜಮೀನಿನಿಂದ ತಟ್ಟೆಗೆ, ಬಾಗಿಲಿಂದ ಬಾಗಿಲಿಗೆ.", hi: "खेत से थाली तक, दरवाज़े से दरवाज़े तक।" },
+  "Active trays": { kn: "ಸಕ್ರಿಯ ಟ್ರೇಗಳು", hi: "सक्रिय ट्रे" },
+  "Check-ins due": { kn: "ಬಾಕಿ ಇರುವ ಚೆಕ್-ಇನ್‌ಗಳು", hi: "बाकी चेक-इन" },
+  "Earned": { kn: "ಗಳಿಸಿದ್ದು", hi: "कमाया" },
+  "QC score": { kn: "QC ಅಂಕ", hi: "QC स्कोर" },
+  "Good morning": { kn: "ಶುಭೋದಯ", hi: "सुप्रभात" },
+  "Good afternoon": { kn: "ಶುಭ ಮಧ್ಯಾಹ್ನ", hi: "नमस्कार" },
+  "Good evening": { kn: "ಶುಭ ಸಂಜೆ", hi: "शुभ संध्या" },
+  "Today's tasks": { kn: "ಇಂದಿನ ಕೆಲಸಗಳು", hi: "आज के काम" },
+  "View all tasks": { kn: "ಎಲ್ಲಾ ಕೆಲಸಗಳನ್ನು ನೋಡಿ", hi: "सभी काम देखें" },
+  "Grow cycle": { kn: "ಬೆಳವಣಿಗೆಯ ಚಕ್ರ", hi: "उगने का चक्र" },
+  "Recent activity": { kn: "ಇತ್ತೀಚಿನ ಚಟುವಟಿಕೆ", hi: "हाल की गतिविधि" },
+  "Updates from the team": { kn: "ತಂಡದಿಂದ ಅಪ್‌ಡೇಟ್‌ಗಳು", hi: "टीम की ओर से अपडेट" },
+  "Weekly earnings": { kn: "ವಾರದ ಗಳಿಕೆ", hi: "साप्ताहिक कमाई" },
+  "What was paid out to you each week": { kn: "ಪ್ರತಿ ವಾರ ನಿಮಗೆ ಪಾವತಿಸಿದ ಮೊತ್ತ", hi: "हर सप्ताह आपको दिया गया भुगतान" },
+  "Chart range": { kn: "ಚಾರ್ಟ್ ಅವಧಿ", hi: "चार्ट की अवधि" },
+  "How to grow guide": { kn: "ಬೆಳೆಸುವ ಮಾರ್ಗದರ್ಶಿ", hi: "उगाने की गाइड" },
+  "Paid out to you so far": { kn: "ಇಲ್ಲಿಯವರೆಗೆ ನಿಮಗೆ ಪಾವತಿಸಿದ್ದು", hi: "अब तक आपको दिया गया भुगतान" },
+  "Photos for today are waiting": { kn: "ಇಂದಿನ ಫೋಟೋಗಳು ಬಾಕಿ ಇವೆ", hi: "आज की फोटो का इंतज़ार है" },
+  "All caught up for today": { kn: "ಇಂದಿಗೆ ಎಲ್ಲವೂ ಮುಗಿದಿದೆ", hi: "आज के लिए सब पूरा है" },
+  "Ready for your next task": { kn: "ನಿಮ್ಮ ಮುಂದಿನ ಕೆಲಸಕ್ಕೆ ಸಿದ್ಧ", hi: "आपके अगले काम के लिए तैयार" },
+  "Excellent. Restaurants rely on you.": { kn: "ಅತ್ಯುತ್ತಮ. ರೆಸ್ಟೋರೆಂಟ್‌ಗಳು ನಿಮ್ಮ ಮೇಲೆ ಭರವಸೆ ಇಡುತ್ತವೆ.", hi: "बेहतरीन। रेस्टोरेंट आप पर भरोसा करते हैं।" },
+  "Good. Sharp photos and on-time check-ins raise it.": { kn: "ಚೆನ್ನಾಗಿದೆ. ಸ್ಪಷ್ಟ ಫೋಟೋಗಳು ಮತ್ತು ಸಮಯಕ್ಕೆ ಚೆಕ್-ಇನ್ ಇದನ್ನು ಹೆಚ್ಚಿಸುತ್ತವೆ.", hi: "अच्छा। साफ़ फोटो और समय पर चेक-इन इसे बढ़ाते हैं।" },
+  "Below target. Check the QC notes on your trays.": { kn: "ಗುರಿಗಿಂತ ಕಡಿಮೆ. ನಿಮ್ಮ ಟ್ರೇಗಳ QC ಟಿಪ್ಪಣಿಗಳನ್ನು ನೋಡಿ.", hi: "लक्ष्य से कम। अपनी ट्रे पर QC के नोट देखें।" },
+  "No reviews yet. Scores appear after your first QC check.": { kn: "ಇನ್ನೂ ಯಾವುದೇ ಪರಿಶೀಲನೆ ಇಲ್ಲ. ಮೊದಲ QC ಪರಿಶೀಲನೆಯ ನಂತರ ಅಂಕಗಳು ಕಾಣಿಸುತ್ತವೆ.", hi: "अभी कोई समीक्षा नहीं। पहली QC जांच के बाद स्कोर दिखेंगे।" },
+  "4 weeks": { kn: "4 ವಾರಗಳು", hi: "4 सप्ताह" },
+  "Best week": { kn: "ಅತ್ಯುತ್ತಮ ವಾರ", hi: "सबसे अच्छा सप्ताह" },
+  "No earnings in this period": { kn: "ಈ ಅವಧಿಯಲ್ಲಿ ಗಳಿಕೆ ಇಲ್ಲ", hi: "इस अवधि में कोई कमाई नहीं" },
+  "Payouts appear here once your trays pass quality control.": { kn: "ನಿಮ್ಮ ಟ್ರೇಗಳು ಗುಣಮಟ್ಟ ಪರಿಶೀಲನೆಯಲ್ಲಿ ತೇರ್ಗಡೆಯಾದ ನಂತರ ಪಾವತಿಗಳು ಇಲ್ಲಿ ಕಾಣಿಸುತ್ತವೆ.", hi: "आपकी ट्रे गुणवत्ता जांच पास करते ही भुगतान यहां दिखेंगे।" },
+  "1 task needs a check-in today.": { kn: "ಇಂದು 1 ಕೆಲಸಕ್ಕೆ ಚೆಕ್-ಇನ್ ಬೇಕು.", hi: "आज 1 काम के लिए चेक-इन ज़रूरी है।" },
+  "You are all caught up. Nothing is due today.": { kn: "ಎಲ್ಲವೂ ಮುಗಿದಿದೆ. ಇಂದು ಯಾವುದೂ ಬಾಕಿ ಇಲ್ಲ.", hi: "सब पूरा है। आज कुछ बाकी नहीं।" },
+  "No trays are growing yet. New tasks appear here when they are assigned to you.": { kn: "ಇನ್ನೂ ಯಾವುದೇ ಟ್ರೇ ಬೆಳೆಯುತ್ತಿಲ್ಲ. ಹೊಸ ಕೆಲಸಗಳನ್ನು ನಿಮಗೆ ನೀಡಿದಾಗ ಇಲ್ಲಿ ಕಾಣಿಸುತ್ತವೆ.", hi: "अभी कोई ट्रे नहीं उग रही। नए काम सौंपे जाने पर यहां दिखेंगे।" },
+  "Nothing needs you right now. Your trays are growing.": { kn: "ಈಗ ನಿಮಗೆ ಯಾವುದೇ ಕೆಲಸವಿಲ್ಲ. ನಿಮ್ಮ ಟ್ರೇಗಳು ಬೆಳೆಯುತ್ತಿವೆ.", hi: "अभी आपके लिए कोई काम नहीं। आपकी ट्रे उग रही हैं।" },
+  "New tasks will show up here as soon as they are assigned to you.": { kn: "ಹೊಸ ಕೆಲಸಗಳನ್ನು ನಿಮಗೆ ನೀಡಿದ ತಕ್ಷಣ ಇಲ್ಲಿ ಕಾಣಿಸುತ್ತವೆ.", hi: "नए काम सौंपे जाते ही यहां दिखेंगे।" },
+  "No tray is growing right now.": { kn: "ಈಗ ಯಾವುದೇ ಟ್ರೇ ಬೆಳೆಯುತ್ತಿಲ್ಲ.", hi: "अभी कोई ट्रे नहीं उग रही।" },
+  "Nothing new yet. Updates about your trays and payouts will appear here.": { kn: "ಇನ್ನೂ ಹೊಸದೇನೂ ಇಲ್ಲ. ನಿಮ್ಮ ಟ್ರೇಗಳು ಮತ್ತು ಪಾವತಿಗಳ ಬಗ್ಗೆ ಅಪ್‌ಡೇಟ್‌ಗಳು ಇಲ್ಲಿ ಕಾಣಿಸುತ್ತವೆ.", hi: "अभी कुछ नया नहीं। आपकी ट्रे और भुगतान के अपडेट यहां दिखेंगे।" },
+  "No grower profile found": { kn: "ಬೆಳೆಗಾರ ಪ್ರೊಫೈಲ್ ಸಿಗಲಿಲ್ಲ", hi: "उत्पादक प्रोफ़ाइल नहीं मिली" },
+  "Your grower profile is not set up yet.": { kn: "ನಿಮ್ಮ ಬೆಳೆಗಾರ ಪ್ರೊಫೈಲ್ ಇನ್ನೂ ಸಿದ್ಧವಾಗಿಲ್ಲ.", hi: "आपकी उत्पादक प्रोफ़ाइल अभी तैयार नहीं है।" },
+  "Finish joining as a grower and your tasks, earnings and tray checks will appear here.": { kn: "ಬೆಳೆಗಾರರಾಗಿ ಸೇರುವುದನ್ನು ಪೂರ್ಣಗೊಳಿಸಿ, ನಿಮ್ಮ ಕೆಲಸಗಳು, ಗಳಿಕೆ ಮತ್ತು ಟ್ರೇ ಪರಿಶೀಲನೆಗಳು ಇಲ್ಲಿ ಕಾಣಿಸುತ್ತವೆ.", hi: "उत्पादक के रूप में जुड़ना पूरा करें, फिर आपके काम, कमाई और ट्रे की जांच यहां दिखेंगी।" },
+  "Join as a grower": { kn: "ಬೆಳೆಗಾರರಾಗಿ ಸೇರಿ", hi: "उत्पादक के रूप में जुड़ें" },
+  "Pickup requested": { kn: "ಪಿಕಪ್‌ಗೆ ವಿನಂತಿಸಲಾಗಿದೆ", hi: "पिकअप का अनुरोध किया गया" },
+  "Request Pickup": { kn: "ಪಿಕಪ್‌ಗೆ ವಿನಂತಿಸಿ", hi: "पिकअप का अनुरोध करें" },
+  "Upload a top view and a side view of your tray.": { kn: "ನಿಮ್ಮ ಟ್ರೇಯ ಮೇಲಿನ ನೋಟ ಮತ್ತು ಪಕ್ಕದ ನೋಟದ ಫೋಟೋ ಅಪ್‌ಲೋಡ್ ಮಾಡಿ.", hi: "अपनी ट्रे की ऊपर और बगल से फोटो अपलोड करें।" },
+  "Top view": { kn: "ಮೇಲಿನ ನೋಟ", hi: "ऊपर से दृश्य" },
+  "Side view": { kn: "ಪಕ್ಕದ ನೋಟ", hi: "बगल से दृश्य" },
+  "Notes": { kn: "ಟಿಪ್ಪಣಿಗಳು", hi: "नोट" },
+  "Any observations about growth today…": { kn: "ಇಂದಿನ ಬೆಳವಣಿಗೆಯ ಬಗ್ಗೆ ಏನಾದರೂ ಗಮನಿಸಿದ್ದರೆ…", hi: "आज की वृद्धि के बारे में कोई अवलोकन…" },
+  "Submit check-in": { kn: "ಚೆಕ್-ಇನ್ ಸಲ್ಲಿಸಿ", hi: "चेक-इन जमा करें" },
+  "Uploading photos…": { kn: "ಫೋಟೋಗಳನ್ನು ಅಪ್‌ಲೋಡ್ ಮಾಡಲಾಗುತ್ತಿದೆ…", hi: "फोटो अपलोड हो रही हैं…" },
+  "Check-in submitted": { kn: "ಚೆಕ್-ಇನ್ ಸಲ್ಲಿಸಲಾಗಿದೆ", hi: "चेक-इन जमा हो गया" },
+  "Upload image": { kn: "ಚಿತ್ರ ಅಪ್‌ಲೋಡ್ ಮಾಡಿ", hi: "छवि अपलोड करें" },
+  "Uploading…": { kn: "ಅಪ್‌ಲೋಡ್ ಆಗುತ್ತಿದೆ…", hi: "अपलोड हो रहा है…" },
   "Spread seeds evenly on moistened cocopeat. Cover with another tray for darkness.": { kn: "ತೇವಗೊಳಿಸಿದ ಕೊಕೊಪೀಟ್ ಮೇಲೆ ಬೀಜಗಳನ್ನು ಸಮವಾಗಿ ಹರಡಿ. ಕತ್ತಲೆಗಾಗಿ ಇನ್ನೊಂದು ಟ್ರೇಯಿಂದ ಮುಚ್ಚಿ.", hi: "नम कोकोपीट पर बीजों को समान रूप से फैलाएं। अंधेरे के लिए दूसरी ट्रे से ढक दें।" },
   "Keep covered. Mist lightly if surface looks dry.": { kn: "ಮುಚ್ಚಿಯೇ ಇರಲಿ. ಮೇಲ್ಮೈ ಒಣಗಿದಂತೆ ಕಂಡರೆ ಹಗುರವಾಗಿ ಸಿಂಪಡಿಸಿ.", hi: "ढका रहने दें। सतह सूखी दिखे तो हल्की फुहार दें।" },
   "Check germination. Seeds should show white sprouts. Upload photo.": { kn: "ಮೊಳಕೆಯೊಡೆಯುವಿಕೆಯನ್ನು ಪರಿಶೀಲಿಸಿ. ಬೀಜಗಳಲ್ಲಿ ಬಿಳಿ ಮೊಳಕೆ ಕಾಣಬೇಕು. ಫೋಟೋ ಅಪ್‌ಲೋಡ್ ಮಾಡಿ.", hi: "अंकुरण जांचें। बीजों में सफेद अंकुर दिखने चाहिए। फोटो अपलोड करें।" },
@@ -885,7 +936,72 @@ function translateToken(value: string, language: Exclude<LanguageCode, "en">) {
   return translations[value]?.[language] ?? value;
 }
 
+// Dates come out of date-fns in English ("Sunday, 15 November", "8 Nov"); these keep the
+// day number and translate only the names.
+const WEEKDAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"] as const;
+const WEEKDAY_NAMES = {
+  kn: ["ಭಾನುವಾರ", "ಸೋಮವಾರ", "ಮಂಗಳವಾರ", "ಬುಧವಾರ", "ಗುರುವಾರ", "ಶುಕ್ರವಾರ", "ಶನಿವಾರ"],
+  hi: ["रविवार", "सोमवार", "मंगलवार", "बुधवार", "गुरुवार", "शुक्रवार", "शनिवार"],
+};
+const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"] as const;
+const MONTH_NAMES = {
+  kn: ["ಜನವರಿ", "ಫೆಬ್ರವರಿ", "ಮಾರ್ಚ್", "ಏಪ್ರಿಲ್", "ಮೇ", "ಜೂನ್", "ಜುಲೈ", "ಆಗಸ್ಟ್", "ಸೆಪ್ಟೆಂಬರ್", "ಅಕ್ಟೋಬರ್", "ನವೆಂಬರ್", "ಡಿಸೆಂಬರ್"],
+  hi: ["जनवरी", "फ़रवरी", "मार्च", "अप्रैल", "मई", "जून", "जुलाई", "अगस्त", "सितंबर", "अक्टूबर", "नवंबर", "दिसंबर"],
+};
+const MONTH_SHORT = {
+  kn: ["ಜನ", "ಫೆಬ್ರ", "ಮಾರ್ಚ್", "ಏಪ್ರಿ", "ಮೇ", "ಜೂನ್", "ಜುಲೈ", "ಆಗ", "ಸೆಪ್ಟೆಂ", "ಅಕ್ಟೋ", "ನವೆಂ", "ಡಿಸೆಂ"],
+  hi: ["जन॰", "फ़र॰", "मार्च", "अप्रै॰", "मई", "जून", "जुला॰", "अग॰", "सित॰", "अक्टू॰", "नव॰", "दिस॰"],
+};
+const MONTH_SHORT_EN = MONTHS.map((month) => month.slice(0, 3));
+
 const regexTranslations = [
+  {
+    pattern: new RegExp(`^(${WEEKDAYS.join("|")}), (\\d{1,2}) (${MONTHS.join("|")})$`),
+    replace: (language: Exclude<LanguageCode, "en">, weekday: string, day: string, month: string) =>
+      `${WEEKDAY_NAMES[language][WEEKDAYS.indexOf(weekday as (typeof WEEKDAYS)[number])]}, ${day} ${MONTH_NAMES[language][MONTHS.indexOf(month as (typeof MONTHS)[number])]}`,
+  },
+  {
+    pattern: new RegExp(`^(\\d{1,2}) (${MONTH_SHORT_EN.join("|")})( \\d{4})?$`),
+    replace: (language: Exclude<LanguageCode, "en">, day: string, month: string, year?: string) =>
+      `${day} ${MONTH_SHORT[language][MONTH_SHORT_EN.indexOf(month)]}${year ?? ""}`,
+  },
+  {
+    pattern: /^(\d+) weeks$/,
+    replace: (language: Exclude<LanguageCode, "en">, value: string) =>
+      language === "kn" ? `${value} ವಾರಗಳು` : `${value} सप्ताह`,
+  },
+  {
+    pattern: /^(\d+) tasks need a check-in today\.$/,
+    replace: (language: Exclude<LanguageCode, "en">, value: string) =>
+      language === "kn" ? `ಇಂದು ${value} ಕೆಲಸಗಳಿಗೆ ಚೆಕ್-ಇನ್ ಬೇಕು.` : `आज ${value} कामों के लिए चेक-इन ज़रूरी है।`,
+  },
+  {
+    pattern: /^Growing across (\d+) tasks?$/,
+    replace: (language: Exclude<LanguageCode, "en">, value: string) =>
+      language === "kn" ? `${value} ಕೆಲಸಗಳಲ್ಲಿ ಬೆಳೆಯುತ್ತಿದೆ` : `${value} कामों में उग रहा है`,
+  },
+  {
+    pattern: /^of (\d+) days$/,
+    replace: (language: Exclude<LanguageCode, "en">, value: string) =>
+      language === "kn" ? `${value} ದಿನಗಳಲ್ಲಿ` : `${value} दिनों में से`,
+  },
+  {
+    pattern: /^Day (\d+) check-in$/,
+    replace: (language: Exclude<LanguageCode, "en">, value: string) =>
+      language === "kn" ? `ದಿನ ${value} ಚೆಕ್-ಇನ್` : `दिन ${value} का चेक-इन`,
+  },
+  {
+    pattern: /^Weekly earnings for the last (\d+) weeks\. Total (₹[\d,]+)\.$/,
+    replace: (language: Exclude<LanguageCode, "en">, weeks: string, total: string) =>
+      language === "kn"
+        ? `ಕಳೆದ ${weeks} ವಾರಗಳ ವಾರದ ಗಳಿಕೆ. ಒಟ್ಟು ${total}.`
+        : `पिछले ${weeks} सप्ताह की साप्ताहिक कमाई। कुल ${total}।`,
+  },
+  {
+    pattern: /^(\d+)% of the grow cycle$/,
+    replace: (language: Exclude<LanguageCode, "en">, value: string) =>
+      language === "kn" ? `ಬೆಳವಣಿಗೆಯ ಚಕ್ರದ ${value}%` : `उगने के चक्र का ${value}%`,
+  },
   {
     pattern: /^Step (\d+)$/,
     replace: (language: Exclude<LanguageCode, "en">, value: string) =>
