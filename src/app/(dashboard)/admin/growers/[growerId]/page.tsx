@@ -10,7 +10,7 @@ import { Panel, PanelHeader } from "@/components/ui/panel";
 import { StatTile } from "@/components/ui/stat-tile";
 import { StatusChip } from "@/components/ui/status-chip";
 import { Tabs } from "@/components/ui/tabs";
-import { cropName, fssaiKind, rupees, scorePercent, shortId } from "@/lib/admin";
+import { cropName, fssaiKind, rupees, scorePercent } from "@/lib/admin";
 import { getAdminGrower } from "@/lib/admin-data";
 import { earningsSummary } from "@/lib/grower";
 
