@@ -24,8 +24,9 @@ export async function getAdminKPIs() {
       prisma.grower.count(),
       prisma.grower.count({ where: { isActive: true } }),
       prisma.delivery.count({ where: { status: "IN_TRANSIT" } }),
-      prisma.batch.count({ where: { status: "QC_PASSED" } }),
-      prisma.batch.count({ where: { status: { in: ["QC_PASSED", "QC_FAILED", "REJECTED"] } } }),
+      // A tray that passed QC keeps counting once it is harvested; only then does it leave QC_PASSED.
+      prisma.batch.count({ where: { status: { in: ["QC_PASSED", "HARVESTED"] } } }),
+      prisma.batch.count({ where: { status: { in: ["QC_PASSED", "HARVESTED", "QC_FAILED", "REJECTED"] } } }),
       prisma.order.aggregate({ _sum: { totalPrice: true } }),
     ]);
 

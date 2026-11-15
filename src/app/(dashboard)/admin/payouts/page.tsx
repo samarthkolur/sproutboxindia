@@ -92,10 +92,8 @@ export default async function PayoutsPage() {
         </GlassCard>
       </div>
 
-      <PayoutClient initialPayouts={payouts} />
-
       {settlements.length > 0 ? (
-        <section aria-labelledby="settlements-heading" className="mt-8">
+        <section aria-labelledby="settlements-heading" className="mb-8">
           <h2 id="settlements-heading" className="mb-3 text-lg font-bold text-text-primary">Order settlements</h2>
           <div className="space-y-4">
             {settlements.map(({ order, growers, paidOut, share }) => (
@@ -136,6 +134,8 @@ export default async function PayoutsPage() {
           </div>
         </section>
       ) : null}
+
+      <PayoutClient initialPayouts={payouts} />
     </div>
   );
 }
