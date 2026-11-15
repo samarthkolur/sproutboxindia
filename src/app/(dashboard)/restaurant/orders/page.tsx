@@ -1,102 +1,160 @@
-import { GlassCard } from "@/components/shared/GlassCard";
-import { InvoiceLink, invoiceHref } from "@/components/shared/InvoiceLink";
-import { isInvoiceable } from "@/lib/invoices";
-import { StatusBadge } from "@/components/shared/StatusBadge";
-import { auth } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
-import { CROP_DISPLAY_NAMES, type CropType } from "@/lib/constants";
-import { Package, ChevronRight, ArrowRight } from "lucide-react";
 import Link from "next/link";
+import { format } from "date-fns";
+import { Package, Plus } from "lucide-react";
+import { auth } from "@/lib/auth";
+import { OrdersToolbar } from "@/components/restaurant/OrdersToolbar";
+import { PayNowButton } from "@/components/restaurant/PayNowButton";
+import { EmptyState } from "@/components/shared/EmptyState";
+import { InvoiceLink, invoiceHref } from "@/components/shared/InvoiceLink";
+import { DataTable, type Column } from "@/components/ui/data-table";
+import { FilterChips } from "@/components/ui/filter-chips";
+import { PageHeader } from "@/components/ui/page-header";
+import { StatusChip } from "@/components/ui/status-chip";
+import { CROP_DISPLAY_NAMES, type CropType } from "@/lib/constants";
+import { isInvoiceable } from "@/lib/invoices";
+import {
+  ORDER_FILTERS,
+  orderFilterOf,
+  parseOrderFilter,
+  parseOrderSort,
+  rupees,
+  searchOrders,
+  shortId,
+  sortOrders,
+  type OrderFilter,
+} from "@/lib/restaurant";
+import { getRestaurantOrders, type RestaurantOrder } from "@/lib/restaurant-data";
 
-async function getOrders(userId: string) {
-  try {
-    const restaurant = await prisma.restaurant.findUnique({
-      where: { userId },
-      include: {
-        orders: { orderBy: { createdAt: "desc" } },
-      },
-    });
-    return restaurant?.orders || [];
-  } catch {
-    return [];
-  }
-}
+const cropName = (crop: string) => CROP_DISPLAY_NAMES[crop as CropType] ?? crop;
 
-export default async function RestaurantOrdersPage() {
+const FILTER_LABEL: Record<OrderFilter, string> = {
+  all: "All",
+  awaiting: "Awaiting payment",
+  production: "In production",
+  transit: "In transit",
+  delivered: "Delivered",
+  cancelled: "Cancelled",
+};
+
+const COLUMNS: Column<RestaurantOrder>[] = [
+  {
+    key: "order",
+    header: "Order",
+    mobile: "title",
+    cell: (order) => (
+      <>
+        {cropName(order.cropType)}
+        <span className="block text-micro font-normal text-ink-muted">{`${shortId(order.id)} · ${order.quantityKg} kg`}</span>
+      </>
+    ),
+  },
+  { key: "placed", header: "Placed", cell: (order) => <time dateTime={order.createdAt.toISOString()}>{format(order.createdAt, "d MMM yyyy")}</time> },
+  { key: "delivery", header: "Delivery", cell: (order) => <time dateTime={order.deliveryDate.toISOString()}>{format(order.deliveryDate, "d MMM yyyy")}</time> },
+  { key: "status", header: "Status", cell: (order) => <StatusChip status={order.status} /> },
+  { key: "amount", header: "Amount", align: "right", cell: (order) => <span className="font-medium text-ink">{rupees(order.totalPrice)}</span> },
+  {
+    key: "actions",
+    header: "Actions",
+    align: "right",
+    cell: (order) => (
+      // Above the row's stretched link, so each action stays clickable.
+      <span className="relative z-10 inline-flex flex-wrap items-center justify-end gap-2">
+        {order.status === "PENDING_PAYMENT" ? (
+          <PayNowButton orderId={order.id} amount={order.totalPrice} cropType={order.cropType} quantityKg={order.quantityKg} label={`${cropName(order.cropType)}, ${order.quantityKg} kg`} size="sm" />
+        ) : null}
+        {order.status === "DELIVERED" && !order.feedback ? (
+          <Link href={`/restaurant/feedback/${order.id}`} aria-label={`Rate order ${shortId(order.id)}`} className="rounded-full border border-hairline bg-panel/60 px-3 py-1.5 text-sm font-medium text-ink-soft transition-colors hover:text-ink">
+            Rate
+          </Link>
+        ) : null}
+        {order.feedback ? <span className="text-sm text-ink-muted">{`Rated ${order.feedback.rating} of 5`}</span> : null}
+        {isInvoiceable(order.status) ? (
+          <InvoiceLink href={invoiceHref.restaurant(order.id)} label="Invoice" ariaLabel={`Download invoice for order ${shortId(order.id)}`} size="sm" />
+        ) : null}
+      </span>
+    ),
+  },
+];
+
+export default async function RestaurantOrdersPage({ searchParams }: { searchParams: { status?: string; q?: string; sort?: string } }) {
   const session = await auth();
-  const userId = session?.user?.id || "";
-  const orders = await getOrders(userId);
+  const restaurant = await getRestaurantOrders(session?.user?.id ?? "");
+  const orders = restaurant?.orders ?? [];
+
+  const status = parseOrderFilter(searchParams.status);
+  const sort = parseOrderSort(searchParams.sort);
+  const query = (searchParams.q ?? "").slice(0, 80);
+
+  const href = (value: string) => {
+    const next = new URLSearchParams();
+    if (value !== "all") next.set("status", value);
+    if (query) next.set("q", query);
+    if (sort !== "newest") next.set("sort", sort);
+    const qs = next.toString();
+    return qs ? `/restaurant/orders?${qs}` : "/restaurant/orders";
+  };
+
+  const searched = searchOrders(orders, query, cropName);
+  const count = (filter: OrderFilter) => (filter === "all" ? searched.length : searched.filter((o) => orderFilterOf(o.status) === filter).length);
+  const shown = sortOrders(status === "all" ? searched : searched.filter((o) => orderFilterOf(o.status) === status), sort);
+  const awaiting = orders.filter((o) => o.status === "PENDING_PAYMENT").length;
 
   return (
-    <div>
-      <div className="mb-6 sm:mb-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-black text-text-primary tracking-tight">My Orders</h1>
-          <p className="text-sm sm:text-base text-text-secondary mt-1">View and track all your orders</p>
-        </div>
-        <Link
-          href="/restaurant/order/new"
-          className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-sprout-800 px-5 py-2.5 text-sm font-semibold text-white transition-all hover:bg-sprout-900 sm:w-auto"
-        >
-          New Order <ArrowRight className="w-4 h-4" />
-        </Link>
-      </div>
+    <>
+      <PageHeader
+        title="My orders"
+        subtitle={awaiting > 0 ? (awaiting === 1 ? "1 order is waiting for payment." : `${awaiting} orders are waiting for payment.`) : "Everything you have ordered, in one place."}
+        actions={
+          <Link href="/restaurant/order/new" className="inline-flex items-center gap-2 rounded-full bg-brand px-5 py-2.5 text-sm font-medium text-brand-ink transition-opacity hover:opacity-90">
+            New order
+            <Plus className="h-4 w-4" aria-hidden="true" />
+          </Link>
+        }
+      />
 
-      {orders.length > 0 ? (
-        <div className="space-y-3">
-          {orders.map((order) => {
-            const statusMap: Record<string, "pending" | "active" | "growing" | "delivered" | "completed" | "cancelled"> = {
-              PENDING_PAYMENT: "pending", CONFIRMED: "active", IN_PRODUCTION: "growing",
-              AT_HUB: "active", IN_TRANSIT: "active", DELIVERED: "delivered", CANCELLED: "cancelled",
-            };
-            return (
-              <GlassCard key={order.id} padding="sm">
-                <div className="flex flex-col gap-3 min-[520px]:flex-row min-[520px]:items-center">
-                <Link
-                  href={`/restaurant/orders/${order.id}`}
-                  className="flex w-full flex-col gap-3 rounded-xl row-hover cursor-pointer group min-[520px]:flex-row min-[520px]:items-center min-[520px]:gap-4"
-                >
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <h3 className="text-sm font-semibold text-text-primary">
-                        {order.id.slice(0, 8).toUpperCase()}
-                      </h3>
-                      <StatusBadge status={statusMap[order.status] || "active"} />
-                    </div>
-                    <p className="text-xs text-text-muted">
-                      {CROP_DISPLAY_NAMES[order.cropType as CropType] || order.cropType} × {order.quantityKg}kg
-                      · {order.createdAt.toLocaleDateString("en-IN", { month: "short", day: "numeric", year: "numeric" })}
-                    </p>
-                  </div>
-                  <p className="text-sm font-bold text-text-primary min-[520px]:text-right">₹{order.totalPrice.toLocaleString("en-IN")}</p>
-                  <ChevronRight className="hidden h-4 w-4 text-text-muted transition-all group-hover:text-sprout-800 min-[520px]:block" />
-                </Link>
-                {isInvoiceable(order.status) ? (
-                  <InvoiceLink
-                    href={invoiceHref.restaurant(order.id)}
-                    label="Invoice"
-                    ariaLabel={`Download invoice for order ${order.id.slice(0, 8).toUpperCase()}`}
-                    size="sm"
-                    className="shrink-0 self-start min-[520px]:self-center"
-                  />
-                ) : null}
-                </div>
-              </GlassCard>
-            );
-          })}
-        </div>
-      ) : (
-        <GlassCard>
-          <div className="text-center py-16">
-            <Package className="w-12 h-12 text-text-muted/30 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-text-primary mb-1">No orders yet</h3>
-            <p className="text-sm text-text-muted mb-4">Place your first microgreen order</p>
-            <Link href="/restaurant/order/new" className="btn-primary inline-flex items-center gap-2">
-              Place Order <ArrowRight className="w-4 h-4" />
+      {orders.length === 0 ? (
+        <EmptyState
+          icon={Package}
+          title="No orders yet"
+          description="Place your first microgreens order and we will start growing it for you."
+          action={
+            <Link href="/restaurant/order/new" className="rounded-full bg-brand px-4 py-2 text-sm font-medium text-brand-ink">
+              Place an order
             </Link>
-          </div>
-        </GlassCard>
+          }
+        />
+      ) : (
+        <>
+          <FilterChips
+            ariaLabel="Filter orders"
+            value={status}
+            hrefFor={href}
+            chips={ORDER_FILTERS.map((value) => ({ value, label: FILTER_LABEL[value], count: count(value) }))}
+            className="mb-4"
+          />
+          <OrdersToolbar query={query} sort={sort} />
+          <DataTable
+            caption="Orders"
+            columns={COLUMNS}
+            rows={shown}
+            rowKey={(order) => order.id}
+            rowHref={(order) => `/restaurant/orders/${order.id}`}
+            rowLabel={(order) => `${cropName(order.cropType)}, order ${shortId(order.id)}`}
+            empty={
+              <EmptyState
+                icon={Package}
+                title="No orders match"
+                description="Try another status or a different search."
+                action={
+                  <Link href="/restaurant/orders" className="rounded-full border border-hairline bg-panel/60 px-4 py-2 text-sm font-medium text-ink-soft hover:text-ink">
+                    Clear filters
+                  </Link>
+                }
+              />
+            }
+          />
+        </>
       )}
-    </div>
+    </>
   );
 }
