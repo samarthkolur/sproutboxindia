@@ -1,272 +1,87 @@
 import Link from "next/link";
-import { GlassCard } from "@/components/shared/GlassCard";
-import { StatusBadge } from "@/components/shared/StatusBadge";
+import { ClipboardList } from "lucide-react";
 import { auth } from "@/lib/auth";
-import {
-  CROP_DISPLAY_NAMES,
-  CROP_INSTRUCTIONS,
-  type CropType,
-} from "@/lib/constants";
-import { prisma } from "@/lib/prisma";
-import {
-  ClipboardList,
-  Calendar,
-  ChevronRight,
-  CheckCircle2,
-} from "lucide-react";
-import { CheckinModal } from "@/components/grower/CheckinModal";
-import { RequestPickupButton } from "@/components/grower/RequestPickupButton";
+import { GrowerTaskCard } from "@/components/grower/GrowerTaskCard";
+import { EmptyState } from "@/components/shared/EmptyState";
+import { FilterChips } from "@/components/ui/filter-chips";
+import { PageHeader } from "@/components/ui/page-header";
+import { getGrowerTasks } from "@/lib/grower-data";
+import { taskFilterOf, type TaskFilter } from "@/lib/grower";
+import { getTaskState } from "@/lib/tasks";
 
-async function getGrowerTasks(userId: string) {
-  try {
-    const grower = await prisma.grower.findUnique({
-      where: { userId },
-      include: {
-        tasks: {
-          include: {
-            batches: {
-              include: {
-                checkIns: { orderBy: { day: "desc" }, take: 1 },
-              },
-              orderBy: { trayNumber: "asc" },
-            },
-          },
-          orderBy: { sowDate: "desc" },
-        },
-      },
-    });
-    return grower?.tasks || [];
-  } catch {
-    return [];
-  }
+const EMPTY: Record<TaskFilter, { title: string; description: string }> = {
+  active: { title: "No active tasks", description: "New growing tasks appear here when the team assigns them to you." },
+  pickup: { title: "Nothing waiting for pickup", description: "When a tray is ready, request a pickup and it will be listed here." },
+  completed: { title: "No completed tasks yet", description: "Harvested and cancelled tasks are kept here." },
+};
+
+function parseFilter(value: string | undefined): TaskFilter {
+  return value === "pickup" || value === "completed" ? value : "active";
 }
 
-export default async function GrowerTasksPage() {
+export default async function GrowerTasksPage({ searchParams }: { searchParams: { filter?: string } }) {
   const session = await auth();
-  const userId = session?.user?.id || "";
-  const tasks = await getGrowerTasks(userId);
+  const tasks = await getGrowerTasks(session?.user?.id ?? "");
+  const filter = parseFilter(searchParams.filter);
 
-  const activeTasks = tasks.filter(
-    (t) => t.status === "ASSIGNED" || t.status === "IN_PROGRESS"
-  );
-  const completedTasks = tasks.filter(
-    (t) => t.status === "HARVESTED" || t.status === "CANCELLED"
-  );
+  if (!tasks || tasks.length === 0) {
+    return (
+      <>
+        <PageHeader title="My tasks" subtitle="Your growing tasks will be listed here." />
+        <EmptyState
+          icon={ClipboardList}
+          title="No tasks assigned"
+          description="New growing tasks will appear here when the team assigns them to you."
+        />
+      </>
+    );
+  }
+
+  const count = (value: TaskFilter) => tasks.filter((task) => taskFilterOf(task.status) === value).length;
+  const due = tasks.filter((task) => getTaskState(task).canCheckIn).length;
+  const shown = tasks.filter((task) => taskFilterOf(task.status) === filter);
 
   return (
-    <div>
-      <div className="mb-6 sm:mb-8">
-        <h1 className="text-2xl sm:text-3xl font-black text-text-primary tracking-tight">
-          My Tasks
-        </h1>
-        <p className="text-sm sm:text-base text-text-secondary mt-1">
-          {activeTasks.length} active task{activeTasks.length !== 1 ? "s" : ""}{" "}
-          · {completedTasks.length} completed
-        </p>
-      </div>
+    <>
+      <PageHeader
+        title="My tasks"
+        subtitle={due > 0 ? (due === 1 ? "1 task needs a check-in today." : `${due} tasks need a check-in today.`) : "Every task is up to date."}
+      />
 
-      {tasks.length > 0 ? (
-        <div className="space-y-6">
-          {/* Active tasks */}
-          {activeTasks.length > 0 && (
-            <div>
-              <h2 className="text-sm font-semibold text-text-muted uppercase tracking-wider mb-3">
-                Active
-              </h2>
-              <div className="space-y-4">
-                {activeTasks.map((task) => {
-                  const currentDay =
-                    task.batches.length > 0
-                      ? Math.max(...task.batches.map((b) => b.currentDay))
-                      : 0;
-                  const totalDays =
-                    Math.ceil(
-                      (task.harvestDate.getTime() -
-                        task.sowDate.getTime()) /
-                        (1000 * 60 * 60 * 24)
-                    ) || 7;
-                  const progress = Math.round((currentDay / totalDays) * 100);
-                  const cropName =
-                    CROP_DISPLAY_NAMES[task.cropType as CropType] ||
-                    task.cropType;
-                  const instructions = CROP_INSTRUCTIONS[task.cropType];
-                  const todayInstruction = instructions?.[currentDay + 1];
+      <FilterChips
+        ariaLabel="Filter tasks"
+        value={filter}
+        hrefFor={(value) => (value === "active" ? "/grower/tasks" : `/grower/tasks?filter=${value}`)}
+        chips={[
+          { value: "active", label: "Active", count: count("active") },
+          { value: "pickup", label: "Ready for pickup", count: count("pickup") },
+          { value: "completed", label: "Completed", count: count("completed") },
+        ]}
+        className="mb-5"
+      />
 
-                  const activeBatch = task.batches.find(
-                    (b) =>
-                      b.status !== "HARVESTED" &&
-                      b.status !== "REJECTED"
-                  );
-                  const lastCheckIn = activeBatch?.checkIns?.[0];
-                  const alreadyCheckedInToday = lastCheckIn 
-                    ? new Date(lastCheckIn.createdAt).toDateString() === new Date().toDateString() 
-                    : false;
-
-                  const isCompleted = currentDay >= totalDays;
-
-                  return (
-                    <GlassCard key={task.id}>
-                      <div className="mb-4 flex flex-col gap-3 min-[560px]:flex-row min-[560px]:items-start min-[560px]:justify-between">
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-1">
-                            <h2 className="text-lg font-bold text-text-primary">
-                              {cropName}
-                            </h2>
-                            <StatusBadge
-                              status={
-                                task.status === "IN_PROGRESS"
-                                  ? "growing"
-                                  : task.status === "ASSIGNED"
-                                  ? "sowing"
-                                  : task.status === "HARVEST_READY"
-                                  ? "ready"
-                                  : "active"
-                              }
-                            />
-                          </div>
-                          <p className="text-sm text-text-muted">
-                            {task.trayCount} trays · Day {currentDay} of{" "}
-                            {totalDays}
-                          </p>
-                        </div>
-                        <div className="flex items-center gap-2 min-[560px]:ml-4">
-                          <div className="flex items-center gap-1 text-xs text-text-muted">
-                            <Calendar className="w-3.5 h-3.5" />
-                            <span>
-                              {task.sowDate.toLocaleDateString("en-IN", {
-                                month: "short",
-                                day: "numeric",
-                              })}{" "}
-                              →{" "}
-                              {task.harvestDate.toLocaleDateString("en-IN", {
-                                month: "short",
-                                day: "numeric",
-                              })}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Progress bar */}
-                      <div className="mb-4">
-                        <div className="flex items-center justify-between text-xs mb-1.5">
-                          <span className="text-text-muted">Progress</span>
-                          <span className="font-semibold text-sprout-700">
-                            {progress}%
-                          </span>
-                        </div>
-                        <div className="w-full bg-sprout-100 rounded-full h-2">
-                          <div
-                            className="bg-gradient-to-r from-sprout-600 to-sprout-400 h-2 rounded-full progress-bar-animate"
-                            style={{ width: `${progress}%` }}
-                          />
-                        </div>
-                      </div>
-
-                      {/* Today's instruction */}
-                      {todayInstruction && (
-                        <div className="bg-sprout-50/50 rounded-xl p-4 border border-sprout-200/30 mb-4">
-                          <p className="text-xs font-semibold text-sprout-700 mb-1">
-                            Day {currentDay + 1} — Today&apos;s Task
-                          </p>
-                          <p className="text-sm text-text-secondary">
-                            {todayInstruction}
-                          </p>
-                        </div>
-                      )}
-
-                      {/* Actions */}
-                      <div className="flex flex-col gap-3 min-[520px]:flex-row min-[520px]:items-center min-[520px]:justify-between">
-                        {isCompleted && task.status !== "HARVEST_READY" && task.status !== "HARVESTED" ? (
-                          <RequestPickupButton taskId={task.id} />
-                        ) : activeBatch && !alreadyCheckedInToday ? (
-                          <CheckinModal
-                            batchId={activeBatch.id}
-                            day={Math.min(currentDay + 1, totalDays)}
-                          />
-                        ) : activeBatch && alreadyCheckedInToday ? (
-                          <span className="flex items-center gap-1.5 text-sm text-sprout-700 font-medium">
-                            <CheckCircle2 className="w-4 h-4" />
-                            Checked in today
-                          </span>
-                        ) : (
-                          <span />
-                        )}
-                        <Link
-                          href={`/grower/tasks/${task.id}`}
-                          className="flex items-center gap-1 text-sm text-sprout-700 font-semibold hover:text-sprout-900 transition-colors"
-                        >
-                          View Details
-                          <ChevronRight className="w-4 h-4" />
-                        </Link>
-                      </div>
-                    </GlassCard>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-
-          {/* Completed tasks */}
-          {completedTasks.length > 0 && (
-            <div>
-              <h2 className="text-sm font-semibold text-text-muted uppercase tracking-wider mb-3">
-                Completed
-              </h2>
-              <div className="space-y-3">
-                {completedTasks.map((task) => {
-                  const cropName =
-                    CROP_DISPLAY_NAMES[task.cropType as CropType] ||
-                    task.cropType;
-                  return (
-                    <Link
-                      key={task.id}
-                      href={`/grower/tasks/${task.id}`}
-                      className="flex items-center gap-3 rounded-xl border border-white/30 bg-white/40 p-4 transition-all hover:bg-white/60 group sm:gap-4"
-                    >
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-0.5">
-                          <p className="text-sm font-semibold text-text-primary">
-                            {cropName}
-                          </p>
-                          <StatusBadge
-                            status={
-                              task.status === "HARVESTED"
-                                ? "completed"
-                                : "cancelled"
-                            }
-                          />
-                        </div>
-                        <p className="text-xs text-text-muted">
-                          {task.trayCount} trays ·{" "}
-                          {task.harvestDate.toLocaleDateString("en-IN", {
-                            month: "short",
-                            day: "numeric",
-                            year: "numeric",
-                          })}
-                        </p>
-                      </div>
-                      <ChevronRight className="w-4 h-4 text-text-muted flex-shrink-0 group-hover:text-sprout-800 group-hover:translate-x-0.5 transition-all" />
-                    </Link>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-        </div>
+      {shown.length > 0 ? (
+        <ul className="grid gap-4 xl:grid-cols-2">
+          {shown.map((task) => (
+            <li key={task.id}>
+              <GrowerTaskCard task={task} />
+            </li>
+          ))}
+        </ul>
       ) : (
-        <GlassCard>
-          <div className="text-center py-16">
-            <ClipboardList className="w-12 h-12 text-text-muted/30 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-text-primary mb-1">
-              No tasks assigned
-            </h3>
-            <p className="text-sm text-text-muted">
-              New growing tasks will appear here when the admin assigns them to you
-            </p>
-          </div>
-        </GlassCard>
+        <EmptyState
+          icon={ClipboardList}
+          title={EMPTY[filter].title}
+          description={EMPTY[filter].description}
+          action={
+            filter !== "active" ? (
+              <Link href="/grower/tasks" className="rounded-full border border-hairline bg-panel/60 px-4 py-2 text-sm font-medium text-ink-soft hover:text-ink">
+                Back to active tasks
+              </Link>
+            ) : undefined
+          }
+        />
       )}
-    </div>
+    </>
   );
 }
