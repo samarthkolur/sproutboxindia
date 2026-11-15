@@ -2,337 +2,347 @@
 
 import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import Image from "next/image";
 import Link from "next/link";
-import { BrandLogo } from "@/components/layout/BrandLogo";
 import { AddressMapPicker, type SelectedAddress } from "@/components/onboarding/AddressMapPicker";
-import { StepProgress } from "@/components/onboarding/StepProgress";
-import { CROP_TYPES, CROP_DISPLAY_NAMES, CROP_PRICE_PER_KG, CROP_CYCLE_DAYS, type CropType } from "@/lib/constants";
+import { ReviewList, type ReviewSection } from "@/components/join/ReviewList";
+import { SummaryPanel, SummaryRow } from "@/components/join/Summary";
+import { WizardShell } from "@/components/join/WizardShell";
+import { Button } from "@/components/ui/button";
+import { ChoiceGroup } from "@/components/ui/choice-group";
+import { SelectField, TextField } from "@/components/ui/field";
+import { SegmentedControl } from "@/components/ui/segmented-control";
+import {
+  CROP_CYCLE_DAYS,
+  CROP_DISPLAY_NAMES,
+  CROP_IMAGES,
+  CROP_PRICE_PER_KG,
+  CROP_TYPES,
+  type CropType,
+} from "@/lib/constants";
+import { trackSignUp } from "@/lib/gtag";
+import {
+  RESTAURANT_STEPS,
+  firstInvalidStep,
+  validateRestaurantStep,
+  type FieldErrors,
+  type RestaurantFormData,
+} from "@/lib/join-validation";
 import { clearRegistrationPrefill, readRegistrationPrefill } from "@/lib/registration-prefill";
 
-const steps = ["Business", "Crops", "Schedule", "Review"];
+type Frequency = "weekly" | "biweekly";
 
-function RestaurantOnboardingForm() {
+const STEP = { business: 0, location: 1, crops: 2, schedule: 3, review: 4 } as const;
+
+const FREQUENCY_LABEL: Record<Frequency, string> = { weekly: "Weekly", biweekly: "Biweekly" };
+const FREQUENCY_CAPTION: Record<Frequency, string> = { weekly: "Every week", biweekly: "Every 2 weeks" };
+const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"] as const;
+
+function RestaurantWizard() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [step, setStep] = useState(0);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [serverError, setServerError] = useState("");
+  const [emailTaken, setEmailTaken] = useState(false);
+  const [errors, setErrors] = useState<FieldErrors>({});
   const [selectedAddress, setSelectedAddress] = useState<SelectedAddress | null>(null);
-  const [hasPrefilledPassword, setHasPrefilledPassword] = useState(false);
+  const [passwordPrefilled, setPasswordPrefilled] = useState(false);
 
-  const [data, setData] = useState({
+  const [data, setData] = useState<
+    RestaurantFormData & {
+      cuisineType: string;
+      selectedCrops: CropType[];
+      deliveryFrequency: Frequency;
+      preferredDay: string;
+    }
+  >({
+    businessName: "",
     name: searchParams.get("name") || "",
     email: searchParams.get("email") || "",
     password: "",
-    businessName: "",
     phone: "",
+    gstNumber: "",
+    cuisineType: "",
     address: "",
     city: "",
     pincode: "",
-    gstNumber: "",
-    selectedCrops: [] as CropType[],
-    deliveryFrequency: "weekly" as "weekly" | "biweekly",
-    preferredDay: "monday" as string,
+    selectedCrops: [],
+    deliveryFrequency: "weekly",
+    preferredDay: "Monday",
   });
-
-  const update = (field: string, value: string | string[]) =>
-    setData((prev) => ({ ...prev, [field]: value }));
 
   useEffect(() => {
     const prefill = readRegistrationPrefill("RESTAURANT");
     if (!prefill) return;
-
-    setData((prev) => ({
-      ...prev,
-      name: prefill.name,
-      email: prefill.email,
-      password: prefill.password,
-    }));
-    setHasPrefilledPassword(Boolean(prefill.password));
+    setData((prev) => ({ ...prev, name: prefill.name, email: prefill.email, password: prefill.password }));
+    setPasswordPrefilled(Boolean(prefill.password));
   }, []);
+
+  const set = (field: keyof typeof data) => (value: string) => {
+    setData((prev) => ({ ...prev, [field]: value }));
+    setErrors((prev) => (prev[field] ? { ...prev, [field]: undefined } : prev));
+  };
+  const onText = (field: keyof typeof data) => (e: React.ChangeEvent<HTMLInputElement>) => set(field)(e.target.value);
 
   const updateAddress = (address: SelectedAddress) => {
     setSelectedAddress(address);
-    setData((prev) => ({
-      ...prev,
-      address: address.address,
-      city: address.city,
-      pincode: address.pincode,
-    }));
+    setData((prev) => ({ ...prev, address: address.address, city: address.city, pincode: address.pincode }));
+    setErrors((prev) => ({ ...prev, address: undefined }));
   };
 
-  const toggleCrop = (crop: CropType) => {
-    setData((prev) => ({
-      ...prev,
-      selectedCrops: prev.selectedCrops.includes(crop)
-        ? prev.selectedCrops.filter((c) => c !== crop)
-        : [...prev.selectedCrops, crop],
-    }));
-  };
-
-  const validateStep = () => {
-    if (step === 0) {
-      if (!data.businessName.trim() || !data.name.trim() || !data.email.trim() || (!hasPrefilledPassword && !data.password)) {
-        setError("Please fill in all required fields.");
-        return false;
-      }
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(data.email.trim())) {
-        setError("Please enter a valid email address.");
-        return false;
-      }
-      if (!data.address || !data.city || !data.pincode) {
-        setError("Choose a location on the map so address, city, and PIN code can be fetched.");
-        return false;
-      }
-    }
-
-    setError("");
-    return true;
-  };
+  const validate = (target: number) => validateRestaurantStep(target, data, { passwordPrefilled });
 
   const next = () => {
-    if (!validateStep()) return;
-    setStep((s) => Math.min(s + 1, steps.length - 1));
+    const found = validate(step);
+    setErrors(found);
+    if (Object.keys(found).length > 0) {
+      requestAnimationFrame(() => document.querySelector<HTMLElement>('form [aria-invalid="true"]')?.focus());
+      return;
+    }
+    setStep((current) => Math.min(current + 1, RESTAURANT_STEPS.length - 1));
   };
-  const back = () => setStep((s) => Math.max(s - 1, 0));
+  const back = () => {
+    setErrors({});
+    setServerError("");
+    setStep((current) => Math.max(current - 1, 0));
+  };
+  const goTo = (target: number) => {
+    setErrors({});
+    setStep(target);
+  };
 
-  const handleSubmit = async () => {
+  const submit = async () => {
+    const broken = firstInvalidStep(validate, STEP.review);
+    if (broken !== null) {
+      setErrors(validate(broken));
+      setStep(broken);
+      return;
+    }
+
     setLoading(true);
-    setError("");
+    setServerError("");
+    setEmailTaken(false);
     try {
       const res = await fetch("/api/restaurant/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        body: JSON.stringify({ ...data, lat: selectedAddress?.lat, lng: selectedAddress?.lng }),
       });
-      const result = await res.json();
-      if (!res.ok) throw new Error(result.error || "Registration failed");
+      const result = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        if (result.code === "EMAIL_EXISTS") {
+          setEmailTaken(true);
+          setStep(STEP.business);
+        }
+        setServerError(result.error || "Registration failed");
+        return;
+      }
+      trackSignUp("restaurant", {
+        city: data.city,
+        cuisine_type: data.cuisineType || undefined,
+        crops_selected: data.selectedCrops.length,
+        delivery_frequency: data.deliveryFrequency,
+      });
       clearRegistrationPrefill();
       router.push("/login?registered=true");
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (err: any) {
-      setError(err.message);
+    } catch {
+      setServerError("Something went wrong. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
-  const inputClass =
-    "w-full bg-white/60 border border-white/50 rounded-xl px-4 py-3 text-sm text-text-primary placeholder:text-text-muted outline-none focus:border-sprout-500 focus:ring-2 focus:ring-sprout-500/20 transition-all backdrop-blur-sm";
-  const labelClass =
-    "block text-xs font-semibold text-text-primary mb-2 uppercase tracking-wider";
+  const chosen = data.selectedCrops;
+  const cycle = chosen.map((crop) => CROP_CYCLE_DAYS[crop]);
 
-  const cropEmojis: Record<CropType, string> = {
-    sunflower: "🌻",
-    "pea-shoots": "🫛",
-    radish: "🌶️",
-    wheatgrass: "🌾",
-    mustard: "🌿",
-    fenugreek: "🍃",
-  };
+  const review: ReviewSection[] = [
+    {
+      title: "Business",
+      step: STEP.business,
+      rows: [
+        { label: "Restaurant", value: data.businessName },
+        { label: "Contact", value: data.name },
+        { label: "Email", value: data.email },
+        { label: "Phone", value: data.phone },
+      ],
+    },
+    {
+      title: "Location",
+      step: STEP.location,
+      rows: [
+        { label: "City", value: data.city },
+        { label: "PIN", value: data.pincode },
+        { label: "Address", value: data.address },
+      ],
+    },
+    {
+      title: "Crops",
+      step: STEP.crops,
+      rows: [
+        {
+          label: "Crops",
+          value:
+            chosen.length === 0 ? (
+              "None selected"
+            ) : (
+              <ul>
+                {chosen.map((crop) => (
+                  <li key={crop}>{CROP_DISPLAY_NAMES[crop]}</li>
+                ))}
+              </ul>
+            ),
+        },
+      ],
+    },
+    {
+      title: "Schedule",
+      step: STEP.schedule,
+      rows: [
+        { label: "Frequency", value: FREQUENCY_LABEL[data.deliveryFrequency] },
+        { label: "Day", value: data.preferredDay },
+      ],
+    },
+  ];
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center overflow-hidden px-4 py-8 sm:py-12">
-      <div className="absolute inset-0 bg-grid bg-grid-fade" />
-      <div className="absolute inset-0 bg-dots opacity-30" />
-      <div className="blob blob-animated w-[500px] h-[500px] bg-sprout-300/40 -top-40 right-0" />
-      <div className="blob blob-animated-alt w-[400px] h-[400px] bg-sprout-200/50 bottom-0 -left-20" />
-
-      <div className="glass-strong relative z-10 w-full max-w-lg p-5 sm:p-10">
-        <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent rounded-[24px]" />
-        <div className="relative z-10">
-          {/* Logo */}
-          <BrandLogo className="mb-6" />
-
-          <h1 className="text-2xl font-black text-text-primary tracking-tight mb-1">
-            Partner as Restaurant 🍽️
-          </h1>
-          <p className="text-text-secondary text-sm mb-6">
-            Set up your restaurant profile and preferences
-          </p>
-
-          <StepProgress steps={steps} currentStep={step} />
-
-          {error && (
-            <div className="bg-status-error/10 border border-status-error/20 text-status-error rounded-xl px-4 py-3 mb-4 text-sm">
-              {error}
-            </div>
+    <WizardShell
+      title="Partner as Restaurant"
+      subtitle="Set up your restaurant profile and preferences"
+      steps={[...RESTAURANT_STEPS]}
+      step={step}
+      error={serverError}
+      errorAction={
+        emailTaken ? (
+          <Button asChild size="sm" variant="outline" className="rounded-full border-risk/40 bg-transparent text-risk hover:bg-risk/10">
+            <Link href="/login">Sign in instead</Link>
+          </Button>
+        ) : undefined
+      }
+      loading={loading}
+      submitLabel="Submit Application"
+      backHref="/register"
+      backLabel="Register"
+      onBack={back}
+      onNext={next}
+      onSubmit={submit}
+      summary={
+        <SummaryPanel title="Your menu">
+          <SummaryRow
+            label="Crops"
+            value={String(chosen.length)}
+            caption={chosen.length === 0 ? "Pick the greens you use most" : "You place each order yourself, from the catalog"}
+          />
+          {chosen.length > 0 && (
+            <>
+              <ul className="space-y-1.5">
+                {chosen.map((crop) => (
+                  <li key={crop} className="flex items-center justify-between gap-3 text-sm">
+                    <span className="text-ink">{CROP_DISPLAY_NAMES[crop]}</span>
+                    <span className="tabular-nums text-ink-muted">{`₹${CROP_PRICE_PER_KG[crop]}/kg`}</span>
+                  </li>
+                ))}
+              </ul>
+              <SummaryRow
+                label="Grow time"
+                value={Math.min(...cycle) === Math.max(...cycle) ? String(cycle[0]) : `${Math.min(...cycle)}–${Math.max(...cycle)}`}
+                caption="Days from sowing to harvest, depending on the crop"
+              />
+            </>
           )}
-
-          {/* Step 0: Business */}
-          {step === 0 && (
-            <div className="space-y-4">
-              <div>
-                <label className={labelClass}>Restaurant Name</label>
-                <input className={inputClass} value={data.businessName} onChange={(e) => update("businessName", e.target.value)} placeholder="Your restaurant name" required />
-              </div>
-              <div>
-                <label className={labelClass}>Contact Name</label>
-                <input className={inputClass} value={data.name} onChange={(e) => update("name", e.target.value)} placeholder="Primary contact person" required />
-              </div>
-              <div>
-                <label className={labelClass}>Email</label>
-                <input className={inputClass} type="email" value={data.email} onChange={(e) => update("email", e.target.value)} placeholder="restaurant@example.com" required />
-              </div>
-              {!hasPrefilledPassword && (
-                <div>
-                  <label className={labelClass}>Password</label>
-                  <input className={inputClass} type="password" value={data.password} onChange={(e) => update("password", e.target.value)} placeholder="Min. 6 characters" required />
-                </div>
-              )}
-              <div className="grid gap-3 sm:grid-cols-2">
-                <div>
-                  <label className={labelClass}>Phone</label>
-                  <input className={inputClass} type="tel" value={data.phone} onChange={(e) => update("phone", e.target.value)} placeholder="+91 98765" />
-                </div>
-                <div>
-                  <label className={labelClass}>GST (optional)</label>
-                  <input className={inputClass} value={data.gstNumber} onChange={(e) => update("gstNumber", e.target.value)} placeholder="22AAAA..." />
-                </div>
-              </div>
-              <AddressMapPicker value={selectedAddress} onChange={updateAddress} />
-            </div>
+          <SummaryRow
+            label="Delivery rhythm"
+            value={FREQUENCY_LABEL[data.deliveryFrequency]}
+            caption={FREQUENCY_CAPTION[data.deliveryFrequency]}
+          />
+        </SummaryPanel>
+      }
+    >
+      {step === STEP.business && (
+        <>
+          <TextField label="Restaurant Name" value={data.businessName} onChange={onText("businessName")} error={errors.businessName} placeholder="Your restaurant name" />
+          <TextField label="Contact Name" autoComplete="name" value={data.name} onChange={onText("name")} error={errors.name} placeholder="Primary contact person" />
+          <TextField label="Email" type="email" autoComplete="email" value={data.email} onChange={onText("email")} error={errors.email} placeholder="restaurant@example.com" />
+          {!passwordPrefilled && (
+            <TextField label="Password" type="password" autoComplete="new-password" revealable value={data.password} onChange={onText("password")} error={errors.password} hint="At least 6 characters" />
           )}
-
-          {/* Step 1: Crops */}
-          {step === 1 && (
-            <div className="space-y-4">
-              <p className="text-sm text-text-secondary mb-2">
-                Select the microgreens you&apos;d like to order regularly:
-              </p>
-              <div className="grid gap-3 min-[420px]:grid-cols-2">
-                {CROP_TYPES.map((crop) => {
-                  const isSelected = data.selectedCrops.includes(crop);
-                  return (
-                    <button
-                      key={crop}
-                      type="button"
-                      onClick={() => toggleCrop(crop)}
-                      className={`p-4 rounded-xl border text-left transition-all group ${isSelected
-                          ? "border-sprout-600 bg-sprout-50/80 shadow-md"
-                          : "border-white/50 bg-white/40 hover:bg-white/60"
-                        }`}
-                    >
-                      <span className="text-xl mb-1 block">{cropEmojis[crop]}</span>
-                      <p className="text-sm font-semibold text-text-primary">{CROP_DISPLAY_NAMES[crop]}</p>
-                      <p className="text-[11px] text-text-muted">₹{CROP_PRICE_PER_KG[crop]}/kg • {CROP_CYCLE_DAYS[crop]} days</p>
-                    </button>
-                  );
-                })}
-              </div>
-              {data.selectedCrops.length > 0 && (
-                <p className="text-xs text-sprout-600 font-semibold">
-                  {data.selectedCrops.length} varieties selected
-                </p>
-              )}
-            </div>
-          )}
-
-          {/* Step 2: Schedule */}
-          {step === 2 && (
-            <div className="space-y-4">
-              <div>
-                <label className={labelClass}>Delivery Frequency</label>
-                <div className="grid gap-3 min-[420px]:grid-cols-2">
-                  {(["weekly", "biweekly"] as const).map((freq) => (
-                    <button
-                      key={freq}
-                      type="button"
-                      onClick={() => update("deliveryFrequency", freq)}
-                      className={`p-4 rounded-xl border text-center transition-all ${data.deliveryFrequency === freq
-                          ? "border-sprout-600 bg-sprout-50/80 text-sprout-800 shadow-md"
-                          : "border-white/50 bg-white/40 text-text-secondary hover:bg-white/60"
-                        }`}
-                    >
-                      <p className="text-sm font-bold capitalize">{freq}</p>
-                      <p className="text-[11px] text-text-muted mt-0.5">
-                        {freq === "weekly" ? "Every week" : "Every 2 weeks"}
-                      </p>
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <div>
-                <label className={labelClass}>Preferred Delivery Day</label>
-                <select className={inputClass} value={data.preferredDay} onChange={(e) => update("preferredDay", e.target.value)}>
-                  {["monday", "tuesday", "wednesday", "thursday", "friday", "saturday"].map((day) => (
-                    <option key={day} value={day}>{day.charAt(0).toUpperCase() + day.slice(1)}</option>
-                  ))}
-                </select>
-              </div>
-            </div>
-          )}
-
-          {/* Step 3: Review */}
-          {step === 3 && (
-            <div className="space-y-3">
-              {[
-                { label: "Restaurant", value: data.businessName || "—" },
-                { label: "Contact", value: data.name },
-                { label: "Email", value: data.email },
-                { label: "Phone", value: data.phone || "—" },
-                { label: "City", value: data.city || "—" },
-                { label: "PIN", value: data.pincode || "—" },
-                { label: "Address", value: data.address || "—" },
-                { label: "Crops", value: data.selectedCrops.map((c) => CROP_DISPLAY_NAMES[c]).join(", ") || "None selected" },
-                { label: "Frequency", value: data.deliveryFrequency },
-                { label: "Day", value: data.preferredDay },
-              ].map((item) => (
-                <div key={item.label} className="flex flex-col gap-1 rounded-xl border border-white/40 bg-white/50 p-3 min-[420px]:flex-row min-[420px]:items-center min-[420px]:justify-between">
-                  <span className="text-xs font-semibold text-text-muted uppercase tracking-wider">{item.label}</span>
-                  <span className="break-words text-sm font-medium capitalize text-text-primary min-[420px]:max-w-[60%] min-[420px]:text-right">{item.value}</span>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {/* Nav buttons */}
-          <div className="mt-8 flex items-center justify-between gap-3">
-            {step > 0 ? (
-              <button onClick={back} className="text-sm font-semibold text-text-secondary hover:text-sprout-800 transition-colors">
-                ← Back
-              </button>
-            ) : (
-              <Link href="/register" className="text-sm font-semibold text-text-secondary hover:text-sprout-800 transition-colors">
-                ← Register
-              </Link>
-            )}
-
-            {step < steps.length - 1 ? (
-              <button
-                onClick={next}
-                className="inline-flex items-center gap-2 bg-sprout-800 text-white px-6 py-2.5 rounded-xl text-sm font-semibold hover:bg-sprout-900 transition-all active:scale-[0.98]"
-              >
-                Continue
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-                </svg>
-              </button>
-            ) : (
-              <button
-                onClick={handleSubmit}
-                disabled={loading}
-                className="inline-flex items-center gap-2 bg-sprout-800 text-white px-6 py-2.5 rounded-xl text-sm font-semibold hover:bg-sprout-900 transition-all active:scale-[0.98] disabled:opacity-60"
-              >
-                {loading ? (
-                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                ) : (
-                  "Submit Application"
-                )}
-              </button>
-            )}
+          <TextField label="Phone" type="tel" autoComplete="tel" value={data.phone} onChange={onText("phone")} error={errors.phone} placeholder="+91 9876543210" />
+          <div className="grid gap-5 sm:grid-cols-2">
+            <TextField label="Cuisine" optional value={data.cuisineType} onChange={onText("cuisineType")} placeholder="e.g. South Indian" />
+            <TextField label="GST Number" optional value={data.gstNumber} onChange={onText("gstNumber")} error={errors.gstNumber} placeholder="22AAAAA0000A1Z5" />
           </div>
-        </div>
-      </div>
-    </div>
+        </>
+      )}
+
+      {step === STEP.location && (
+        <>
+          <AddressMapPicker value={selectedAddress} onChange={updateAddress} />
+          {errors.address && (
+            <p role="alert" className="text-sm font-medium text-risk">
+              {errors.address}
+            </p>
+          )}
+        </>
+      )}
+
+      {step === STEP.crops && (
+        <>
+          <p className="text-sm text-ink-soft">
+            Select the microgreens you&apos;d like to order regularly. This helps us plan supply; you still place each
+            order yourself.
+          </p>
+          <ChoiceGroup
+            multiple
+            ariaLabel="Crops"
+            choices={CROP_TYPES.map((crop) => ({
+              value: crop,
+              label: CROP_DISPLAY_NAMES[crop],
+              description: `${CROP_CYCLE_DAYS[crop]} days`,
+              trailing: `₹${CROP_PRICE_PER_KG[crop]}/kg`,
+              icon: (
+                <span className="relative block h-11 w-11 overflow-hidden rounded-xl">
+                  <Image src={CROP_IMAGES[crop]} alt="" fill sizes="44px" className="object-cover" />
+                </span>
+              ),
+            }))}
+            values={data.selectedCrops}
+            onChange={(values) => setData((prev) => ({ ...prev, selectedCrops: values as CropType[] }))}
+          />
+        </>
+      )}
+
+      {step === STEP.schedule && (
+        <>
+          <div>
+            <p className="mb-1.5 text-sm font-medium text-ink">Delivery Frequency</p>
+            <SegmentedControl
+              ariaLabel="Delivery Frequency"
+              className="w-full [&>button]:flex-1"
+              options={(Object.keys(FREQUENCY_LABEL) as Frequency[]).map((value) => ({ value, label: FREQUENCY_LABEL[value] }))}
+              value={data.deliveryFrequency}
+              onChange={set("deliveryFrequency")}
+            />
+            <p className="mt-2 text-micro text-ink-muted">{FREQUENCY_CAPTION[data.deliveryFrequency]}</p>
+          </div>
+          <SelectField label="Preferred Delivery Day" value={data.preferredDay} onChange={(e) => set("preferredDay")(e.target.value)}>
+            {DAYS.map((day) => (
+              <option key={day} value={day}>
+                {day}
+              </option>
+            ))}
+          </SelectField>
+        </>
+      )}
+
+      {step === STEP.review && <ReviewList sections={review} onEdit={goTo} />}
+    </WizardShell>
   );
 }
 
-export default function RestaurantOnboardingPage() {
+export default function RestaurantJoinPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center text-text-muted">Loading...</div>}>
-      <RestaurantOnboardingForm />
+    <Suspense fallback={<div role="status" className="py-24 text-center text-ink-muted">Loading…</div>}>
+      <RestaurantWizard />
     </Suspense>
   );
 }
