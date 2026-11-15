@@ -17,7 +17,7 @@ vi.mock("@/lib/grower-data", () => ({ getGrowerHome: (...args: unknown[]) => get
 import GrowerDashboard from "@/app/(dashboard)/grower/dashboard/page";
 
 function home(overrides: Record<string, unknown> = {}) {
-  return { grower: grower(), payouts: [payout()], reviewedCheckIns: 3, notifications: [], ...overrides };
+  return { grower: grower(), payouts: [payout()], scoredTrays: 3, notifications: [], ...overrides };
 }
 
 async function renderPage() {
@@ -50,10 +50,10 @@ describe("grower dashboard", () => {
     expect(screen.getByText("Photos for today are waiting")).toBeInTheDocument();
   });
 
-  it("shows 'No reviews yet' instead of a misleading score for a new grower", async () => {
-    getGrowerHome.mockResolvedValue(home({ reviewedCheckIns: 0, grower: grower({ qualityScore: 0.5 }) }));
+  it("shows 'No scores yet' instead of a misleading score for a new grower", async () => {
+    getGrowerHome.mockResolvedValue(home({ scoredTrays: 0, grower: grower({ qualityScore: 0.5 }) }));
     await renderPage();
-    expect(screen.getByText(/No reviews yet/)).toBeInTheDocument();
+    expect(screen.getByText(/No scores yet/)).toBeInTheDocument();
     expect(screen.queryByText("50%")).not.toBeInTheDocument();
   });
 

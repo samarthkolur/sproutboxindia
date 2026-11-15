@@ -14,6 +14,12 @@ const withLatestCheckIn = {
   },
 } satisfies Prisma.TaskInclude;
 
+// The yield, quality and timeliness scores are computed from finished trays (harvested or
+// rejected), see updateGrowerScores. Until there is one, the stored 0.5 is only a default.
+function countScoredTrays(growerId: string) {
+  return prisma.batch.count({ where: { task: { growerId }, status: { in: ["HARVESTED", "REJECTED"] } } });
+}
+
 const OPEN_STATUSES = ["ASSIGNED", "IN_PROGRESS", "HARVEST_READY"] as const;
 
 export async function getGrowerHome(userId: string) {
@@ -30,16 +36,16 @@ export async function getGrowerHome(userId: string) {
   });
   if (!grower) return null;
 
-  const [payouts, reviewedCheckIns, notifications] = await Promise.all([
+  const [payouts, scoredTrays, notifications] = await Promise.all([
     prisma.payout.findMany({
       where: { growerId: grower.id },
       select: { amount: true, status: true, paidAt: true },
     }),
-    prisma.checkIn.count({ where: { qcResult: { not: null }, batch: { task: { growerId: grower.id } } } }),
+    countScoredTrays(grower.id),
     prisma.notification.findMany({ where: { userId }, orderBy: { createdAt: "desc" }, take: 5 }),
   ]);
 
-  return { grower, payouts, reviewedCheckIns, notifications };
+  return { grower, payouts, scoredTrays, notifications };
 }
 
 export async function getGrowerTasks(userId: string) {
@@ -89,8 +95,5 @@ export async function getGrowerProfile(userId: string) {
     include: { user: { select: { name: true, email: true } } },
   });
   if (!grower) return null;
-  const reviewedCheckIns = await prisma.checkIn.count({
-    where: { qcResult: { not: null }, batch: { task: { growerId: grower.id } } },
-  });
-  return { grower, reviewedCheckIns };
+  return { grower, scoredTrays: await countScoredTrays(grower.id) };
 }

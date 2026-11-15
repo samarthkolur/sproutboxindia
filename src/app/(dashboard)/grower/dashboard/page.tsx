@@ -37,13 +37,13 @@ export default async function GrowerDashboard() {
     );
   }
 
-  const { grower, payouts, reviewedCheckIns, notifications } = home;
+  const { grower, payouts, scoredTrays, notifications } = home;
   const states = grower.tasks.map((task) => ({ task, state: getTaskState(task, now) }));
   const actionable = states.filter(({ task, state }) => state.canCheckIn || state.canRequestPickup || task.status === "HARVEST_READY");
   const due = states.filter(({ state }) => state.canCheckIn).length;
   const activeTrays = grower.tasks.reduce((sum, task) => sum + task.trayCount, 0);
   const { paid, pending } = earningsSummary(payouts);
-  const qc = qcTile(grower.qualityScore, reviewedCheckIns);
+  const qc = qcTile(grower.qualityScore, scoredTrays);
 
   // The grow-cycle ring follows the task furthest along that is still growing.
   const growing = states

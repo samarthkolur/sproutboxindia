@@ -58,12 +58,13 @@ export const rupees = (amount: number) => `₹${Math.round(amount).toLocaleStrin
 // ── Quality ─────────────────────────────────────────────────────────────────
 
 /**
- * What the QC tile says. A new grower's stored score is the 0.5 default, which
- * would read as "50%, needs improvement" before anyone has reviewed anything.
+ * What the QC tile says. A new grower's stored score is the 0.5 default, which would
+ * read as "50%, needs improvement" before a single tray has finished. `scoredTrays` is
+ * the number of harvested or rejected trays, the ones the scores are computed from.
  */
-export function qcTile(qualityScore: number, reviewedCheckIns: number) {
-  if (reviewedCheckIns === 0) {
-    return { value: "—", caption: "No reviews yet. Scores appear after your first QC check.", tone: "neutral" as const };
+export function qcTile(qualityScore: number, scoredTrays: number) {
+  if (scoredTrays === 0) {
+    return { value: "—", caption: "No scores yet. They appear after your first finished tray.", tone: "neutral" as const };
   }
   const percent = Math.round(qualityScore * 100);
   if (percent >= 90) return { value: `${percent}%`, caption: "Excellent. Restaurants rely on you.", tone: "good" as const };

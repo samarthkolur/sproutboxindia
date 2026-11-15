@@ -75,10 +75,10 @@ describe("earningsSummary", () => {
 });
 
 describe("qcTile", () => {
-  it("does not show the default 0.5 score as a result before any review", () => {
+  it("does not show the default 0.5 score as a result before any tray has finished", () => {
     const tile = qcTile(0.5, 0);
     expect(tile.value).toBe("—");
-    expect(tile.caption).toMatch(/No reviews yet/);
+    expect(tile.caption).toMatch(/No scores yet/);
     expect(tile.tone).toBe("neutral");
   });
 
