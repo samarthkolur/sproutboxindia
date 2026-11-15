@@ -790,6 +790,47 @@ export const translations: Record<string, TranslationEntry> = {
   "Today, we're building the infrastructure for a distributed, resilient, and community-driven food network.": { kn: "ಇಂದು, ನಾವು ವಿತರಿತ, ಸ್ಥಿತಿಸ್ಥಾಪಕ ಮತ್ತು ಸಮುದಾಯ-ಚಾಲಿತ ಆಹಾರ ಜಾಲಕ್ಕೆ ಮೂಲಸೌಕರ್ಯವನ್ನು ನಿರ್ಮಿಸುತ್ತಿದ್ದೇವೆ.", hi: "आज, हम एक वितरित, लचीले और समुदाय-संचालित खाद्य नेटवर्क के लिए बुनियादी ढांचा बना रहे हैं।" },
   "Traditional agriculture requires massive land, water, and transport logistics. But microgreens are different. They grow quickly, require minimal space, and can be cultivated virtually anywhere. We realized we could flip the model upside down.": { kn: "ಸಾಂಪ್ರದಾಯಿಕ ಕೃಷಿಗೆ ಅಪಾರ ಭೂಮಿ, ನೀರು ಮತ್ತು ಸಾರಿಗೆ ವ್ಯವಸ್ಥೆ ಬೇಕು. ಆದರೆ ಮೈಕ್ರೋಗ್ರೀನ್‌ಗಳು ಭಿನ್ನ. ಅವು ವೇಗವಾಗಿ ಬೆಳೆಯುತ್ತವೆ, ಕನಿಷ್ಠ ಜಾಗ ಸಾಕು, ಮತ್ತು ಬಹುತೇಕ ಎಲ್ಲಿ ಬೇಕಾದರೂ ಬೆಳೆಸಬಹುದು. ಮಾದರಿಯನ್ನು ತಲೆಕೆಳಗಾಗಿಸಬಹುದು ಎಂದು ನಮಗೆ ಅರಿವಾಯಿತು.", hi: "पारंपरिक खेती के लिए भारी ज़मीन, पानी और परिवहन की ज़रूरत होती है। लेकिन माइक्रोग्रीन अलग हैं। वे जल्दी उगते हैं, बहुत कम जगह लेते हैं, और लगभग कहीं भी उगाए जा सकते हैं। हमने समझा कि हम पूरा मॉडल उलट सकते हैं।" },
   "We believe that the freshest, most nutritious food shouldn't travel thousands of miles. By empowering individuals to grow microgreens from home, we're building a hyper-local food system.": { kn: "ತಾಜಾ ಮತ್ತು ಅತ್ಯಂತ ಪೌಷ್ಟಿಕ ಆಹಾರ ಸಾವಿರಾರು ಮೈಲಿ ಪ್ರಯಾಣಿಸಬಾರದು ಎಂದು ನಾವು ನಂಬುತ್ತೇವೆ. ವ್ಯಕ್ತಿಗಳು ಮನೆಯಲ್ಲೇ ಮೈಕ್ರೋಗ್ರೀನ್‌ಗಳನ್ನು ಬೆಳೆಯಲು ಸಬಲರನ್ನಾಗಿಸುವ ಮೂಲಕ, ನಾವು ಅತಿ ಸ್ಥಳೀಯ ಆಹಾರ ವ್ಯವಸ್ಥೆಯನ್ನು ನಿರ್ಮಿಸುತ್ತಿದ್ದೇವೆ.", hi: "हमारा मानना है कि सबसे ताज़ा और पौष्टिक भोजन को हज़ारों मील का सफ़र नहीं करना चाहिए। लोगों को घर पर माइक्रोग्रीन उगाने के लिए सशक्त बनाकर, हम एक अति-स्थानीय खाद्य प्रणाली बना रहे हैं।" },
+  // ── Phase 1: grower wizard ──
+  "An FSSAI number has 14 digits.": { kn: "FSSAI ಸಂಖ್ಯೆಯಲ್ಲಿ 14 ಅಂಕಿಗಳಿರುತ್ತವೆ.", hi: "FSSAI नंबर में 14 अंक होते हैं।" },
+  "Compliance": { kn: "ಅನುಸರಣೆ", hi: "अनुपालन" },
+  "Edit": { kn: "ಸಂಪಾದಿಸಿ", hi: "संपादित करें" },
+  "Enter a growing area greater than 0 sq ft.": { kn: "0 ಚ.ಅಡಿಗಿಂತ ಹೆಚ್ಚಿನ ಬೆಳೆಯುವ ಪ್ರದೇಶವನ್ನು ನಮೂದಿಸಿ.", hi: "0 वर्ग फुट से अधिक का उगाने का क्षेत्र दर्ज करें।" },
+  "Enter a valid phone number, at least 7 digits.": { kn: "ಮಾನ್ಯವಾದ ಫೋನ್ ಸಂಖ್ಯೆಯನ್ನು ನಮೂದಿಸಿ, ಕನಿಷ್ಠ 7 ಅಂಕಿಗಳು.", hi: "मान्य फ़ोन नंबर दर्ज करें, कम से कम 7 अंक।" },
+  "FSSAI Registration Number": { kn: "FSSAI ನೋಂದಣಿ ಸಂಖ್ಯೆ", hi: "FSSAI पंजीकरण संख्या" },
+  "FSSAI number": { kn: "FSSAI ಸಂಖ್ಯೆ", hi: "FSSAI नंबर" },
+  "For serious growers": { kn: "ಗಂಭೀರ ಬೆಳೆಗಾರರಿಗೆ", hi: "गंभीर उत्पादकों के लिए" },
+  "Grown at home, one crop per tray": { kn: "ಮನೆಯಲ್ಲಿ ಬೆಳೆಯಲಾಗುತ್ತದೆ, ಪ್ರತಿ ಟ್ರೇಗೆ ಒಂದು ಬೆಳೆ", hi: "घर पर उगाया जाता है, हर ट्रे में एक फसल" },
+  "If every tray passes quality control": { kn: "ಪ್ರತಿ ಟ್ರೇ ಗುಣಮಟ್ಟ ಪರಿಶೀಲನೆಯಲ್ಲಿ ತೇರ್ಗಡೆಯಾದರೆ", hi: "यदि हर ट्रे गुणवत्ता जांच में पास हो" },
+  "Indian food safety law (FSSAI) requires a registration before you can supply restaurants commercially. You can leave this blank for now and add it later. Our team checks each number we receive.": { kn: "ರೆಸ್ಟೋರೆಂಟ್‌ಗಳಿಗೆ ವಾಣಿಜ್ಯವಾಗಿ ಪೂರೈಸುವ ಮೊದಲು ಭಾರತೀಯ ಆಹಾರ ಸುರಕ್ಷತಾ ಕಾನೂನು (FSSAI) ನೋಂದಣಿಯನ್ನು ಕಡ್ಡಾಯಗೊಳಿಸುತ್ತದೆ. ನೀವು ಇದನ್ನು ಈಗ ಖಾಲಿ ಬಿಟ್ಟು ನಂತರ ಸೇರಿಸಬಹುದು. ನಮ್ಮ ತಂಡವು ನಾವು ಸ್ವೀಕರಿಸುವ ಪ್ರತಿ ಸಂಖ್ಯೆಯನ್ನು ಪರಿಶೀಲಿಸುತ್ತದೆ.", hi: "रेस्तरां को व्यावसायिक रूप से आपूर्ति करने से पहले भारतीय खाद्य सुरक्षा कानून (FSSAI) के तहत पंजीकरण आवश्यक है। आप इसे अभी खाली छोड़ सकते हैं और बाद में जोड़ सकते हैं। हमारी टीम हमें मिलने वाले हर नंबर की जांच करती है।" },
+  "Kit price": { kn: "ಕಿಟ್ ಬೆಲೆ", hi: "किट की कीमत" },
+  "Most popular choice": { kn: "ಅತ್ಯಂತ ಜನಪ್ರಿಯ ಆಯ್ಕೆ", hi: "सबसे लोकप्रिय विकल्प" },
+  "Not provided": { kn: "ಒದಗಿಸಿಲ್ಲ", hi: "उपलब्ध नहीं कराया" },
+  "Payout per tray": { kn: "ಪ್ರತಿ ಟ್ರೇಗೆ ಪಾವತಿ", hi: "प्रति ट्रे भुगतान" },
+  "Perfect for beginners": { kn: "ಆರಂಭಿಕರಿಗೆ ಸೂಕ್ತ", hi: "शुरुआत करने वालों के लिए उत्तम" },
+  "Potential earnings per cycle": { kn: "ಪ್ರತಿ ಚಕ್ರಕ್ಕೆ ಸಂಭಾವ್ಯ ಗಳಿಕೆ", hi: "प्रति चक्र संभावित कमाई" },
+  "Summary": { kn: "ಸಾರಾಂಶ", hi: "सारांश" },
+  "We pay you here. You can add it later.": { kn: "ನಾವು ನಿಮಗೆ ಇಲ್ಲಿ ಪಾವತಿಸುತ್ತೇವೆ. ನೀವು ಇದನ್ನು ನಂತರ ಸೇರಿಸಬಹುದು.", hi: "हम आपको यहीं भुगतान करेंगे। आप इसे बाद में जोड़ सकते हैं।" },
+  "Your starter kit": { kn: "ನಿಮ್ಮ ಸ್ಟಾರ್ಟರ್ ಕಿಟ್", hi: "आपकी स्टार्टर किट" },
+  // ── Phase 1: restaurant wizard ──
+  "A GST number has 15 characters.": { kn: "GST ಸಂಖ್ಯೆಯಲ್ಲಿ 15 ಅಕ್ಷರಗಳಿರುತ್ತವೆ.", hi: "GST नंबर में 15 अक्षर होते हैं।" },
+  "Cuisine": { kn: "ಖಾದ್ಯ ಪ್ರಕಾರ", hi: "व्यंजन" },
+  "Days from sowing to harvest, depending on the crop": { kn: "ಬೆಳೆಯನ್ನು ಅವಲಂಬಿಸಿ ಬಿತ್ತನೆಯಿಂದ ಕೊಯ್ಲಿನವರೆಗಿನ ದಿನಗಳು", hi: "फसल के अनुसार बुवाई से कटाई तक के दिन" },
+  "Delivery rhythm": { kn: "ವಿತರಣಾ ಕ್ರಮ", hi: "डिलीवरी का क्रम" },
+  "Enter your contact name.": { kn: "ನಿಮ್ಮ ಸಂಪರ್ಕ ಹೆಸರನ್ನು ನಮೂದಿಸಿ.", hi: "अपना संपर्क नाम दर्ज करें।" },
+  "Enter your restaurant's name.": { kn: "ನಿಮ್ಮ ರೆಸ್ಟೋರೆಂಟ್‌ನ ಹೆಸರನ್ನು ನಮೂದಿಸಿ.", hi: "अपने रेस्तरां का नाम दर्ज करें।" },
+  "Friday": { kn: "ಶುಕ್ರವಾರ", hi: "शुक्रवार" },
+  "Monday": { kn: "ಸೋಮವಾರ", hi: "सोमवार" },
+  "Saturday": { kn: "ಶನಿವಾರ", hi: "शनिवार" },
+  "Thursday": { kn: "ಗುರುವಾರ", hi: "गुरुवार" },
+  "Tuesday": { kn: "ಮಂಗಳವಾರ", hi: "मंगलवार" },
+  "Wednesday": { kn: "ಬುಧವಾರ", hi: "बुधवार" },
+  "GST Number": { kn: "GST ಸಂಖ್ಯೆ", hi: "GST नंबर" },
+  "Grow time": { kn: "ಬೆಳೆಯುವ ಸಮಯ", hi: "उगने का समय" },
+  "Pick the greens you use most": { kn: "ನೀವು ಹೆಚ್ಚು ಬಳಸುವ ಸೊಪ್ಪುಗಳನ್ನು ಆರಿಸಿ", hi: "वे साग चुनें जिनका आप सबसे ज़्यादा उपयोग करते हैं" },
+  "Select the microgreens you'd like to order regularly. This helps us plan supply; you still place each order yourself.": { kn: "ನೀವು ನಿಯಮಿತವಾಗಿ ಆರ್ಡರ್ ಮಾಡಲು ಬಯಸುವ ಮೈಕ್ರೋಗ್ರೀನ್‌ಗಳನ್ನು ಆಯ್ಕೆಮಾಡಿ. ಇದು ಪೂರೈಕೆಯನ್ನು ಯೋಜಿಸಲು ನಮಗೆ ಸಹಾಯ ಮಾಡುತ್ತದೆ; ನೀವು ಇನ್ನೂ ಪ್ರತಿ ಆರ್ಡರ್ ಅನ್ನು ನೀವೇ ಮಾಡುತ್ತೀರಿ.", hi: "वे माइक्रोग्रीन चुनें जिन्हें आप नियमित रूप से ऑर्डर करना चाहेंगे। इससे हमें आपूर्ति की योजना बनाने में मदद मिलती है; हर ऑर्डर आप खुद देते हैं।" },
+  "You place each order yourself, from the catalog": { kn: "ಪ್ರತಿ ಆರ್ಡರ್ ಅನ್ನು ನೀವೇ ಕ್ಯಾಟಲಾಗ್‌ನಿಂದ ಮಾಡುತ್ತೀರಿ", hi: "हर ऑर्डर आप खुद कैटलॉग से देते हैं" },
+  "Your menu": { kn: "ನಿಮ್ಮ ಮೆನು", hi: "आपका मेन्यू" },
+  "e.g. South Indian": { kn: "ಉದಾ. ದಕ್ಷಿಣ ಭಾರತೀಯ", hi: "जैसे दक्षिण भारतीय" },
 };
 
 
@@ -807,6 +848,16 @@ const regexTranslations = [
     pattern: /^(\d+) days$/,
     replace: (language: Exclude<LanguageCode, "en">, value: string) =>
       language === "kn" ? `${value} ದಿನಗಳು` : `${value} दिन`,
+  },
+  {
+    pattern: /^Step (\d+) of (\d+)$/,
+    replace: (language: Exclude<LanguageCode, "en">, step: string, total: string) =>
+      language === "kn" ? `ಹಂತ ${step} / ${total}` : `चरण ${step} / ${total}`,
+  },
+  {
+    pattern: /^(\d+) trays$/,
+    replace: (language: Exclude<LanguageCode, "en">, count: string) =>
+      language === "kn" ? `${count} ಟ್ರೇಗಳು` : `${count} ट्रे`,
   },
   {
     pattern: /^Day (\d+)$/,

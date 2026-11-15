@@ -18,7 +18,8 @@ function needsTranslation(text: string) {
   return translateText(value, "kn") === value || translateText(value, "hi") === value;
 }
 
-export function findUntranslated(root: ParentNode): string[] {
+// `ignore` is for text the person typed (names, cities): data, not interface.
+export function findUntranslated(root: ParentNode, options: { ignore?: string[] } = {}): string[] {
   const missing = new Set<string>();
 
   const walker = document.createTreeWalker(root as Node, NodeFilter.SHOW_TEXT);
@@ -39,5 +40,8 @@ export function findUntranslated(root: ParentNode): string[] {
     }
   });
 
-  return Array.from(missing).sort();
+  const ignored = new Set(options.ignore ?? []);
+  return Array.from(missing)
+    .filter((text) => !ignored.has(text))
+    .sort();
 }
