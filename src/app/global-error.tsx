@@ -1,22 +1,16 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { GlassCard } from "@/components/shared/GlassCard";
+import { FatalErrorPanel } from "@/components/shared/FatalErrorPanel";
 import "@/app/globals.css";
 
+// Replaces the root layout when it fails, so it sets the theme attribute itself:
+// the colour tokens only exist under [data-theme]. English only, because the
+// language provider lives in the layout that just failed.
 export default function GlobalError({ reset }: { error: Error; reset: () => void }) {
   return (
-    <html lang="en">
+    <html lang="en" data-theme="light">
       <body>
-        <main className="grid min-h-screen place-items-center bg-[#F8FAF7] px-4">
-          <GlassCard className="max-w-md text-center">
-            <h1 className="text-2xl font-black text-text-primary">Something went wrong</h1>
-            <p className="mt-2 text-sm text-text-muted">The request could not be completed. Please try again.</p>
-            <Button className="mt-5 bg-sprout-800 text-white hover:bg-sprout-900" onClick={reset}>
-              Try again
-            </Button>
-          </GlassCard>
-        </main>
+        <FatalErrorPanel onRetry={reset} />
       </body>
     </html>
   );
