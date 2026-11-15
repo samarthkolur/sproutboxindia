@@ -718,6 +718,10 @@ export const translations: Record<string, TranslationEntry> = {
   "New allocation": { kn: "ಹೊಸ ನಿಯೋಜನೆ", hi: "नया आवंटन" },
   "Check in": { kn: "ಚೆಕ್-ಇನ್", hi: "चेक-इन" },
   "New order": { kn: "ಹೊಸ ಆರ್ಡರ್", hi: "नया ऑर्डर" },
+  // ── Phase 1: form fields ──
+  "Optional": { kn: "ಐಚ್ಛಿಕ", hi: "वैकल्पिक" },
+  "Show password": { kn: "ಪಾಸ್‌ವರ್ಡ್ ತೋರಿಸಿ", hi: "पासवर्ड दिखाएं" },
+  "Hide password": { kn: "ಪಾಸ್‌ವರ್ಡ್ ಮರೆಮಾಡಿ", hi: "पासवर्ड छिपाएं" },
 };
 
 
