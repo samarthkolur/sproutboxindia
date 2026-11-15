@@ -1,253 +1,178 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { ArrowRight, Sprout, UtensilsCrossed } from "lucide-react";
 import { BrandLogo } from "@/components/layout/BrandLogo";
+import { Button } from "@/components/ui/button";
+import { ChoiceGroup } from "@/components/ui/choice-group";
+import { TextField } from "@/components/ui/field";
 import { saveRegistrationPrefill } from "@/lib/registration-prefill";
+import { MIN_PASSWORD_LENGTH, isValidEmail } from "@/lib/validation";
+
+type Role = "GROWER" | "RESTAURANT";
+type Errors = Partial<Record<"name" | "email" | "password" | "confirmPassword", string>>;
+
+const ROLE_CHOICES = [
+  { value: "GROWER", label: "Grower", description: "Grow from home", icon: <Sprout className="h-6 w-6" aria-hidden="true" /> },
+  {
+    value: "RESTAURANT",
+    label: "Restaurant",
+    description: "Order fresh produce",
+    icon: <UtensilsCrossed className="h-6 w-6" aria-hidden="true" />,
+  },
+];
+
+// V2: say what happens next, because no account exists until the last step of the next page.
+const NEXT_STEP: Record<Role, string> = {
+  GROWER: "Next, tell us about your space and kit. Your account is created when you submit the last step.",
+  RESTAURANT:
+    "Next, tell us about your kitchen and what you'd like to order. Your account is created when you submit the last step.",
+};
+
+function validate(data: { name: string; email: string; password: string; confirmPassword: string }): Errors {
+  const errors: Errors = {};
+  if (!data.name.trim()) errors.name = "Enter your full name.";
+  if (!data.email.trim()) errors.email = "Enter your email address.";
+  else if (!isValidEmail(data.email)) errors.email = "Enter a valid email address.";
+  if (data.password.length < MIN_PASSWORD_LENGTH) errors.password = "Password must be at least 6 characters.";
+  if (!data.confirmPassword) errors.confirmPassword = "Re-enter your password.";
+  else if (data.password !== data.confirmPassword) errors.confirmPassword = "Passwords do not match.";
+  return errors;
+}
 
 export default function RegisterPage() {
   const router = useRouter();
+  const formRef = useRef<HTMLFormElement>(null);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
     confirmPassword: "",
-    role: "GROWER" as "GROWER" | "RESTAURANT",
+    role: "GROWER" as Role,
   });
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState<Errors>({});
+  const [submitCount, setSubmitCount] = useState(0);
+  const [formError, setFormError] = useState("");
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const set = (field: keyof typeof formData) => (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setFormData((prev) => ({ ...prev, [field]: value }));
+    // Clear a field's error as soon as the person starts fixing it.
+    setErrors((prev) => (prev[field as keyof Errors] ? { ...prev, [field]: undefined } : prev));
+  };
+
+  // After a failed submit, move focus to the first field that needs attention.
+  useEffect(() => {
+    if (submitCount === 0) return;
+    formRef.current?.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus();
+  }, [submitCount]);
+
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
-    if (!formData.name.trim() || !formData.email.trim() || !formData.password) {
-      setError("Please fill in all required fields");
+    setFormError("");
+
+    const found = validate(formData);
+    if (Object.keys(found).length > 0) {
+      setErrors(found);
+      setSubmitCount((count) => count + 1);
       return;
     }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(formData.email.trim())) {
-      setError("Please enter a valid email address");
-      return;
-    }
-
-    if (formData.password !== formData.confirmPassword) {
-      setError("Passwords do not match");
-      return;
-    }
-
-    if (formData.password.length < 6) {
-      setError("Password must be at least 6 characters");
-      return;
-    }
-
-    setLoading(true);
 
     try {
       saveRegistrationPrefill({
         role: formData.role,
-        name: formData.name,
-        email: formData.email,
+        name: formData.name.trim(),
+        email: formData.email.trim(),
         password: formData.password,
       });
-
-      if (formData.role === "GROWER") {
-        router.push("/join/grower");
-      } else {
-        router.push("/join/restaurant");
-      }
+      router.push(formData.role === "GROWER" ? "/join/grower" : "/join/restaurant");
     } catch {
-      setError("Something went wrong. Please try again.");
-    } finally {
-      setLoading(false);
+      setFormError("Something went wrong. Please try again.");
     }
   };
 
   return (
     <div>
-      {/* Logo */}
       <BrandLogo className="mb-6 sm:mb-8" markClassName="h-10 w-10" textClassName="text-xl" />
 
-      <h1 className="text-2xl font-black text-text-primary mb-1 tracking-tight sm:text-3xl">
-        Create your account
-      </h1>
-      <p className="text-text-secondary text-sm mb-8">
-        Join SproutBox as a grower or restaurant partner
-      </p>
+      <h1 className="mb-1 text-2xl font-semibold tracking-tight text-ink sm:text-3xl">Create your account</h1>
+      <p className="mb-8 text-sm text-ink-soft">Join SproutBox as a grower or restaurant partner</p>
 
-      {error && (
-        <div className="bg-status-error/10 border border-status-error/20 text-status-error rounded-xl px-4 py-3 mb-6 text-sm animate-in fade-in slide-in-from-top-2 duration-300">
-          {error}
+      {formError && (
+        <div role="alert" className="mb-6 rounded-tile bg-risk-soft px-4 py-3 text-sm text-risk">
+          {formError}
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-5">
-        {/* Role selection */}
+      <form ref={formRef} onSubmit={handleSubmit} noValidate className="space-y-5">
         <div>
-          <label className="block text-xs font-semibold text-text-primary mb-2 uppercase tracking-wider">
+          <p className="mb-1.5 text-sm font-medium text-ink">
             I am a
-          </label>
-          <div className="grid gap-3 min-[420px]:grid-cols-2">
-            <button
-              type="button"
-              onClick={() =>
-                setFormData((prev) => ({ ...prev, role: "GROWER" }))
-              }
-              className={`p-4 rounded-xl border text-center transition-all group ${formData.role === "GROWER"
-                  ? "border-sprout-600 bg-sprout-50/80 shadow-md shadow-sprout-800/10"
-                  : "border-white/50 bg-white/40 hover:bg-white/60 hover:border-white/70"
-                }`}
-            >
-              <span className="text-2xl mb-1.5 block group-hover:scale-110 transition-transform">🌱</span>
-              <span className={`text-sm font-semibold ${formData.role === "GROWER" ? "text-sprout-800" : "text-text-secondary"}`}>
-                Grower
-              </span>
-              <p className={`text-[10px] mt-0.5 ${formData.role === "GROWER" ? "text-sprout-600" : "text-text-muted"}`}>
-                Grow from home
-              </p>
-            </button>
-            <button
-              type="button"
-              onClick={() =>
-                setFormData((prev) => ({ ...prev, role: "RESTAURANT" }))
-              }
-              className={`p-4 rounded-xl border text-center transition-all group ${formData.role === "RESTAURANT"
-                  ? "border-sprout-600 bg-sprout-50/80 shadow-md shadow-sprout-800/10"
-                  : "border-white/50 bg-white/40 hover:bg-white/60 hover:border-white/70"
-                }`}
-            >
-              <span className="text-2xl mb-1.5 block group-hover:scale-110 transition-transform">🍽️</span>
-              <span className={`text-sm font-semibold ${formData.role === "RESTAURANT" ? "text-sprout-800" : "text-text-secondary"}`}>
-                Restaurant
-              </span>
-              <p className={`text-[10px] mt-0.5 ${formData.role === "RESTAURANT" ? "text-sprout-600" : "text-text-muted"}`}>
-                Order fresh produce
-              </p>
-            </button>
-          </div>
+          </p>
+          <ChoiceGroup
+            ariaLabel="I am a"
+            choices={ROLE_CHOICES}
+            value={formData.role}
+            onChange={(role) => setFormData((prev) => ({ ...prev, role: role as Role }))}
+          />
+          <p className="mt-2.5 text-micro text-ink-muted">{NEXT_STEP[formData.role]}</p>
         </div>
 
-        <div>
-          <label
-            htmlFor="name"
-            className="block text-xs font-semibold text-text-primary mb-2 uppercase tracking-wider"
-          >
-            Full Name
-          </label>
-          <input
-            id="name"
-            type="text"
-            value={formData.name}
-            onChange={(e) =>
-              setFormData((prev) => ({ ...prev, name: e.target.value }))
-            }
-            className="w-full bg-white/60 border border-white/50 rounded-xl px-4 py-3 text-sm text-text-primary placeholder:text-text-muted outline-none focus:border-sprout-500 focus:ring-2 focus:ring-sprout-500/20 transition-all backdrop-blur-sm"
-            placeholder="Your full name"
-            required
+        <TextField
+          label="Full Name"
+          autoComplete="name"
+          value={formData.name}
+          onChange={set("name")}
+          error={errors.name}
+          placeholder="Your full name"
+        />
+        <TextField
+          label="Email"
+          type="email"
+          autoComplete="email"
+          value={formData.email}
+          onChange={set("email")}
+          error={errors.email}
+          placeholder="you@example.com"
+        />
+        <div className="grid gap-4 sm:grid-cols-2">
+          <TextField
+            label="Password"
+            type="password"
+            autoComplete="new-password"
+            revealable
+            value={formData.password}
+            onChange={set("password")}
+            error={errors.password}
+            hint="At least 6 characters"
+          />
+          <TextField
+            label="Confirm"
+            type="password"
+            autoComplete="new-password"
+            value={formData.confirmPassword}
+            onChange={set("confirmPassword")}
+            error={errors.confirmPassword}
           />
         </div>
 
-        <div>
-          <label
-            htmlFor="reg-email"
-            className="block text-xs font-semibold text-text-primary mb-2 uppercase tracking-wider"
-          >
-            Email
-          </label>
-          <input
-            id="reg-email"
-            type="email"
-            value={formData.email}
-            onChange={(e) =>
-              setFormData((prev) => ({ ...prev, email: e.target.value }))
-            }
-            className="w-full bg-white/60 border border-white/50 rounded-xl px-4 py-3 text-sm text-text-primary placeholder:text-text-muted outline-none focus:border-sprout-500 focus:ring-2 focus:ring-sprout-500/20 transition-all backdrop-blur-sm"
-            placeholder="you@example.com"
-            required
-          />
-        </div>
-
-        <div className="grid gap-3 sm:grid-cols-2">
-          <div>
-            <label
-              htmlFor="reg-password"
-              className="block text-xs font-semibold text-text-primary mb-2 uppercase tracking-wider"
-            >
-              Password
-            </label>
-            <input
-              id="reg-password"
-              type="password"
-              value={formData.password}
-              onChange={(e) =>
-                setFormData((prev) => ({ ...prev, password: e.target.value }))
-              }
-              className="w-full bg-white/60 border border-white/50 rounded-xl px-4 py-3 text-sm text-text-primary placeholder:text-text-muted outline-none focus:border-sprout-500 focus:ring-2 focus:ring-sprout-500/20 transition-all backdrop-blur-sm"
-              placeholder="Min. 6 chars"
-              required
-              minLength={6}
-            />
-          </div>
-          <div>
-            <label
-              htmlFor="confirm-password"
-              className="block text-xs font-semibold text-text-primary mb-2 uppercase tracking-wider"
-            >
-              Confirm
-            </label>
-            <input
-              id="confirm-password"
-              type="password"
-              value={formData.confirmPassword}
-              onChange={(e) =>
-                setFormData((prev) => ({
-                  ...prev,
-                  confirmPassword: e.target.value,
-                }))
-              }
-              className="w-full bg-white/60 border border-white/50 rounded-xl px-4 py-3 text-sm text-text-primary placeholder:text-text-muted outline-none focus:border-sprout-500 focus:ring-2 focus:ring-sprout-500/20 transition-all backdrop-blur-sm"
-              placeholder="••••••••"
-              required
-            />
-          </div>
-        </div>
-
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full bg-sprout-800 text-white py-3 rounded-xl text-sm font-semibold hover:bg-sprout-900 transition-all hover:shadow-lg hover:shadow-sprout-800/25 active:scale-[0.98] disabled:opacity-60 disabled:pointer-events-none flex items-center justify-center gap-2"
-        >
-          {loading ? (
-            <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-          ) : (
-            <>
-              Continue
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-              </svg>
-            </>
-          )}
-        </button>
+        <Button type="submit" size="lg" className="w-full rounded-full">
+          Continue
+          <ArrowRight className="ml-2 h-4 w-4" aria-hidden="true" />
+        </Button>
       </form>
 
-      <div className="relative my-8">
-        <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-white/40" />
-        </div>
-        <div className="relative flex justify-center">
-          <span className="bg-transparent px-4 text-xs text-text-muted">
-            Already have an account?
-          </span>
-        </div>
+      <div className="my-8 flex items-center gap-4 text-xs text-ink-muted">
+        <span className="h-px flex-1 bg-hairline" />
+        <span>Already have an account?</span>
+        <span className="h-px flex-1 bg-hairline" />
       </div>
 
-      <Link
-        href="/login"
-        className="block w-full text-center border-2 border-sprout-800/15 text-sprout-800 py-3 rounded-xl text-sm font-semibold hover:bg-sprout-50/50 hover:border-sprout-800/30 transition-all active:scale-[0.98]"
-      >
-        Sign in instead
-      </Link>
+      <Button asChild variant="outline" size="lg" className="w-full rounded-full border-hairline bg-transparent">
+        <Link href="/login">Sign in instead</Link>
+      </Button>
     </div>
   );
 }
