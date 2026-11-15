@@ -798,7 +798,6 @@ export const translations: Record<string, TranslationEntry> = {
   "Engagement (supply)": { kn: "ತೊಡಗಿಸಿಕೊಳ್ಳುವಿಕೆ (ಪೂರೈಕೆ)", hi: "जुड़ाव (आपूर्ति)" },
   "Cannot be measured yet.": { kn: "ಇನ್ನೂ ಅಳೆಯಲು ಸಾಧ್ಯವಿಲ್ಲ.", hi: "अभी मापा नहीं जा सकता।" },
   "Not enough order history yet.": { kn: "ಇನ್ನೂ ಸಾಕಷ್ಟು ಆರ್ಡರ್ ಇತಿಹಾಸವಿಲ್ಲ.", hi: "अभी पर्याप्त ऑर्डर इतिहास नहीं।" },
-  "No check-ins have been reviewed yet.": { kn: "ಇನ್ನೂ ಯಾವುದೇ ಚೆಕ್-ಇನ್ ಪರಿಶೀಲಿಸಿಲ್ಲ.", hi: "अभी कोई चेक-इन नहीं जांचा गया।" },
   "No deliveries have completed yet.": { kn: "ಇನ್ನೂ ಯಾವುದೇ ವಿತರಣೆ ಪೂರ್ಣಗೊಂಡಿಲ್ಲ.", hi: "अभी कोई डिलीवरी पूरी नहीं हुई।" },
   "Kilos on orders whose delivery was marked delivered in the last seven days.": { kn: "ಕಳೆದ ಏಳು ದಿನಗಳಲ್ಲಿ ವಿತರಣೆ ತಲುಪಿದೆ ಎಂದು ಗುರುತಿಸಲಾದ ಆರ್ಡರ್‌ಗಳ ಕಿಲೋಗಳು.", hi: "पिछले सात दिनों में जिनकी डिलीवरी हो चुकी चिह्नित है, उन ऑर्डर के किलो।" },
   "A stand-in: the number of active growers. The product has no separate certification flag yet.": { kn: "ಬದಲಿ ಅಳತೆ: ಸಕ್ರಿಯ ಬೆಳೆಗಾರರ ಸಂಖ್ಯೆ. ಉತ್ಪನ್ನದಲ್ಲಿ ಇನ್ನೂ ಪ್ರತ್ಯೇಕ ಪ್ರಮಾಣೀಕರಣ ಗುರುತು ಇಲ್ಲ.", hi: "विकल्प के तौर पर: सक्रिय उत्पादकों की संख्या। उत्पाद में अभी अलग प्रमाणन संकेत नहीं है।" },
