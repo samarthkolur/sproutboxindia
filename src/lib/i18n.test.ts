@@ -118,3 +118,26 @@ describe("crop instructions", () => {
     }
   });
 });
+
+// findUntranslated skips text that starts with a digit (units, prices), so patterns that
+// begin with a number are pinned here instead.
+describe("grower portal patterns that start with a number", () => {
+  it.each([
+    "5 trays · Day 3 of 9",
+    "9 days from sowing to harvest",
+    "4 weeks",
+    "12 weeks",
+    "8 Nov",
+    "8 Nov 2026",
+  ])("translates %s", (text) => {
+    expect(translateText(text, "kn")).not.toBe(text);
+    expect(translateText(text, "hi")).not.toBe(text);
+  });
+
+  it("keeps the numbers when it translates", () => {
+    expect(translateText("5 trays · Day 3 of 9", "hi")).toBe("5 ट्रे · 9 में से दिन 3");
+    expect(translateText("15 Nov 2026", "kn")).toContain("15");
+    expect(translateText("Sunday, 15 November", "hi")).toBe("रविवार, 15 नवंबर");
+  });
+});
+

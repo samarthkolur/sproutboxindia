@@ -752,6 +752,21 @@ export const translations: Record<string, TranslationEntry> = {
   "Days to harvest": { kn: "ಕೊಯ್ಲಿಗೆ ದಿನಗಳು", hi: "कटाई तक के दिन" },
   "Digital, hub & delivery checks": { kn: "ಡಿಜಿಟಲ್, ಹಬ್ ಮತ್ತು ವಿತರಣಾ ಪರಿಶೀಲನೆಗಳು", hi: "डिजिटल, हब और डिलीवरी जांच" },
   "Farm-to-fork, door to door.": { kn: "ಜಮೀನಿನಿಂದ ತಟ್ಟೆಗೆ, ಬಾಗಿಲಿಂದ ಬಾಗಿಲಿಗೆ.", hi: "खेत से थाली तक, दरवाज़े से दरवाज़े तक।" },
+  "Choose a crop": { kn: "ಬೆಳೆ ಆರಿಸಿ", hi: "फसल चुनें" },
+  "Give light and air": { kn: "ಬೆಳಕು ಮತ್ತು ಗಾಳಿ ನೀಡಿ", hi: "रोशनी और हवा दें" },
+  "Good habits for every crop": { kn: "ಪ್ರತಿ ಬೆಳೆಗೂ ಒಳ್ಳೆಯ ಅಭ್ಯಾಸಗಳು", hi: "हर फसल के लिए अच्छी आदतें" },
+  "How to grow": { kn: "ಹೇಗೆ ಬೆಳೆಸುವುದು", hi: "कैसे उगाएं" },
+  "Indirect light and a little airflow keep stems sturdy and green. Avoid harsh afternoon sun.": { kn: "ಪರೋಕ್ಷ ಬೆಳಕು ಮತ್ತು ಸ್ವಲ್ಪ ಗಾಳಿ ಕಾಂಡಗಳನ್ನು ಗಟ್ಟಿಯಾಗಿ ಮತ್ತು ಹಸಿರಾಗಿ ಇಡುತ್ತವೆ. ಮಧ್ಯಾಹ್ನದ ತೀವ್ರ ಬಿಸಿಲನ್ನು ತಪ್ಪಿಸಿ.", hi: "अप्रत्यक्ष रोशनी और थोड़ी हवा तनों को मज़बूत और हरा रखती है। दोपहर की तेज़ धूप से बचें।" },
+  "Keep the covered days dark": { kn: "ಮುಚ್ಚಿದ ದಿನಗಳಲ್ಲಿ ಕತ್ತಲೆ ಕಾಪಾಡಿ", hi: "ढके हुए दिनों में अंधेरा बनाए रखें" },
+  "Pick a crop to see what to do on each day, from sowing to harvest.": { kn: "ಬಿತ್ತನೆಯಿಂದ ಕೊಯ್ಲಿನವರೆಗೆ ಪ್ರತಿ ದಿನ ಏನು ಮಾಡಬೇಕೆಂದು ನೋಡಲು ಬೆಳೆ ಆರಿಸಿ.", hi: "बुवाई से कटाई तक हर दिन क्या करना है, यह देखने के लिए फसल चुनें।" },
+  "Pro tips": { kn: "ಪರಿಣಿತ ಸಲಹೆಗಳು", hi: "उपयोगी सुझाव" },
+  "Request pickup on time": { kn: "ಸಮಯಕ್ಕೆ ಪಿಕಪ್‌ಗೆ ವಿನಂತಿಸಿ", hi: "समय पर पिकअप का अनुरोध करें" },
+  "Take photos that pass QC": { kn: "QC ಯಲ್ಲಿ ತೇರ್ಗಡೆಯಾಗುವ ಫೋಟೋ ತೆಗೆಯಿರಿ", hi: "QC में पास होने वाली फोटो लें" },
+  "Take the top and side photos in daylight, from the same distance every day, so the reviewer can compare them.": { kn: "ಪರಿಶೀಲಕರು ಹೋಲಿಸಲು ಸಾಧ್ಯವಾಗುವಂತೆ, ಮೇಲಿನ ಮತ್ತು ಪಕ್ಕದ ಫೋಟೋಗಳನ್ನು ಹಗಲು ಬೆಳಕಿನಲ್ಲಿ, ಪ್ರತಿದಿನ ಒಂದೇ ದೂರದಿಂದ ತೆಗೆಯಿರಿ.", hi: "समीक्षक तुलना कर सकें, इसलिए ऊपर और बगल की फोटो दिन की रोशनी में, रोज़ एक ही दूरी से लें।" },
+  "Use the amount in the day's step. Leaves that stay wet invite mould, so water the base rather than soaking the tops.": { kn: "ಆ ದಿನದ ಹಂತದಲ್ಲಿ ಹೇಳಿದ ಪ್ರಮಾಣವನ್ನು ಬಳಸಿ. ಎಲೆಗಳು ಒದ್ದೆಯಾಗಿ ಉಳಿದರೆ ಅಚ್ಚು ಬರುತ್ತದೆ, ಆದ್ದರಿಂದ ಮೇಲ್ಭಾಗ ನೆನೆಸುವ ಬದಲು ಬುಡಕ್ಕೆ ನೀರು ಹಾಕಿ.", hi: "उस दिन के चरण में बताई मात्रा का उपयोग करें। पत्ते गीले रहें तो फफूंद लगती है, इसलिए ऊपर से भिगोने के बजाय जड़ के पास पानी दें।" },
+  "Water gently and evenly": { kn: "ಮೃದುವಾಗಿ ಮತ್ತು ಸಮವಾಗಿ ನೀರು ಹಾಕಿ", hi: "धीरे और समान रूप से पानी दें" },
+  "When the cycle is complete, the Request Pickup button appears on your task. Harvesting by the due date counts towards your timing score.": { kn: "ಚಕ್ರ ಪೂರ್ಣಗೊಂಡಾಗ, ನಿಮ್ಮ ಕೆಲಸದಲ್ಲಿ ಪಿಕಪ್ ವಿನಂತಿ ಬಟನ್ ಕಾಣಿಸುತ್ತದೆ. ನಿಗದಿತ ದಿನಾಂಕದೊಳಗೆ ಕೊಯ್ಲು ಮಾಡಿದರೆ ಅದು ನಿಮ್ಮ ಸಮಯಪಾಲನೆ ಅಂಕಕ್ಕೆ ಸೇರುತ್ತದೆ.", hi: "चक्र पूरा होने पर आपके काम में पिकअप अनुरोध का बटन दिखता है। नियत तारीख तक कटाई करना आपके समय-पालन स्कोर में गिना जाता है।" },
+  "While the seeds are covered, lift the cover only for the day's check. Light too early gives pale, weak stems.": { kn: "ಬೀಜಗಳು ಮುಚ್ಚಿರುವಾಗ, ಆ ದಿನದ ಪರಿಶೀಲನೆಗೆ ಮಾತ್ರ ಮುಚ್ಚಳ ತೆಗೆಯಿರಿ. ಬೇಗ ಬೆಳಕು ಬಿದ್ದರೆ ಕಾಂಡಗಳು ಮಸುಕಾಗಿ ದುರ್ಬಲವಾಗುತ್ತವೆ.", hi: "जब बीज ढके हों, तो केवल उस दिन की जांच के लिए ढक्कन उठाएं। बहुत जल्दी रोशनी मिलने से तने पीले और कमज़ोर होते हैं।" },
   "Add your registration number so the team can verify it.": { kn: "ತಂಡವು ಪರಿಶೀಲಿಸಲು ನಿಮ್ಮ ನೋಂದಣಿ ಸಂಖ್ಯೆಯನ್ನು ಸೇರಿಸಿ.", hi: "अपना पंजीकरण नंबर जोड़ें ताकि टीम उसे सत्यापित कर सके।" },
   "Bank account number": { kn: "ಬ್ಯಾಂಕ್ ಖಾತೆ ಸಂಖ್ಯೆ", hi: "बैंक खाता संख्या" },
   "Contact and address": { kn: "ಸಂಪರ್ಕ ಮತ್ತು ವಿಳಾಸ", hi: "संपर्क और पता" },
@@ -1034,6 +1049,16 @@ const MONTH_SHORT = {
 const MONTH_SHORT_EN = MONTHS.map((month) => month.slice(0, 3));
 
 const regexTranslations = [
+  {
+    pattern: /^(\d+) trays · Day (\d+) of (\d+)$/,
+    replace: (language: Exclude<LanguageCode, "en">, trays: string, day: string, total: string) =>
+      language === "kn" ? `${trays} ಟ್ರೇಗಳು · ${total}ರಲ್ಲಿ ${day}ನೇ ದಿನ` : `${trays} ट्रे · ${total} में से दिन ${day}`,
+  },
+  {
+    pattern: /^(\d+) days from sowing to harvest$/,
+    replace: (language: Exclude<LanguageCode, "en">, value: string) =>
+      language === "kn" ? `ಬಿತ್ತನೆಯಿಂದ ಕೊಯ್ಲಿನವರೆಗೆ ${value} ದಿನಗಳು` : `बुवाई से कटाई तक ${value} दिन`,
+  },
   {
     pattern: /^Your kit holds (\d+) trays\.$/,
     replace: (language: Exclude<LanguageCode, "en">, value: string) =>
