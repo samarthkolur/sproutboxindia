@@ -8,7 +8,8 @@ export interface SegmentOption {
 }
 
 // V5: range pills sit beside the thing they change (a chart's period, a form's cadence).
-// Active = the one solid fill (V1). Widths flex, because Kannada/Hindi labels run long.
+// Active = the one solid fill (V1). Labels never ellipsize (Kannada/Hindi run long): the
+// pill row scrolls sideways instead of cutting a word.
 export function SegmentedControl({
   options,
   value,
@@ -26,7 +27,7 @@ export function SegmentedControl({
     <div
       role="radiogroup"
       aria-label={ariaLabel}
-      className={cn("inline-flex max-w-full items-center gap-1 rounded-full border border-hairline bg-inset/50 p-1", className)}
+      className={cn("inline-flex max-w-full items-center gap-1 overflow-x-auto rounded-full border border-hairline bg-inset/50 p-1", className)}
     >
       {options.map((option) => {
         const active = option.value === value;
@@ -39,7 +40,7 @@ export function SegmentedControl({
             data-no-global-loading
             onClick={() => onChange(option.value)}
             className={cn(
-              "min-w-0 truncate rounded-full px-3.5 py-1.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50",
+              "shrink-0 whitespace-nowrap rounded-full px-3 py-1.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50",
               active ? "bg-brand text-brand-ink shadow-panel" : "text-ink-soft hover:text-ink"
             )}
           >

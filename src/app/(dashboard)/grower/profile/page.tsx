@@ -54,7 +54,7 @@ export default async function GrowerProfilePage() {
                 <dt className="text-micro text-ink-muted">Name</dt>
                 <dd className="mt-0.5 text-sm font-medium text-ink">{grower.user.name || "Not added"}</dd>
               </div>
-              <div className="min-w-0">
+              <div className="min-w-0 sm:col-span-2">
                 <dt className="text-micro text-ink-muted">Email</dt>
                 <dd className="mt-0.5 break-words text-sm font-medium text-ink">{grower.user.email}</dd>
               </div>
@@ -137,7 +137,7 @@ export default async function GrowerProfilePage() {
             {reviewed ? (
               <PerformanceRadar yieldScore={grower.yieldScore} qualityScore={grower.qualityScore} timelinessScore={grower.timelinessScore} />
             ) : null}
-            <div className="mt-2 grid grid-cols-3 gap-2">
+            <div className="mt-2 grid grid-cols-[repeat(auto-fit,minmax(9rem,1fr))] gap-2">
               <StatTile label="Yield" value={reviewed ? pct(grower.yieldScore) : "—"} caption="Harvest weight vs expected" className="!p-3" />
               <StatTile label="Quality" value={qc.value} caption="Finished trays that passed" tone={qc.tone} className="!p-3" />
               <StatTile label="Timing" value={reviewed ? pct(grower.timelinessScore) : "—"} caption="Trays harvested by their due date" className="!p-3" />
