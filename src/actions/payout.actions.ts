@@ -2,8 +2,10 @@
 
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { NOT_ADMIN, requireAdmin } from "@/lib/admin-auth";
 
 export async function markPayoutAsPaid(payoutId: string) {
+  if (!(await requireAdmin())) return NOT_ADMIN;
   try {
     const payout = await prisma.payout.findUnique({
       where: { id: payoutId },
@@ -36,4 +38,17 @@ export async function markPayoutAsPaid(payoutId: string) {
     console.error("Failed to mark payout as paid:", error);
     return { error: message };
   }
+}
+
+/** Settle several payouts in one go. Already-paid ones are left alone. */
+export async function markPayoutsAsPaid(payoutIds: string[]) {
+  if (!(await requireAdmin())) return { ...NOT_ADMIN, count: 0 };
+  const ids = payoutIds.slice(0, 500);
+  if (ids.length === 0) return { count: 0 };
+  const result = await prisma.payout.updateMany({
+    where: { id: { in: ids }, status: { in: ["PENDING", "PROCESSING"] } },
+    data: { status: "PAID", paidAt: new Date() },
+  });
+  revalidatePath("/admin/payouts");
+  return { count: result.count };
 }

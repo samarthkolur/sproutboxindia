@@ -2,9 +2,11 @@
 
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-import { TRAY_YIELD_GRAMS, DEFAULT_BUFFER_PERCENT } from "@/lib/constants";
+import { NOT_ADMIN, requireAdmin } from "@/lib/admin-auth";
+import { planOrder } from "@/lib/admin";
 
 export async function createProductionPlan(orderId: string) {
+  if (!(await requireAdmin())) return NOT_ADMIN;
   try {
     const order = await prisma.order.findUnique({
       where: { id: orderId },
@@ -18,16 +20,8 @@ export async function createProductionPlan(orderId: string) {
       throw new Error("Order must be CONFIRMED to create a production plan");
     }
 
-    const traysNeeded = Math.ceil((order.quantityKg * 1000) / TRAY_YIELD_GRAMS);
-    const bufferTrays = Math.ceil(traysNeeded * DEFAULT_BUFFER_PERCENT);
-    const totalTrays = traysNeeded + bufferTrays;
-
-    // Simple estimation for dates (e.g. harvest date is delivery date - 1 day, sow date is harvest date - 10 days)
-    const harvestDate = new Date(order.deliveryDate);
-    harvestDate.setDate(harvestDate.getDate() - 1);
-    
-    const sowDate = new Date(harvestDate);
-    sowDate.setDate(sowDate.getDate() - 10);
+    // The same calculation the Demand page previews, so what is shown is what is stored.
+    const plan = planOrder(order);
 
     // Create plan in a transaction
     await prisma.$transaction([
@@ -35,11 +29,11 @@ export async function createProductionPlan(orderId: string) {
         data: {
           orderId: order.id,
           totalKg: order.quantityKg,
-          totalTrays: totalTrays,
-          bufferTrays: bufferTrays,
-          bufferPercent: DEFAULT_BUFFER_PERCENT,
-          sowDate,
-          harvestDate,
+          totalTrays: plan.totalTrays,
+          bufferTrays: plan.bufferTrays,
+          bufferPercent: plan.bufferPercent,
+          sowDate: plan.sowDate,
+          harvestDate: plan.harvestDate,
           status: "DRAFT",
         },
       }),
@@ -56,4 +50,18 @@ export async function createProductionPlan(orderId: string) {
     console.error("Failed to create production plan:", error);
     return { error: message };
   }
+}
+
+/** Create plans for several orders at once. Each is its own transaction, so one bad order does not block the rest. */
+export async function createProductionPlans(orderIds: string[]) {
+  if (!(await requireAdmin())) return { ...NOT_ADMIN, created: 0, failed: [] as { orderId: string; error: string }[] };
+  const failed: { orderId: string; error: string }[] = [];
+  let created = 0;
+  for (const orderId of orderIds.slice(0, 50)) {
+    const result = await createProductionPlan(orderId);
+    if ("error" in result && result.error) failed.push({ orderId, error: result.error });
+    else created += 1;
+  }
+  revalidatePath("/admin/allocate");
+  return { created, failed };
 }

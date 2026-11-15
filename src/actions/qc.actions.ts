@@ -3,12 +3,15 @@
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import type { QCResult } from "@prisma/client";
+import { NOT_ADMIN, requireAdmin } from "@/lib/admin-auth";
 
 export async function processQCCheckIn(
   checkInId: string,
   result: QCResult,
   notes?: string
 ) {
+  const admin = await requireAdmin();
+  if (!admin) return NOT_ADMIN;
   try {
     const checkIn = await prisma.checkIn.findUnique({
       where: { id: checkInId },
@@ -27,6 +30,12 @@ export async function processQCCheckIn(
       throw new Error("Check-in not found");
     }
 
+    // A tray that already has a verdict cannot be passed or rejected a second time: the grower
+    // would be notified again and a harvested tray could be sent back to the queue.
+    if (result !== "RISK" && checkIn.batch.status !== "QC_PENDING") {
+      throw new Error("This tray has already been reviewed");
+    }
+
     // Update check-in with QC result
     await prisma.checkIn.update({
       where: { id: checkInId },
@@ -34,6 +43,7 @@ export async function processQCCheckIn(
         qcResult: result,
         qcNotes: notes ?? null,
         qcReviewedAt: new Date(),
+        qcReviewedBy: admin.id,
       },
     });
 
@@ -73,6 +83,7 @@ export async function processQCCheckIn(
     // RISK: keep batch as QC_PENDING, no status change needed
 
     revalidatePath("/admin/qc");
+    revalidatePath(`/grower/tasks/${checkIn.batch.taskId}`);
     return { success: true };
   } catch (error) {
     const message = error instanceof Error ? error.message : "Failed to process QC";
