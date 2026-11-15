@@ -1,15 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import {
-  Elements,
-  PaymentElement,
-  useElements,
-  useStripe,
-} from "@stripe/react-stripe-js";
-import { Loader2, X } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Elements, PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js";
+import type { Appearance } from "@stripe/stripe-js";
+import { Loader2 } from "lucide-react";
+import { Modal } from "@/components/ui/modal";
 import { getStripeClient } from "@/lib/stripe-client";
+import { rupees } from "@/lib/restaurant";
 
 export interface PendingPayment {
   orderId: string;
@@ -20,72 +17,86 @@ export interface PendingPayment {
   quantityKg: number;
 }
 
-function PaymentStep({
-  payment,
-  onSuccess,
-}: {
-  payment: PendingPayment;
-  onSuccess: () => void;
-}) {
+function cssColor(name: string, fallback: string) {
+  try {
+    const value = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+    return value ? `rgb(${value.replace(/\s+/g, ",")})` : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+/** Stripe draws its own fields, so the page's colours are read from the CSS tokens and handed over. */
+export function stripeAppearance(): Appearance {
+  return {
+    theme: "flat",
+    variables: {
+      colorPrimary: cssColor("--c-brand", "#2b362a"),
+      colorBackground: cssColor("--c-panel-solid", "#f2f8ef"),
+      colorText: cssColor("--c-ink", "#222a24"),
+      colorTextSecondary: cssColor("--c-ink-soft", "#4a574e"),
+      colorDanger: cssColor("--c-risk", "#a83e32"),
+      fontFamily: "Outfit, system-ui, sans-serif",
+      borderRadius: "14px",
+    },
+  };
+}
+
+function PaymentStep({ payment, onSuccess }: { payment: PendingPayment; onSuccess: () => void }) {
   const stripe = useStripe();
   const elements = useElements();
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  async function handleConfirm() {
+  async function confirm() {
     if (!stripe || !elements) return;
     setSubmitting(true);
     setError(null);
-
-    const { error: confirmError } = await stripe.confirmPayment({
-      elements,
-      redirect: "if_required",
-    });
-
+    const { error: confirmError } = await stripe.confirmPayment({ elements, redirect: "if_required" });
+    setSubmitting(false);
     if (confirmError) {
       setError(confirmError.message || "Payment failed. Please try again.");
-      setSubmitting(false);
       return;
     }
-
-    setSubmitting(false);
     onSuccess();
   }
 
   return (
     <div>
-      <div className="mb-4 flex items-center justify-between rounded-xl bg-sprout-50/70 p-3">
-        <span className="text-sm font-semibold text-text-primary">{payment.label}</span>
-        <span className="text-sm font-black text-sprout-800">
-          ₹{payment.amount.toLocaleString("en-IN")}
-        </span>
+      <div className="mb-4 flex items-center justify-between gap-3 rounded-tile bg-inset/60 p-3">
+        <span className="min-w-0 text-sm font-medium text-ink">{payment.label}</span>
+        <span className="shrink-0 text-sm font-semibold tabular-nums text-ink">{rupees(payment.amount)}</span>
       </div>
 
       <PaymentElement />
 
-      {error && (
-        <p className="mt-3 rounded-xl border border-red-200 bg-red-50 p-3 text-xs font-medium text-red-600">
+      {error ? (
+        <p role="alert" className="mt-3 rounded-tile bg-risk-soft px-3 py-2 text-sm font-medium text-risk">
           {error}
         </p>
-      )}
+      ) : null}
 
-      <Button
-        onClick={handleConfirm}
+      <button
+        type="button"
+        data-no-global-loading
+        onClick={confirm}
         disabled={submitting || !stripe || !elements}
-        className="mt-4 flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-sprout-800 font-bold text-white hover:bg-sprout-900"
+        className="mt-4 inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-brand px-5 text-base font-medium text-brand-ink transition-opacity hover:opacity-90 disabled:opacity-60"
       >
         {submitting ? (
           <>
-            <Loader2 className="h-5 w-5 animate-spin" /> Processing…
+            <Loader2 className="h-5 w-5 animate-spin motion-reduce:animate-none" aria-hidden="true" /> Processing…
           </>
         ) : (
-          `Pay ₹${payment.amount.toLocaleString("en-IN")}`
+          `Pay ${rupees(payment.amount)}`
         )}
-      </Button>
+      </button>
     </div>
   );
 }
 
+// Pays one or several held orders in turn ("1 of 2"). Closing it leaves the orders awaiting
+// payment, which can be finished from the Orders page.
 export function CheckoutModal({
   payments,
   onComplete,
@@ -98,52 +109,37 @@ export function CheckoutModal({
   const [index, setIndex] = useState(0);
   const stripePromise = getStripeClient();
   const current = payments[index];
+  if (!current) return null;
 
-  if (!stripePromise || !current) return null;
-
-  function handleStepSuccess() {
-    if (index + 1 < payments.length) {
-      setIndex((i) => i + 1);
-    } else {
-      onComplete();
-    }
+  function next() {
+    if (index + 1 < payments.length) setIndex(index + 1);
+    else onComplete();
   }
 
   return (
-    <div className="fixed inset-0 z-50 grid place-items-center bg-black/40 p-4 backdrop-blur-sm">
-      <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
-        <div className="mb-5 flex items-start justify-between gap-3">
-          <div>
-            <h3 className="text-lg font-bold text-text-primary">
-              Complete Payment {payments.length > 1 ? `(${index + 1} of ${payments.length})` : ""}
-            </h3>
-            <p className="mt-0.5 text-sm text-text-muted">
-              Your order is reserved until payment is completed.
-            </p>
-          </div>
-          <button
-            onClick={onCancel}
-            className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 text-gray-600 transition-colors hover:bg-gray-200"
-          >
-            <X className="h-4 w-4" />
-          </button>
-        </div>
-
-        <Elements
-          key={current.orderId}
-          stripe={stripePromise}
-          options={{ clientSecret: current.clientSecret }}
-        >
-          <PaymentStep payment={current} onSuccess={handleStepSuccess} />
-        </Elements>
-
+    <Modal
+      open
+      onClose={onCancel}
+      title="Complete payment"
+      description={payments.length > 1 ? `Payment ${index + 1} of ${payments.length}` : "Your order is held until it is paid."}
+      footer={
         <button
+          type="button"
+          data-no-global-loading
           onClick={onCancel}
-          className="mt-3 w-full text-center text-xs font-medium text-text-muted hover:text-text-primary"
+          className="rounded-full border border-hairline bg-panel/60 px-4 py-2 text-sm font-medium text-ink-soft transition-colors hover:text-ink"
         >
           Pay later from the Orders page
         </button>
-      </div>
-    </div>
+      }
+    >
+      {stripePromise ? (
+        <Elements key={current.orderId} stripe={stripePromise} options={{ clientSecret: current.clientSecret, appearance: stripeAppearance() }}>
+          <PaymentStep payment={current} onSuccess={next} />
+        </Elements>
+      ) : (
+        <p className="text-sm text-ink-soft">Online payment is not set up yet. Your order is saved and can be paid from the Orders page once it is.</p>
+      )}
+    </Modal>
   );
 }
