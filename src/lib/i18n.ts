@@ -722,6 +722,12 @@ export const translations: Record<string, TranslationEntry> = {
   "Optional": { kn: "ಐಚ್ಛಿಕ", hi: "वैकल्पिक" },
   "Show password": { kn: "ಪಾಸ್‌ವರ್ಡ್ ತೋರಿಸಿ", hi: "पासवर्ड दिखाएं" },
   "Hide password": { kn: "ಪಾಸ್‌ವರ್ಡ್ ಮರೆಮಾಡಿ", hi: "पासवर्ड छिपाएं" },
+  // ── Phase 1: marketing chrome ──
+  "SproutBox home": { kn: "SproutBox ಮುಖಪುಟ", hi: "SproutBox होम" },
+  "Made in India": { kn: "ಭಾರತದಲ್ಲಿ ತಯಾರಿಸಲಾಗಿದೆ", hi: "भारत में निर्मित" },
+  "Open menu": { kn: "ಮೆನು ತೆರೆಯಿರಿ", hi: "मेन्यू खोलें" },
+  "Close menu": { kn: "ಮೆನು ಮುಚ್ಚಿ", hi: "मेन्यू बंद करें" },
+  "Skip to content": { kn: "ವಿಷಯಕ್ಕೆ ಹೋಗಿ", hi: "सामग्री पर जाएं" },
 };
 
 
@@ -749,6 +755,13 @@ const regexTranslations = [
     pattern: /^Day (\d+) of (\d+)$/,
     replace: (language: Exclude<LanguageCode, "en">, day: string, total: string) =>
       language === "kn" ? `${total}ರಲ್ಲಿ ${day}ನೇ ದಿನ` : `${total} में से दिन ${day}`,
+  },
+  {
+    pattern: /^© (\d{4}) SproutBox\. All rights reserved\.$/,
+    replace: (language: Exclude<LanguageCode, "en">, year: string) =>
+      language === "kn"
+        ? `© ${year} SproutBox. ಎಲ್ಲಾ ಹಕ್ಕುಗಳನ್ನು ಕಾಯ್ದಿರಿಸಲಾಗಿದೆ.`
+        : `© ${year} SproutBox. सर्वाधिकार सुरक्षित।`,
   },
   {
     pattern: /^(.+), (.+) sq ft$/i,

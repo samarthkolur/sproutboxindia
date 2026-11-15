@@ -13,22 +13,10 @@ export function BrandLogo({
   return (
     <span className={cn("flex items-center gap-2.5", className)}>
       <span className={cn("relative block h-9 w-9 shrink-0", markClassName)}>
-        <Image
-          src="/logo.png"
-          alt=""
-          fill
-          sizes="40px"
-          className="object-contain"
-          priority
-        />
+        <Image src="/logo.png" alt="" fill sizes="40px" className="object-contain" priority />
       </span>
-      <span
-        className={cn(
-          "font-bold tracking-tight text-text-primary",
-          textClassName ?? "text-lg"
-        )}
-      >
-        Sprout<span className="text-sprout-800">Box</span>
+      <span data-i18n-ignore className={cn("font-semibold tracking-tight text-ink", textClassName ?? "text-lg")}>
+        Sprout<span className="text-brand">Box</span>
       </span>
     </span>
   );
