@@ -282,3 +282,53 @@ export function parseFeedbackNotes(stored: string | null | undefined): { tags: F
     .filter((tag): tag is FeedbackTag => (FEEDBACK_TAGS as readonly string[]).includes(tag));
   return { tags, text: rest.join("\n").trim() };
 }
+
+// ── Dashboard sentence ───────────────────────────────────────────────────────
+
+/** "2 orders growing, next delivery Thursday": the one line under the greeting. */
+export function dashboardSentence(input: { awaitingPayment: number; growing: number; nextDeliveryDay: string | null }) {
+  const { awaitingPayment, growing, nextDeliveryDay } = input;
+  if (awaitingPayment > 0) {
+    return awaitingPayment === 1 ? "1 order is waiting for payment." : `${awaitingPayment} orders are waiting for payment.`;
+  }
+  if (growing > 0) {
+    const status = growing === 1 ? "1 order is on its way" : `${growing} orders are on their way`;
+    return nextDeliveryDay ? `${status}. Next delivery ${nextDeliveryDay}.` : `${status}.`;
+  }
+  return "Nothing is on its way. Place an order and we will start growing it.";
+}
+
+// ── Placing an order ─────────────────────────────────────────────────────────
+
+export interface OrderAttempt {
+  ok: boolean;
+  /** The API's `data` for a created order. */
+  data?: { order: { id: string; totalPrice: number }; clientSecret: string | null };
+}
+
+export interface PlacedOrder {
+  item: CartItem;
+  orderId: string;
+  totalPrice: number;
+  /** Set when the order is held until payment (Stripe is on). */
+  clientSecret: string | null;
+}
+
+/**
+ * Splits the results of one request per cart line into the orders that were created and the
+ * lines that were not. The page keeps only the failed lines in the cart, so a retry cannot
+ * place the successful ones a second time.
+ */
+export function summarizeAttempts(cart: CartItem[], attempts: OrderAttempt[]) {
+  const placed: PlacedOrder[] = [];
+  const failed: CartItem[] = [];
+  cart.forEach((item, index) => {
+    const attempt = attempts[index];
+    if (attempt?.ok && attempt.data) {
+      placed.push({ item, orderId: attempt.data.order.id, totalPrice: attempt.data.order.totalPrice, clientSecret: attempt.data.clientSecret });
+    } else {
+      failed.push(item);
+    }
+  });
+  return { placed, failed, awaitingPayment: placed.filter((p) => p.clientSecret) };
+}

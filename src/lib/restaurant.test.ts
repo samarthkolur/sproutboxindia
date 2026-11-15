@@ -6,6 +6,7 @@ import {
   averageRating,
   cartTotal,
   composeFeedbackNotes,
+  dashboardSentence,
   fromDateInputValue,
   growthProgress,
   minDeliveryDate,
@@ -22,6 +23,7 @@ import {
   searchOrders,
   sortOrders,
   stageIndex,
+  summarizeAttempts,
   toDateInputValue,
 } from "./restaurant";
 
@@ -236,5 +238,51 @@ describe("feedback tags", () => {
   it("round-trips", () => {
     const stored = composeFeedbackNotes(["Freshness", "On time"], "Great");
     expect(parseFeedbackNotes(stored)).toEqual({ tags: ["Freshness", "On time"], text: "Great" });
+  });
+});
+
+describe("dashboardSentence", () => {
+  it("leads with unpaid orders, since they hold up everything else", () => {
+    expect(dashboardSentence({ awaitingPayment: 1, growing: 3, nextDeliveryDay: "Thursday" })).toBe("1 order is waiting for payment.");
+    expect(dashboardSentence({ awaitingPayment: 2, growing: 0, nextDeliveryDay: null })).toBe("2 orders are waiting for payment.");
+  });
+
+  it("says what is on its way and when the next delivery is", () => {
+    expect(dashboardSentence({ awaitingPayment: 0, growing: 2, nextDeliveryDay: "Thursday" })).toBe("2 orders are on their way. Next delivery Thursday.");
+    expect(dashboardSentence({ awaitingPayment: 0, growing: 1, nextDeliveryDay: null })).toBe("1 order is on its way.");
+  });
+
+  it("invites a first order when nothing is happening", () => {
+    expect(dashboardSentence({ awaitingPayment: 0, growing: 0, nextDeliveryDay: null })).toMatch(/Place an order/);
+  });
+});
+
+describe("summarizeAttempts", () => {
+  const cart = [
+    { cropType: "sunflower" as const, quantityKg: 1 },
+    { cropType: "radish" as const, quantityKg: 2 },
+    { cropType: "mustard" as const, quantityKg: 0.5 },
+  ];
+  const created = (id: string, secret: string | null) => ({ ok: true, data: { order: { id, totalPrice: 100 }, clientSecret: secret } });
+
+  it("keeps nothing failed when every line was placed", () => {
+    const result = summarizeAttempts(cart, [created("a", null), created("b", null), created("c", null)]);
+    expect(result.failed).toEqual([]);
+    expect(result.placed.map((p) => p.orderId)).toEqual(["a", "b", "c"]);
+  });
+
+  it("returns only the lines that failed, so a retry cannot place the others twice", () => {
+    const result = summarizeAttempts(cart, [created("a", "s1"), { ok: false }, created("c", null)]);
+    expect(result.failed).toEqual([cart[1]]);
+    expect(result.placed.map((p) => p.item.cropType)).toEqual(["sunflower", "mustard"]);
+  });
+
+  it("lists the placed orders that still need paying", () => {
+    const result = summarizeAttempts(cart, [created("a", "s1"), created("b", null), { ok: false }]);
+    expect(result.awaitingPayment.map((p) => p.orderId)).toEqual(["a"]);
+  });
+
+  it("treats a missing result as a failure", () => {
+    expect(summarizeAttempts(cart, [created("a", null)]).failed).toHaveLength(2);
   });
 });
