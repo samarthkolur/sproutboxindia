@@ -10,15 +10,7 @@ import { ThemeToggle } from "@/components/layout/ThemeToggle";
 import { Button } from "@/components/ui/button";
 import { useDismiss } from "@/components/ui/use-dismiss";
 import { cn } from "@/lib/utils";
-
-// The one nav for every public page. Anchors use "/#id" so they also work
-// from /about and the join pages.
-export const MARKETING_LINKS = [
-  { href: "/#how-it-works", label: "How it works" },
-  { href: "/#growers", label: "For Growers" },
-  { href: "/#restaurants", label: "For Restaurants" },
-  { href: "/about", label: "About" },
-] as const;
+import { MARKETING_LINKS } from "./links";
 
 export function MarketingNav() {
   const pathname = usePathname();

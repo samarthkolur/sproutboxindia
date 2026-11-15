@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Sprout } from "lucide-react";
 import { BrandLogo } from "@/components/layout/BrandLogo";
-import { MARKETING_LINKS } from "./MarketingNav";
+import { MARKETING_LINKS } from "./links";
 
 const ACCOUNT_LINKS = [
   { href: "/login", label: "Sign In" },

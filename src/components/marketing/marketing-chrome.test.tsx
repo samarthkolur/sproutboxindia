@@ -14,7 +14,8 @@ vi.mock("@/components/i18n/LanguageToggle", () => ({ LanguageToggle: () => <div 
 vi.mock("@/components/layout/ThemeToggle", () => ({ ThemeToggle: () => <div data-testid="theme" /> }));
 
 import { MarketingFooter } from "./MarketingFooter";
-import { MARKETING_LINKS, MarketingNav } from "./MarketingNav";
+import { MARKETING_LINKS } from "./links";
+import { MarketingNav } from "./MarketingNav";
 
 beforeEach(() => {
   pathname = "/";
@@ -94,5 +95,18 @@ describe("MarketingFooter", () => {
   it("has Kannada and Hindi for everything it says", () => {
     const { container } = render(<MarketingFooter />);
     expect(findUntranslated(container)).toEqual([]);
+  });
+});
+
+describe("server/client boundary", () => {
+  // jsdom cannot catch this: calling .map on data imported from a "use client" file
+  // only fails when Next renders the server component.
+  it("keeps the shared link data out of 'use client' files", async () => {
+    const { readFileSync } = await import("node:fs");
+    const { join } = await import("node:path");
+    const dir = join(process.cwd(), "src/components/marketing");
+    expect(readFileSync(join(dir, "links.ts"), "utf8")).not.toMatch(/^\s*["']use client["']/);
+    expect(readFileSync(join(dir, "MarketingFooter.tsx"), "utf8")).not.toMatch(/^\s*["']use client["']/);
+    expect(readFileSync(join(dir, "MarketingFooter.tsx"), "utf8")).not.toContain("./MarketingNav");
   });
 });
