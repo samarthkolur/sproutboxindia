@@ -225,3 +225,78 @@ export async function getAdminDeliveries(status: string, limit: number) {
     counts: Object.fromEntries(counts.map((c) => [c.status, c._count])) as Record<string, number>,
   };
 }
+
+// ── Payouts ─────────────────────────────────────────────────────────────────
+
+const STATUSES_OF = { pending: ["PENDING", "PROCESSING"], paid: ["PAID"], failed: ["FAILED"] } as const;
+
+export async function getAdminPayouts(filter: "pending" | "paid" | "failed", query: string) {
+  const search = query.trim();
+  const where = {
+    status: { in: [...STATUSES_OF[filter]] },
+    ...(search ? { grower: { user: { name: { contains: search, mode: "insensitive" as const } } } } : {}),
+  };
+  const [rows, byStatus] = await Promise.all([
+    prisma.payout.findMany({
+      where,
+      orderBy: { createdAt: "desc" },
+      take: 300,
+      include: { grower: { select: { id: true, user: { select: { name: true } } } }, batch: { select: { trayNumber: true, task: { select: { cropType: true } } } } },
+    }),
+    // Totals over every payout, not the rows on the page.
+    prisma.payout.groupBy({ by: ["status"], _sum: { amount: true }, _count: true }),
+  ]);
+  const sum = (statuses: readonly string[], key: "amount" | "count") =>
+    byStatus.filter((s) => statuses.includes(s.status)).reduce((total, s) => total + (key === "amount" ? s._sum.amount ?? 0 : s._count), 0);
+  return {
+    rows: rows.map((p) => ({
+      id: p.id,
+      growerId: p.grower.id,
+      growerName: p.grower.user.name ?? "Grower",
+      cropType: p.batch.task.cropType,
+      trayNumber: p.batch.trayNumber,
+      createdAt: p.createdAt.toISOString(),
+      status: p.status,
+      amount: p.amount,
+    })),
+    totals: {
+      pendingAmount: sum(STATUSES_OF.pending, "amount"),
+      paidAmount: sum(STATUSES_OF.paid, "amount"),
+      failedAmount: sum(STATUSES_OF.failed, "amount"),
+      pendingCount: sum(STATUSES_OF.pending, "count"),
+      paidCount: sum(STATUSES_OF.paid, "count"),
+      failedCount: sum(STATUSES_OF.failed, "count"),
+    },
+  };
+}
+
+/** Delivered orders with where their money went, for the documents on each side of it. */
+export async function getAdminSettlements() {
+  const orders = await prisma.order.findMany({
+    where: { status: "DELIVERED", productionPlan: { isNot: null } },
+    orderBy: { createdAt: "desc" },
+    take: 20,
+    include: {
+      restaurant: { select: { businessName: true } },
+      productionPlan: {
+        include: {
+          tasks: {
+            include: {
+              grower: { include: { user: { select: { name: true } } } },
+              batches: { select: { payout: { select: { amount: true } } } },
+            },
+          },
+        },
+      },
+    },
+  });
+  return orders.map((order) => {
+    const growers = (order.productionPlan?.tasks ?? []).map((task) => ({
+      taskId: task.id,
+      name: task.grower.user.name ?? "Grower",
+      amount: task.batches.reduce((sum, b) => sum + (b.payout?.amount ?? 0), 0),
+    }));
+    const paidOut = growers.reduce((sum, g) => sum + g.amount, 0);
+    return { order, growers, paidOut, share: order.totalPrice - paidOut };
+  });
+}

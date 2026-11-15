@@ -752,6 +752,21 @@ export const translations: Record<string, TranslationEntry> = {
   "Days to harvest": { kn: "ಕೊಯ್ಲಿಗೆ ದಿನಗಳು", hi: "कटाई तक के दिन" },
   "Digital, hub & delivery checks": { kn: "ಡಿಜಿಟಲ್, ಹಬ್ ಮತ್ತು ವಿತರಣಾ ಪರಿಶೀಲನೆಗಳು", hi: "डिजिटल, हब और डिलीवरी जांच" },
   "Farm-to-fork, door to door.": { kn: "ಜಮೀನಿನಿಂದ ತಟ್ಟೆಗೆ, ಬಾಗಿಲಿಂದ ಬಾಗಿಲಿಗೆ.", hi: "खेत से थाली तक, दरवाज़े से दरवाज़े तक।" },
+  "Billed": { kn: "ಬಿಲ್ ಮಾಡಲಾಗಿದೆ", hi: "बिल किया" },
+  "SproutBox": { kn: "SproutBox", hi: "SproutBox" },
+  "Filter payouts": { kn: "ಪಾವತಿಗಳನ್ನು ಫಿಲ್ಟರ್ ಮಾಡಿ", hi: "भुगतान फ़िल्टर करें" },
+  "Search payouts": { kn: "ಪಾವತಿಗಳನ್ನು ಹುಡುಕಿ", hi: "भुगतान खोजें" },
+  "Search by grower": { kn: "ಬೆಳೆಗಾರರ ಮೂಲಕ ಹುಡುಕಿ", hi: "उत्पादक से खोजें" },
+  "Grower payouts": { kn: "ಬೆಳೆಗಾರರ ಪಾವತಿಗಳು", hi: "उत्पादक भुगतान" },
+  "Order settlements": { kn: "ಆರ್ಡರ್ ಸೆಟ್ಲ್‌ಮೆಂಟ್‌ಗಳು", hi: "ऑर्डर निपटान" },
+  "Restaurant invoice": { kn: "ರೆಸ್ಟೋರೆಂಟ್ ಇನ್‌ವಾಯ್ಸ್", hi: "रेस्टोरेंट इनवॉइस" },
+  "Settlement": { kn: "ಸೆಟ್ಲ್‌ಮೆಂಟ್", hi: "निपटान" },
+  "Mark payouts as paid": { kn: "ಪಾವತಿಗಳನ್ನು ಪಾವತಿಸಲಾಗಿದೆ ಎಂದು ಗುರುತಿಸಿ", hi: "भुगतान को चुकाया हुआ चिह्नित करें" },
+  "Every grower has been paid.": { kn: "ಎಲ್ಲಾ ಬೆಳೆಗಾರರಿಗೆ ಪಾವತಿಸಲಾಗಿದೆ.", hi: "सभी उत्पादकों को भुगतान हो चुका है।" },
+  "No payouts here": { kn: "ಇಲ್ಲಿ ಯಾವುದೇ ಪಾವತಿಗಳಿಲ್ಲ", hi: "यहां कोई भुगतान नहीं" },
+  "Payouts appear when growers harvest trays that passed quality control.": { kn: "ಬೆಳೆಗಾರರು ಗುಣಮಟ್ಟ ಪರಿಶೀಲನೆಯಲ್ಲಿ ತೇರ್ಗಡೆಯಾದ ಟ್ರೇಗಳನ್ನು ಕೊಯ್ಲು ಮಾಡಿದಾಗ ಪಾವತಿಗಳು ಕಾಣಿಸುತ್ತವೆ.", hi: "उत्पादकों द्वारा गुणवत्ता जांच पास ट्रे की कटाई करने पर भुगतान दिखते हैं।" },
+  "Showing the latest 300. Search by grower to narrow it down.": { kn: "ಇತ್ತೀಚಿನ 300 ತೋರಿಸಲಾಗುತ್ತಿದೆ. ಸಂಕುಚಿತಗೊಳಿಸಲು ಬೆಳೆಗಾರರ ಮೂಲಕ ಹುಡುಕಿ.", hi: "नवीनतम 300 दिखाए जा रहे हैं। सीमित करने के लिए उत्पादक से खोजें।" },
+  "To look at": { kn: "ಗಮನಿಸಬೇಕಾದದ್ದು", hi: "देखने के लिए" },
   "Drop-off": { kn: "ಡ್ರಾಪ್-ಆಫ್", hi: "ड्रॉप-ऑफ़" },
   "Where harvests are checked and packed before they go out.": { kn: "ಕೊಯ್ಲುಗಳನ್ನು ಹೊರಗೆ ಕಳುಹಿಸುವ ಮೊದಲು ಪರಿಶೀಲಿಸಿ ಪ್ಯಾಕ್ ಮಾಡುವ ಸ್ಥಳ.", hi: "जहां कटाई की जांच और पैकिंग बाहर भेजने से पहले होती है।" },
   "No hubs yet": { kn: "ಇನ್ನೂ ಹಬ್‌ಗಳಿಲ್ಲ", hi: "अभी कोई हब नहीं" },
@@ -1354,6 +1369,44 @@ const MONTH_SHORT = {
 const MONTH_SHORT_EN = MONTHS.map((month) => month.slice(0, 3));
 
 const regexTranslations = [
+  {
+    pattern: /^(₹[\d,]+) is waiting to be paid to growers\.$/,
+    replace: (language: Exclude<LanguageCode, "en">, amount: string) =>
+      language === "kn" ? `${amount} ಬೆಳೆಗಾರರಿಗೆ ಪಾವತಿಸಲು ಕಾಯುತ್ತಿದೆ.` : `${amount} उत्पादकों को चुकाने के लिए बाकी है।`,
+  },
+  {
+    pattern: /^(\d+) selected · (₹[\d,]+)$/,
+    replace: (language: Exclude<LanguageCode, "en">, n: string, amount: string) => (language === "kn" ? `${n} ಆಯ್ಕೆ · ${amount}` : `${n} चुने गए · ${amount}`),
+  },
+  {
+    pattern: /^Mark paid \((\d+)\)$/,
+    replace: (language: Exclude<LanguageCode, "en">, n: string) => (language === "kn" ? `ಪಾವತಿಸಲಾಗಿದೆ ಎಂದು ಗುರುತಿಸಿ (${n})` : `चुकाया हुआ चिह्नित करें (${n})`),
+  },
+  {
+    pattern: /^Mark (\d+) as paid$/,
+    replace: (language: Exclude<LanguageCode, "en">, n: string) => (language === "kn" ? `${n} ಪಾವತಿಸಲಾಗಿದೆ ಎಂದು ಗುರುತಿಸಿ` : `${n} को चुकाया हुआ चिह्नित करें`),
+  },
+  {
+    pattern: /^(\d+) payouts? marked paid$/,
+    replace: (language: Exclude<LanguageCode, "en">, n: string) => (language === "kn" ? `${n} ಪಾವತಿಗಳನ್ನು ಪಾವತಿಸಲಾಗಿದೆ ಎಂದು ಗುರುತಿಸಲಾಗಿದೆ` : `${n} भुगतान चुकाए हुए चिह्नित`),
+  },
+  {
+    pattern: /^This marks (\d+) payouts? totalling (₹[\d,]+) as paid\. Do it once the money has been sent\.$/,
+    replace: (language: Exclude<LanguageCode, "en">, n: string, amount: string) =>
+      language === "kn" ? `ಇದು ಒಟ್ಟು ${amount} ಮೊತ್ತದ ${n} ಪಾವತಿಗಳನ್ನು ಪಾವತಿಸಲಾಗಿದೆ ಎಂದು ಗುರುತಿಸುತ್ತದೆ. ಹಣ ಕಳುಹಿಸಿದ ನಂತರ ಮಾಡಿ.` : `यह कुल ${amount} के ${n} भुगतानों को चुकाया हुआ चिह्नित करता है। पैसा भेजने के बाद ही करें।`,
+  },
+  {
+    pattern: /^(\d+) payouts? (?:to pay|so far)$/,
+    replace: (language: Exclude<LanguageCode, "en">, n: string) => (language === "kn" ? `${n} ಪಾವತಿಗಳು` : `${n} भुगतान`),
+  },
+  {
+    pattern: /^(\d+) to look at$/,
+    replace: (language: Exclude<LanguageCode, "en">, n: string) => (language === "kn" ? `${n} ಗಮನಿಸಬೇಕು` : `${n} देखने हैं`),
+  },
+  {
+    pattern: /^Select (.+), (₹[\d,]+)$/,
+    replace: (language: Exclude<LanguageCode, "en">, who: string, amount: string) => (language === "kn" ? `${who}, ${amount} ಆಯ್ಕೆ ಮಾಡಿ` : `${who}, ${amount} चुनें`),
+  },
   {
     pattern: /^(Mark (?:packed|in transit|delivered)) for (.+), ([A-Z0-9]{8})$/,
     replace: (language: Exclude<LanguageCode, "en">, action: string, who: string, ref: string) =>
