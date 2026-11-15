@@ -2,8 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
-
 @import "tw-animate-css";
 
 :root {
@@ -14,9 +12,73 @@
   --sprout-mid: #52B788;
 }
 
+/* ── Design tokens (UI rework) ──────────────────────────────────────────────
+   RGB triplets so Tailwind opacity modifiers work. Light values sampled from
+   the Grovia reference, dark values from Verdelo.
+   Rule (V1): charcoal marks "active/primary" on light, mint on dark.
+   Green (leaf) means data/progress; watch (amber) means look at this.      */
+:root,
+:root[data-theme="light"] {
+  color-scheme: light;
+  --c-canvas: 226 237 220;      /* #E2EDDC pale sage */
+  --c-canvas-glow: 142 202 135; /* #8ECA87 corner glow */
+  --c-panel: 255 255 255;       /* used translucent: bg-panel/55 */
+  --c-panel-solid: 242 248 239; /* #F2F8EF */
+  --c-inset: 223 231 219;       /* #DFE7DB */
+  --c-hairline: 205 219 200;    /* #CDDBC8 */
+  --c-ink: 34 42 36;            /* #222A24 */
+  --c-ink-soft: 74 87 78;       /* #4A574E */
+  --c-ink-muted: 92 107 97;     /* #5C6B61  >= 4.5:1 on panel */
+  --c-brand: 43 54 42;          /* #2B362A charcoal */
+  --c-brand-ink: 255 255 255;
+  --c-leaf: 102 156 94;         /* #669C5E */
+  --c-leaf-soft: 212 232 207;   /* #D4E8CF */
+  --c-good: 47 110 62;
+  --c-good-soft: 212 232 207;
+  --c-watch: 153 94 28;         /* #995E1C */
+  --c-watch-soft: 243 227 200;
+  --c-risk: 168 62 50;
+  --c-risk-soft: 245 222 217;
+  --c-shadow: 30 60 40;
+  --radius: 0.625rem;
+  --sidebar: rgb(var(--c-panel-solid));
+  --sidebar-foreground: rgb(var(--c-ink));
+  --sidebar-primary: rgb(var(--c-brand));
+  --sidebar-primary-foreground: rgb(var(--c-brand-ink));
+  --sidebar-accent: rgb(var(--c-inset));
+  --sidebar-accent-foreground: rgb(var(--c-ink));
+  --sidebar-border: rgb(var(--c-hairline));
+  --sidebar-ring: rgb(var(--c-brand));
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --c-canvas: 22 33 25;         /* #162119 */
+  --c-canvas-glow: 31 78 52;
+  --c-panel: 45 55 46;          /* #2D372E */
+  --c-panel-solid: 27 37 29;    /* #1B251D */
+  --c-inset: 10 17 11;          /* #0A110B */
+  --c-hairline: 58 74 61;
+  --c-ink: 234 242 236;
+  --c-ink-soft: 183 197 187;
+  --c-ink-muted: 143 163 150;   /* #8FA396 */
+  --c-brand: 110 223 161;       /* #6EDFA1 mint */
+  --c-brand-ink: 14 31 21;
+  --c-leaf: 115 225 168;
+  --c-leaf-soft: 34 62 45;
+  --c-good: 110 223 161;
+  --c-good-soft: 28 58 40;
+  --c-watch: 229 184 74;
+  --c-watch-soft: 55 50 30;
+  --c-risk: 232 130 115;
+  --c-risk-soft: 58 35 31;
+  --c-shadow: 0 0 0;
+}
+
 body {
-  background-color: #F8FAF7;
-  font-family: 'Inter', system-ui, sans-serif;
+  background-color: rgb(var(--c-canvas));
+  color: rgb(var(--c-ink));
+  font-family: var(--font-outfit), var(--font-kannada), var(--font-devanagari), system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
@@ -32,19 +94,6 @@ svg,
 video,
 canvas {
   max-width: 100%;
-}
-
-/* ── Grain texture overlay (heavier for that premium feel) ──────────────── */
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
-  background-size: 200px 200px;
-  opacity: 0.05;
-  pointer-events: none;
-  z-index: 9999;
-  mix-blend-mode: multiply;
 }
 
 /* ── Glass morphism ─────────────────────────────────────────────────────── */
@@ -126,13 +175,6 @@ body::before {
   .glass,
   .glass-strong {
     word-break: break-word;
-  }
-
-  /* Ensure minimum touch target sizes (48px recommended by WCAG) */
-  button,
-  a,
-  [role="button"] {
-    min-height: 36px;
   }
 
   /* Row hover should not slide on mobile — causes jitter */
@@ -466,88 +508,66 @@ body::before {
 }
 
 @layer base {
-  .theme {
-    --font-heading: var(--font-sans);
-    --font-sans: var(--font-sans);
-  }
-  :root {
-    --background: oklch(1 0 0);
-    --foreground: oklch(0.145 0 0);
-    --card: oklch(1 0 0);
-    --card-foreground: oklch(0.145 0 0);
-    --popover: oklch(1 0 0);
-    --popover-foreground: oklch(0.145 0 0);
-    --primary: oklch(0.205 0 0);
-    --primary-foreground: oklch(0.985 0 0);
-    --secondary: oklch(0.97 0 0);
-    --secondary-foreground: oklch(0.205 0 0);
-    --muted: oklch(0.97 0 0);
-    --muted-foreground: oklch(0.556 0 0);
-    --accent: oklch(0.97 0 0);
-    --accent-foreground: oklch(0.205 0 0);
-    --destructive: oklch(0.577 0.245 27.325);
-    --border: oklch(0.922 0 0);
-    --input: oklch(0.922 0 0);
-    --ring: oklch(0.708 0 0);
-    --chart-1: oklch(0.87 0 0);
-    --chart-2: oklch(0.556 0 0);
-    --chart-3: oklch(0.439 0 0);
-    --chart-4: oklch(0.371 0 0);
-    --chart-5: oklch(0.269 0 0);
-    --radius: 0.625rem;
-    --sidebar: oklch(0.985 0 0);
-    --sidebar-foreground: oklch(0.145 0 0);
-    --sidebar-primary: oklch(0.205 0 0);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.97 0 0);
-    --sidebar-accent-foreground: oklch(0.205 0 0);
-    --sidebar-border: oklch(0.922 0 0);
-    --sidebar-ring: oklch(0.708 0 0);
-  }
-  .dark {
-    --background: oklch(0.145 0 0);
-    --foreground: oklch(0.985 0 0);
-    --card: oklch(0.205 0 0);
-    --card-foreground: oklch(0.985 0 0);
-    --popover: oklch(0.205 0 0);
-    --popover-foreground: oklch(0.985 0 0);
-    --primary: oklch(0.922 0 0);
-    --primary-foreground: oklch(0.205 0 0);
-    --secondary: oklch(0.269 0 0);
-    --secondary-foreground: oklch(0.985 0 0);
-    --muted: oklch(0.269 0 0);
-    --muted-foreground: oklch(0.708 0 0);
-    --accent: oklch(0.269 0 0);
-    --accent-foreground: oklch(0.985 0 0);
-    --destructive: oklch(0.704 0.191 22.216);
-    --border: oklch(1 0 0 / 10%);
-    --input: oklch(1 0 0 / 15%);
-    --ring: oklch(0.556 0 0);
-    --chart-1: oklch(0.87 0 0);
-    --chart-2: oklch(0.556 0 0);
-    --chart-3: oklch(0.439 0 0);
-    --chart-4: oklch(0.371 0 0);
-    --chart-5: oklch(0.269 0 0);
-    --sidebar: oklch(0.205 0 0);
-    --sidebar-foreground: oklch(0.985 0 0);
-    --sidebar-primary: oklch(0.488 0.243 264.376);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.269 0 0);
-    --sidebar-accent-foreground: oklch(0.985 0 0);
-    --sidebar-border: oklch(1 0 0 / 10%);
-    --sidebar-ring: oklch(0.556 0 0);
-  }
   * {
     min-width: 0;
-    border-color: var(--border);
-    outline-color: var(--ring);
-  }
-  body {
-    background-color: var(--background);
-    color: var(--foreground);
+    border-color: rgb(var(--c-hairline));
+    outline-color: rgb(var(--c-brand) / 0.5);
   }
   html {
-    font-family: 'Inter', system-ui, sans-serif;
+    font-family: var(--font-outfit), var(--font-kannada), var(--font-devanagari), system-ui, sans-serif;
     scroll-behavior: smooth;
   }
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+}
+
+/* ── New shell pieces ─────────────────────────────────────────────────── */
+
+/* V3: depth, not flatness. The glow is CSS gradients only (no images). */
+.app-canvas {
+  background-color: rgb(var(--c-canvas));
+  background-image:
+    radial-gradient(ellipse 60% 55% at 100% 100%, rgb(var(--c-canvas-glow) / 0.55), transparent 70%),
+    radial-gradient(ellipse 50% 40% at 0% 0%, rgb(255 255 255 / 0.35), transparent 70%);
+  background-attachment: fixed;
+}
+
+:root[data-theme="dark"] .app-canvas {
+  background-image:
+    radial-gradient(ellipse 55% 50% at 100% 100%, rgb(var(--c-canvas-glow) / 0.8), transparent 70%),
+    radial-gradient(ellipse 40% 35% at 15% 0%, rgb(60 110 80 / 0.25), transparent 70%);
+}
+
+/* Translucent panel. Blur is kept light so low-end phones stay smooth. */
+.panel {
+  background: rgb(var(--c-panel) / 0.55);
+  border: 1px solid rgb(255 255 255 / 0.55);
+  border-radius: 22px;
+  box-shadow: 0 1px 2px rgb(var(--c-shadow) / 0.06), 0 8px 24px rgb(var(--c-shadow) / 0.08);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+
+:root[data-theme="dark"] .panel {
+  background: rgb(var(--c-panel) / 0.6);
+  border-color: rgb(255 255 255 / 0.07);
+}
+
+@media (max-width: 639px) {
+  .panel {
+    border-radius: 18px;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    background: rgb(var(--c-panel-solid) / 0.86);
+  }
+}
+
+.scrollbar-none {
+  scrollbar-width: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
 }
