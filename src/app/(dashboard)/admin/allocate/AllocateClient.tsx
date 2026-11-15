@@ -1,548 +1,301 @@
 "use client";
 
-import { useState } from "react";
-import { GlassCard } from "@/components/shared/GlassCard";
-import {
-  Target,
-  ChevronRight,
-  Loader2,
-  Check,
-  Users,
-  ArrowRight,
-  MapPin,
-  Navigation,
-  AlertCircle,
-} from "lucide-react";
-import { CROP_DISPLAY_NAMES, type CropType } from "@/lib/constants";
+import { useMemo, useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { format } from "date-fns";
+import { AlertTriangle, Loader2, MapPin, Navigation, ShieldCheck, Target } from "lucide-react";
 import { toast } from "sonner";
+import { EmptyState } from "@/components/shared/EmptyState";
+import { DetailLayout } from "@/components/ui/detail-layout";
+import { controlClass } from "@/components/ui/field";
+import { Meter } from "@/components/ui/meter";
+import { Panel, PanelHeader } from "@/components/ui/panel";
+import { SearchPill } from "@/components/ui/search-pill";
+import { StatusChip, type Tone } from "@/components/ui/status-chip";
+import {
+  checkAllocation,
+  cropName,
+  proposeAllocation,
+  scoreCandidates,
+  shortId,
+  urgencyOf,
+  type GrowerInput,
+  type Urgency,
+} from "@/lib/admin";
+import { cn } from "@/lib/utils";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
-
-type Grower = {
-  id: string;
-  name: string;
-  city: string;
-  kitSize: number;
-  compositeScore: number;
-  activeTasks: number;
-  lat: number | null;
-  lng: number | null;
-};
-
-type Plan = {
+export interface AllocatablePlan {
   id: string;
   totalTrays: number;
   bufferTrays: number;
   sowDate: Date;
   harvestDate: Date;
-  status: string;
   order: {
-    id: string;
     cropType: string;
     quantityKg: number;
-    restaurant: {
-      businessName: string;
-      city: string;
-      lat: number | null;
-      lng: number | null;
-    };
+    deliveryDate: Date;
+    restaurant: { businessName: string; city: string; lat: number | null; lng: number | null };
   };
-};
-
-type ScoredGrowerAllocation = {
-  growerId: string;
-  growerName: string;
-  city: string;
-  compositeScore: number;
-  distanceKm: number | null;
-  proximityScore: number; // 0–1
-  combinedScore: number;  // weighted final score
-  trayCount: number;
-};
-
-// ─── Haversine distance (km) ──────────────────────────────────────────────────
-
-function haversineKm(
-  lat1: number,
-  lng1: number,
-  lat2: number,
-  lng2: number
-): number {
-  const R = 6371;
-  const dLat = ((lat2 - lat1) * Math.PI) / 180;
-  const dLng = ((lng2 - lng1) * Math.PI) / 180;
-  const a =
-    Math.sin(dLat / 2) ** 2 +
-    Math.cos((lat1 * Math.PI) / 180) *
-      Math.cos((lat2 * Math.PI) / 180) *
-      Math.sin(dLng / 2) ** 2;
-  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
-// ─── Proximity + quality combined allocation ──────────────────────────────────
-// Weights: 50% proximity, 50% composite quality score
-// Growers without GPS fall to the bottom but are still included
+const URGENCY_TONE: Record<Urgency, Tone> = { overdue: "risk", urgent: "watch", soon: "info", ok: "neutral" };
 
-function scoreAndAllocate(
-  growers: Grower[],
-  totalTrays: number,
-  restaurantLat: number | null,
-  restaurantLng: number | null
-): ScoredGrowerAllocation[] {
-  if (growers.length === 0 || totalTrays <= 0) return [];
+export function AllocateClient({ plans: initial, growers }: { plans: AllocatablePlan[]; growers: GrowerInput[] }) {
+  const router = useRouter();
+  const [plans, setPlans] = useState(initial);
+  const [planId, setPlanId] = useState<string | null>(initial[0]?.id ?? null);
+  const plan = plans.find((p) => p.id === planId) ?? null;
 
-  const MAX_DISTANCE_KM = 30; // beyond this, proximity score → 0
+  const candidates = useMemo(() => (plan ? scoreCandidates(growers, plan.order.restaurant) : []), [growers, plan]);
+  const [assignments, setAssignments] = useState<Record<string, number>>(() => (initial[0] ? proposeAllocation(scoreCandidates(growers, initial[0].order.restaurant), initial[0].totalTrays) : {}));
+  const [query, setQuery] = useState("");
+  const [city, setCity] = useState("all");
+  const [verifiedOnly, setVerifiedOnly] = useState(false);
+  const [sending, setSending] = useState(false);
 
-  const scored = growers.map((g) => {
-    let distanceKm: number | null = null;
-    let proximityScore = 0;
+  const cities = useMemo(() => Array.from(new Set(growers.map((g) => g.city))).sort(), [growers]);
+  const check = plan ? checkAllocation(assignments, candidates, plan.totalTrays) : null;
+  const nearestId = candidates.filter((c) => c.distanceKm !== null).sort((a, b) => a.distanceKm! - b.distanceKm!)[0]?.id;
 
-    if (
-      g.lat != null &&
-      g.lng != null &&
-      restaurantLat != null &&
-      restaurantLng != null
-    ) {
-      distanceKm = haversineKm(g.lat, g.lng, restaurantLat, restaurantLng);
-      // Linear decay: 0 km → 1.0 score, 30 km+ → 0.0 score
-      proximityScore = Math.max(0, 1 - distanceKm / MAX_DISTANCE_KM);
-    } else {
-      // No GPS data: treat as mid-distance
-      proximityScore = 0.3;
-    }
+  const visible = candidates.filter(
+    (c) =>
+      (city === "all" || c.city === city) &&
+      (!verifiedOnly || c.fssaiVerified) &&
+      c.name.toLowerCase().includes(query.trim().toLowerCase())
+  );
 
-    // Combined = 50% proximity + 50% composite quality
-    const combinedScore = proximityScore * 0.5 + g.compositeScore * 0.5;
-
-    return {
-      growerId: g.id,
-      growerName: g.name,
-      city: g.city,
-      compositeScore: g.compositeScore,
-      distanceKm,
-      proximityScore,
-      combinedScore,
-      trayCount: 0, // filled below
-    };
-  });
-
-  // Sort by combined score descending
-  scored.sort((a, b) => b.combinedScore - a.combinedScore);
-
-  // Weighted proportional tray assignment
-  const totalScore = scored.reduce((s, g) => s + g.combinedScore, 0) || scored.length;
-  let assigned = 0;
-
-  return scored.map((g, i) => {
-    const trays =
-      i === scored.length - 1
-        ? totalTrays - assigned
-        : Math.max(1, Math.round((g.combinedScore / totalScore) * totalTrays));
-    assigned += trays;
-    return { ...g, trayCount: trays };
-  });
-}
-
-// ─── Component ────────────────────────────────────────────────────────────────
-
-export function AllocateClient({
-  plans,
-  growers,
-}: {
-  plans: Plan[];
-  growers: Grower[];
-}) {
-  const [planList, setPlanList] = useState(plans);
-  const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
-  const [allocations, setAllocations] = useState<ScoredGrowerAllocation[]>([]);
-  const [dispatching, setDispatching] = useState(false);
-  const [dispatched, setDispatched] = useState<string[]>([]);
-
-  function handleSelectPlan(plan: Plan) {
-    setSelectedPlan(plan);
-    setAllocations(
-      scoreAndAllocate(
-        growers,
-        plan.totalTrays,
-        plan.order.restaurant.lat,
-        plan.order.restaurant.lng
-      )
-    );
+  function choose(next: AllocatablePlan) {
+    setPlanId(next.id);
+    setAssignments(proposeAllocation(scoreCandidates(growers, next.order.restaurant), next.totalTrays));
   }
 
-  function handleAutoAllocate() {
-    if (!selectedPlan) return;
-    setAllocations(
-      scoreAndAllocate(
-        growers,
-        selectedPlan.totalTrays,
-        selectedPlan.order.restaurant.lat,
-        selectedPlan.order.restaurant.lng
-      )
-    );
-  }
-
-  function handleTrayChange(growerId: string, value: number) {
-    setAllocations((prev) =>
-      prev.map((a) =>
-        a.growerId === growerId ? { ...a, trayCount: Math.max(0, value) } : a
-      )
-    );
-  }
-
-  const totalAssigned = allocations.reduce((s, a) => s + a.trayCount, 0);
-
-  async function handleDispatch() {
-    if (!selectedPlan) return;
-    const validAllocations = allocations.filter((a) => a.trayCount > 0);
-    if (validAllocations.length === 0) {
-      toast.error("No trays assigned — adjust counts before dispatching");
-      return;
-    }
-
-    setDispatching(true);
+  async function send() {
+    if (!plan || !check?.ok) return;
+    setSending(true);
     try {
       const res = await fetch("/api/admin/allocate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          planId: selectedPlan.id,
-          allocations: validAllocations.map((a) => ({
-            growerId: a.growerId,
-            trayCount: a.trayCount,
-          })),
+          planId: plan.id,
+          allocations: Object.entries(assignments)
+            .filter(([, trayCount]) => trayCount > 0)
+            .map(([growerId, trayCount]) => ({ growerId, trayCount })),
         }),
       });
-
-      const data = await res.json();
-
+      const body = await res.json().catch(() => null);
       if (!res.ok) {
-        toast.error(data?.error || `Dispatch failed (${res.status})`);
+        toast.error(body?.error || `Could not send the tasks (${res.status})`);
         return;
       }
-
-      toast.success(
-        `✅ Tasks sent! ${validAllocations.length} grower${
-          validAllocations.length > 1 ? "s" : ""
-        } notified — direct delivery to ${selectedPlan.order.restaurant.businessName}`
-      );
-      setDispatched((prev) => [...prev, selectedPlan.id]);
-      setPlanList((prev) => prev.filter((p) => p.id !== selectedPlan.id));
-      setSelectedPlan(null);
-      setAllocations([]);
-    } catch (err) {
-      console.error("Dispatch error:", err);
-      toast.error("Network error — check your connection and try again");
+      toast.success("Tasks sent", { description: `Growers have been told what to sow for ${plan.order.restaurant.businessName}.` });
+      const remaining = plans.filter((p) => p.id !== plan.id);
+      setPlans(remaining);
+      if (remaining[0]) choose(remaining[0]);
+      else {
+        setPlanId(null);
+        setAssignments({});
+      }
+      router.refresh();
+    } catch {
+      toast.error("Network error. Check your connection and try again.");
     } finally {
-      setDispatching(false);
+      setSending(false);
     }
   }
 
-  // ── Empty state ──────────────────────────────────────────────────────────────
-  if (planList.length === 0 && !selectedPlan) {
+  if (plans.length === 0) {
     return (
-      <GlassCard>
-        <div className="text-center py-16">
-          <Target className="w-12 h-12 text-text-muted/30 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-text-primary mb-1">
-            No plans awaiting allocation
-          </h3>
-          <p className="text-sm text-text-muted">
-            Create a production plan in the{" "}
-            <a
-              href="/admin/demand"
-              className="text-sprout-700 font-semibold hover:underline"
-            >
-              Demand Engine
-            </a>{" "}
-            first.
-          </p>
-        </div>
-      </GlassCard>
+      <EmptyState
+        icon={Target}
+        title="No plans waiting for growers"
+        description="Create a production plan in the Demand engine first."
+        action={
+          <Link href="/admin/demand" className="rounded-full bg-brand px-4 py-2 text-sm font-medium text-brand-ink">
+            Open the Demand engine
+          </Link>
+        }
+      />
     );
   }
 
-  // ── Main layout ──────────────────────────────────────────────────────────────
   return (
-    <div className="grid gap-5 sm:gap-6 lg:grid-cols-2">
-      {/* ── LEFT: Plan selection ────────────────────────────────────────────── */}
-      <div className="space-y-3">
-        <h2 className="text-sm font-bold text-text-muted uppercase tracking-wider mb-3">
-          Plans Awaiting Allocation
-        </h2>
-
-        {planList.length === 0 ? (
-          <div className="rounded-xl border border-sprout-200/40 bg-white/50 p-6 text-sm text-text-muted text-center">
-            All plans have been allocated 🎉
+    <DetailLayout
+      asidePosition="left"
+      aside={
+        <Panel padding="none" className="overflow-hidden lg:sticky lg:top-24">
+          <div className="px-4 pt-4">
+            <PanelHeader title="Plans" subtitle={`${plans.length} waiting`} />
           </div>
-        ) : (
-          planList.map((plan) => {
-            const isSelected = selectedPlan?.id === plan.id;
-            const isDone = dispatched.includes(plan.id);
-            const hasRestaurantGPS =
-              plan.order.restaurant.lat != null &&
-              plan.order.restaurant.lng != null;
-            return (
-              <button
-                key={plan.id}
-                onClick={() => handleSelectPlan(plan)}
-                className={`w-full text-left rounded-2xl border p-4 transition-all ${
-                  isSelected
-                    ? "bg-sprout-800/5 border-sprout-700/30 shadow-sm ring-1 ring-sprout-700/20"
-                    : isDone
-                    ? "bg-sprout-50 border-sprout-200/40 opacity-60"
-                    : "bg-white/50 border-white/40 hover:bg-white/80 hover:shadow-sm"
-                }`}
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <div className="flex-1 min-w-0">
-                    <div className="mb-0.5 flex flex-wrap items-center gap-2">
-                      <p className="text-sm font-bold text-text-primary truncate">
-                        {plan.order.restaurant.businessName}
-                      </p>
-                      {!hasRestaurantGPS && (
-                        <span
-                          className="text-[10px] text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded-full border border-amber-200/50 flex-shrink-0"
-                          title="Restaurant location not set — proximity scoring unavailable"
-                        >
-                          No GPS
-                        </span>
-                      )}
-                    </div>
-                    <p className="text-xs text-text-muted">
-                      {CROP_DISPLAY_NAMES[plan.order.cropType as CropType] ||
-                        plan.order.cropType}{" "}
-                      · {plan.order.quantityKg}kg · {plan.totalTrays} trays
-                    </p>
-                    <p className="text-[11px] text-text-muted mt-1 flex items-center gap-1">
-                      <MapPin className="w-3 h-3" />
-                      {plan.order.restaurant.city} · Direct delivery
-                    </p>
-                  </div>
-                  {isDone ? (
-                    <span className="flex items-center gap-1 text-xs font-semibold text-sprout-700 bg-sprout-100 px-2 py-0.5 rounded-full flex-shrink-0">
-                      <Check className="w-3 h-3" /> Done
-                    </span>
-                  ) : (
-                    <ChevronRight
-                      className={`w-4 h-4 flex-shrink-0 transition-colors ${
-                        isSelected ? "text-sprout-800" : "text-text-muted"
-                      }`}
-                    />
-                  )}
-                </div>
-                <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-text-muted">
-                  <span>
-                    Sow:{" "}
-                    {new Date(plan.sowDate).toLocaleDateString("en-IN", {
-                      month: "short",
-                      day: "numeric",
-                    })}
-                  </span>
-                  <span>→</span>
-                  <span>
-                    Harvest:{" "}
-                    {new Date(plan.harvestDate).toLocaleDateString("en-IN", {
-                      month: "short",
-                      day: "numeric",
-                    })}
-                  </span>
-                </div>
-              </button>
-            );
-          })
-        )}
-      </div>
-
-      {/* ── RIGHT: Allocation table ─────────────────────────────────────────── */}
-      <div>
-        {selectedPlan ? (
-          <GlassCard>
-            {/* Header */}
-            <div className="mb-1 flex flex-col gap-3 min-[520px]:flex-row min-[520px]:items-start min-[520px]:justify-between">
-              <div className="min-w-0">
-                <h2 className="text-base font-bold text-text-primary">
-                  Assign Trays
-                </h2>
-                <p className="text-xs text-text-muted mt-0.5">
-                  Growers sorted by proximity to{" "}
-                  <span className="font-semibold text-sprout-700">
-                    {selectedPlan.order.restaurant.businessName}
-                  </span>
-                </p>
-              </div>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => setAllocations(allocations.map(a => ({ ...a, trayCount: 0 })))}
-                  className="flex-shrink-0 rounded-lg bg-red-50 px-3 py-1.5 text-xs font-semibold text-red-600 transition-colors hover:bg-red-100"
-                >
-                  Clear All
-                </button>
-                <button
-                  onClick={handleAutoAllocate}
-                  className="flex-shrink-0 rounded-lg bg-sprout-100 px-3 py-1.5 text-xs font-semibold text-sprout-700 transition-colors hover:bg-sprout-200"
-                >
-                  Auto-Allocate
-                </button>
-              </div>
-            </div>
-
-            {/* Direct delivery notice */}
-            <div className="mb-4 mt-3 flex items-start gap-2 rounded-xl border border-blue-200/40 bg-blue-50/60 px-3 py-2">
-              <Navigation className="w-3.5 h-3.5 text-blue-600 flex-shrink-0" />
-              <p className="text-[11px] text-blue-700">
-                Direct delivery — growers ship straight to restaurant. Nearest growers ranked first.
-              </p>
-            </div>
-
-            {/* Progress bar */}
-            <div className="mb-4">
-              <div className="mb-1.5 flex flex-col gap-1 text-xs min-[420px]:flex-row min-[420px]:items-center min-[420px]:justify-between">
-                <span className="text-text-muted">
-                  {totalAssigned} / {selectedPlan.totalTrays} trays
-                </span>
-                {totalAssigned !== selectedPlan.totalTrays && (
-                  <span className="text-amber-600 font-medium flex items-center gap-1">
-                    <AlertCircle className="w-3 h-3" />
-                    {totalAssigned < selectedPlan.totalTrays
-                      ? `${selectedPlan.totalTrays - totalAssigned} unassigned`
-                      : `${totalAssigned - selectedPlan.totalTrays} over`}
-                  </span>
-                )}
-              </div>
-              <div className="w-full bg-sprout-100 rounded-full h-2">
-                <div
-                  className="bg-gradient-to-r from-sprout-600 to-sprout-400 h-2 rounded-full transition-all duration-500"
-                  style={{
-                    width: `${Math.min(
-                      (totalAssigned / selectedPlan.totalTrays) * 100,
-                      100
-                    )}%`,
-                  }}
-                />
-              </div>
-            </div>
-
-            {/* Grower rows */}
-            {growers.length === 0 ? (
-              <div className="text-center py-10">
-                <Users className="w-10 h-10 text-text-muted/30 mx-auto mb-3" />
-                <p className="text-sm text-text-muted">No active growers</p>
-              </div>
-            ) : (
-              <div className="space-y-2 mb-5">
-                {allocations.map((a, rank) => (
-                  <div
-                    key={a.growerId}
-                    className={`flex flex-col gap-3 rounded-xl border px-3 py-2.5 transition-all min-[520px]:flex-row min-[520px]:items-center ${
-                      rank === 0
-                        ? "bg-sprout-50/70 border-sprout-300/40"
-                        : "bg-white/60 border-white/40"
-                    }`}
+          <ul className="divide-y divide-hairline/70">
+            {plans.map((p) => {
+              const urgency = urgencyOf(p.order.deliveryDate);
+              const active = p.id === planId;
+              return (
+                <li key={p.id}>
+                  <button
+                    type="button"
+                    data-no-global-loading
+                    aria-pressed={active}
+                    onClick={() => choose(p)}
+                    className={cn("block w-full px-4 py-3 text-left transition-colors hover:bg-inset/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand/50", active && "bg-leaf-soft/60")}
                   >
-                    {/* Rank badge */}
-                    <span
-                      className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-black flex-shrink-0 ${
-                        rank === 0
-                          ? "bg-sprout-800 text-white"
-                          : rank === 1
-                          ? "bg-sprout-200 text-sprout-900"
-                          : "bg-gray-100 text-gray-500"
-                      }`}
-                    >
-                      {rank + 1}
+                    <span className="flex items-start justify-between gap-2">
+                      <span className="min-w-0">
+                        <span className="block text-sm font-medium text-ink">{p.order.restaurant.businessName}</span>
+                        <span className="block text-micro text-ink-muted">{`${cropName(p.order.cropType)}, ${p.order.quantityKg} kg`}</span>
+                      </span>
+                      <span className="shrink-0 text-sm font-medium tabular-nums text-ink">{`${p.totalTrays} trays`}</span>
                     </span>
+                    <span className="mt-1.5 block">
+                      <StatusChip tone={URGENCY_TONE[urgency.level]} label={urgency.level === "overdue" ? `${-urgency.days} days overdue` : `Delivery in ${urgency.days} days`} />
+                    </span>
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        </Panel>
+      }
+    >
+      {plan && check ? (
+        <Panel>
+          <PanelHeader
+            title={plan.order.restaurant.businessName}
+            subtitle={`${cropName(plan.order.cropType)}, ${plan.order.quantityKg} kg · ${shortId(plan.id)}`}
+            actions={
+              <button
+                type="button"
+                data-no-global-loading
+                onClick={() => setAssignments(proposeAllocation(candidates, plan.totalTrays))}
+                className="inline-flex items-center gap-1.5 rounded-full border border-hairline bg-panel/60 px-3.5 py-1.5 text-sm font-medium text-ink-soft transition-colors hover:text-ink"
+              >
+                <Target className="h-4 w-4" aria-hidden="true" />
+                Auto-allocate
+              </button>
+            }
+          />
 
-                    <div className="flex-1 min-w-0">
-                      <div className="flex flex-wrap items-center gap-1.5">
-                        <p className="text-sm font-semibold text-text-primary truncate">
-                          {a.growerName}
-                        </p>
-                        {rank === 0 && (
-                          <span className="text-[9px] font-bold text-sprout-700 bg-sprout-100 px-1.5 py-0.5 rounded-full flex-shrink-0">
-                            NEAREST
+          <dl className="mb-4 grid grid-cols-2 gap-3 text-sm sm:grid-cols-4">
+            {[
+              ["Trays needed", `${plan.totalTrays} (${plan.bufferTrays} buffer)`],
+              ["Sow from", format(plan.sowDate, "d MMM")],
+              ["Harvest", format(plan.harvestDate, "d MMM")],
+              ["Delivery", format(plan.order.deliveryDate, "d MMM")],
+            ].map(([label, value]) => (
+              <div key={label}>
+                <dt className="text-micro text-ink-muted">{label}</dt>
+                <dd className="font-medium text-ink">{value}</dd>
+              </div>
+            ))}
+          </dl>
+
+          <div className="mb-4">
+            <div className="mb-1.5 flex items-baseline justify-between text-sm">
+              <span className="text-ink-soft">Assigned</span>
+              <span className={cn("font-medium tabular-nums", check.ok ? "text-good" : check.assigned > plan.totalTrays ? "text-risk" : "text-ink")}>{`${check.assigned} of ${plan.totalTrays} trays`}</span>
+            </div>
+            <Meter size="thick" value={check.assigned} max={plan.totalTrays} tone={check.ok ? "leaf" : check.assigned > plan.totalTrays ? "risk" : "brand"} label="Trays assigned" />
+          </div>
+
+          <div className="mb-3 flex flex-wrap items-center gap-2">
+            <SearchPill value={query} onChange={setQuery} placeholder="Search growers" ariaLabel="Search growers" className="min-w-[10rem] flex-1" />
+            <select aria-label="City" value={city} onChange={(e) => setCity(e.target.value)} className={cn(controlClass, "!w-auto !py-2 text-sm")}>
+              <option value="all">All cities</option>
+              {cities.map((c) => (
+                <option key={c} value={c}>
+                  {c}
+                </option>
+              ))}
+            </select>
+            <label className="inline-flex items-center gap-2 text-sm text-ink-soft">
+              <input type="checkbox" checked={verifiedOnly} onChange={(e) => setVerifiedOnly(e.target.checked)} className="h-4 w-4 accent-[rgb(var(--c-brand))]" />
+              FSSAI verified only
+            </label>
+          </div>
+
+          {visible.length === 0 ? (
+            <p className="py-6 text-center text-sm text-ink-muted">No growers match.</p>
+          ) : (
+            <ul className="divide-y divide-hairline/70">
+              {visible.map((c) => {
+                const given = assignments[c.id] ?? 0;
+                const over = check.overCapacity.includes(c.id);
+                return (
+                  <li key={c.id} className={cn("grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 py-3", c.free === 0 && "opacity-60")}>
+                    <div className="min-w-0">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="text-sm font-medium text-ink">{c.name}</span>
+                        {c.id === nearestId ? (
+                          <span className="inline-flex items-center gap-1 rounded-full bg-leaf-soft px-2 py-0.5 text-micro font-medium text-ink">
+                            <Navigation className="h-3 w-3" aria-hidden="true" />
+                            Nearest
                           </span>
-                        )}
+                        ) : null}
+                        {c.fssaiVerified ? <ShieldCheck className="h-4 w-4 text-good" aria-label="FSSAI verified" /> : null}
                       </div>
-                      <div className="mt-0.5 flex flex-wrap items-center gap-x-3 gap-y-1">
-                        {/* Distance */}
-                        <span className="flex items-center gap-0.5 text-[10px] text-text-muted">
-                          <MapPin className="w-2.5 h-2.5" />
-                          {a.distanceKm != null
-                            ? `${a.distanceKm.toFixed(1)} km`
-                            : a.city}
+                      <p className="mt-0.5 flex flex-wrap items-center gap-x-3 text-micro text-ink-muted">
+                        <span className="inline-flex items-center gap-1">
+                          <MapPin className="h-3 w-3" aria-hidden="true" />
+                          {c.distanceKm === null ? c.city : `${c.city}, ${c.distanceKm.toFixed(1)} km`}
                         </span>
-                        {/* Score bar */}
-                        <div className="flex items-center gap-1">
-                          <div className="w-12 bg-sprout-100 rounded-full h-1">
-                            <div
-                              className="bg-sprout-500 h-1 rounded-full"
-                              style={{
-                                width: `${a.combinedScore * 100}%`,
-                              }}
-                            />
-                          </div>
-                          <span className="text-[10px] text-text-muted">
-                            {Math.round(a.combinedScore * 100)}
-                          </span>
-                        </div>
+                        <span>{`Score ${Math.round(c.compositeScore * 100)}%`}</span>
+                      </p>
+                      <div className="mt-1.5 flex items-center gap-2">
+                        <Meter value={c.activeTrays + given} max={Math.max(c.kitSize, 1)} tone={over ? "risk" : "leaf"} label={`${c.name} kit use`} className="max-w-[10rem]" />
+                        <span className={cn("text-micro tabular-nums", over ? "font-medium text-risk" : "text-ink-muted")}>{`${c.free} of ${c.kitSize} trays free`}</span>
                       </div>
+                      {over ? (
+                        <p role="alert" className="mt-1 inline-flex items-center gap-1 text-micro font-medium text-risk">
+                          <AlertTriangle className="h-3 w-3" aria-hidden="true" />
+                          {`Only room for ${c.free}`}
+                        </p>
+                      ) : null}
                     </div>
-
-                    {/* Tray input */}
-                    <div className="flex flex-shrink-0 items-center justify-end gap-1">
+                    <label className="flex flex-col items-end gap-1 text-micro text-ink-muted">
+                      <span>Trays</span>
                       <input
                         type="number"
                         min={0}
-                        max={selectedPlan.totalTrays}
-                        value={a.trayCount}
-                        onChange={(e) =>
-                          handleTrayChange(a.growerId, Number(e.target.value))
-                        }
-                        className="w-14 h-8 rounded-lg border border-sprout-800/20 bg-white/80 px-2 text-sm font-bold text-center focus:outline-none focus:ring-2 focus:ring-sprout-500/30"
+                        max={c.free}
+                        inputMode="numeric"
+                        value={given}
+                        disabled={c.free === 0}
+                        aria-label={`Trays for ${c.name}`}
+                        onChange={(e) => setAssignments((current) => ({ ...current, [c.id]: Math.max(0, Math.floor(Number(e.target.value) || 0)) }))}
+                        className={cn(controlClass, "!w-20 !px-3 !py-2 text-center tabular-nums", over && "border-risk")}
                       />
-                      <span className="text-[10px] text-text-muted">trays</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
+                    </label>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
 
-            {/* Dispatch button */}
+          <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-hairline/70 pt-4">
+            <p className="text-sm text-ink-soft" aria-live="polite">
+              {check.ok
+                ? "Ready to send."
+                : check.overCapacity.length > 0
+                  ? "Someone has more trays than their kit holds."
+                  : check.remaining > 0
+                    ? `${check.remaining} trays still need a grower.`
+                    : `${-check.remaining} trays too many.`}
+            </p>
             <button
-              disabled={
-                dispatching ||
-                totalAssigned === 0 ||
-                allocations.filter((a) => a.trayCount > 0).length === 0
-              }
-              onClick={handleDispatch}
-              className="w-full bg-sprout-800 text-white hover:bg-sprout-900 py-3 rounded-xl font-semibold flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all hover:shadow-lg hover:shadow-sprout-800/20 active:scale-[0.99]"
+              type="button"
+              data-no-global-loading
+              onClick={send}
+              disabled={!check.ok || sending}
+              className="inline-flex items-center gap-2 rounded-full bg-brand px-5 py-2.5 text-sm font-medium text-brand-ink transition-opacity hover:opacity-90 disabled:opacity-50"
             >
-              {dispatching ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin" /> Dispatching…
-                </>
-              ) : (
-                <>
-                  Dispatch Tasks <ArrowRight className="w-4 h-4" />
-                </>
-              )}
+              {sending ? <Loader2 className="h-4 w-4 animate-spin motion-reduce:animate-none" aria-hidden="true" /> : null}
+              Send tasks to growers
             </button>
-          </GlassCard>
-        ) : (
-          <div className="flex items-center justify-center h-full min-h-[240px] rounded-2xl border-2 border-dashed border-sprout-200/60 bg-white/30">
-            <div className="text-center px-6">
-              <Target className="w-10 h-10 text-sprout-300 mx-auto mb-3" />
-              <p className="text-sm font-semibold text-text-primary mb-1">
-                Select a production plan
-              </p>
-              <p className="text-xs text-text-muted">
-                Growers will be ranked by distance to the restaurant
-              </p>
-            </div>
           </div>
-        )}
-      </div>
-    </div>
+        </Panel>
+      ) : null}
+    </DetailLayout>
   );
 }

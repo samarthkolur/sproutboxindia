@@ -5,7 +5,7 @@ import { describe, expect, it, vi } from "vitest";
 vi.mock("@/lib/prisma", () => ({ prisma: {} }));
 
 import { calculateProductionPlan } from "@/lib/business";
-import { daysUntil, pipelineSentence, planOrder, qcPassPercent, sortByUrgency, urgencyOf, waitingFor, weeklyTotals } from "./admin";
+import { checkAllocation, daysUntil, haversineKm, pipelineSentence, proposeAllocation, scoreCandidates, type GrowerInput, planOrder, qcPassPercent, sortByUrgency, urgencyOf, waitingFor, weeklyTotals } from "./admin";
 
 const NOW = new Date(2026, 10, 15, 14, 0);
 const inDays = (n: number) => new Date(2026, 10, 15 + n);
@@ -115,5 +115,98 @@ describe("qcPassPercent", () => {
     expect(qcPassPercent(37, 42)).toBe(88);
     expect(qcPassPercent(0, 0)).toBeNull();
     expect(qcPassPercent(0, 5)).toBe(0);
+  });
+});
+
+describe("haversineKm", () => {
+  it("is about 1.4 km between two Koramangala points and zero for the same one", () => {
+    expect(haversineKm(12.9352, 77.6245, 12.9352, 77.6245)).toBe(0);
+    expect(haversineKm(12.9345, 77.6193, 12.9352, 77.6245)).toBeGreaterThan(0.4);
+    expect(haversineKm(12.9345, 77.6193, 12.9352, 77.6245)).toBeLessThan(1);
+  });
+});
+
+const grower = (id: string, over: Partial<GrowerInput> = {}): GrowerInput => ({
+  id, name: id, city: "Bengaluru", kitSize: 15, activeTrays: 0, compositeScore: 0.8, lat: 12.9352, lng: 77.6245, fssaiVerified: false, ...over,
+});
+const restaurant = { lat: 12.9345, lng: 77.6193 };
+
+describe("scoreCandidates", () => {
+  it("ranks a close, well-scored grower above a distant or weak one", () => {
+    const ranked = scoreCandidates([grower("far", { lat: 13.2, lng: 77.9 }), grower("weak", { compositeScore: 0.3 }), grower("best")], restaurant);
+    expect(ranked.map((c) => c.id)).toEqual(["best", "weak", "far"]);
+  });
+
+  it("measures room in trays, not tasks, and never below zero", () => {
+    const ranked = scoreCandidates([grower("a", { kitSize: 15, activeTrays: 12 }), grower("b", { kitSize: 5, activeTrays: 9 })], restaurant);
+    expect(Object.fromEntries(ranked.map((c) => [c.id, c.free]))).toEqual({ a: 3, b: 0 });
+  });
+
+  it("treats a missing location as middling, not as a failure", () => {
+    const [c] = scoreCandidates([grower("nogps", { lat: null, lng: null })], restaurant);
+    expect(c.distanceKm).toBeNull();
+    expect(c.combined).toBeCloseTo(0.3 * 0.5 + 0.8 * 0.5);
+  });
+});
+
+describe("proposeAllocation", () => {
+  const sum = (m: Record<string, number>) => Object.values(m).reduce((a, b) => a + b, 0);
+
+  it("splits the trays in proportion to score and always totals the plan", () => {
+    const candidates = scoreCandidates([grower("a", { compositeScore: 0.9 }), grower("b", { compositeScore: 0.6 }), grower("c", { compositeScore: 0.3 })], restaurant);
+    const split = proposeAllocation(candidates, 19);
+    expect(sum(split)).toBe(19);
+    expect(split.a).toBeGreaterThan(split.b);
+    expect(split.b).toBeGreaterThan(split.c);
+  });
+
+  it("never gives a grower more than they have room for", () => {
+    const candidates = scoreCandidates([grower("small", { kitSize: 5, compositeScore: 0.95 }), grower("big", { kitSize: 40, compositeScore: 0.5 })], restaurant);
+    const split = proposeAllocation(candidates, 19);
+    expect(split.small).toBeLessThanOrEqual(5);
+    expect(sum(split)).toBe(19);
+  });
+
+  it("skips a grower who is full", () => {
+    const candidates = scoreCandidates([grower("full", { kitSize: 5, activeTrays: 5 }), grower("open")], restaurant);
+    expect(proposeAllocation(candidates, 8)).toEqual({ full: 0, open: 8 });
+  });
+
+  it("leaves trays unassigned when there is not enough room, rather than overfilling", () => {
+    const candidates = scoreCandidates([grower("a", { kitSize: 5 }), grower("b", { kitSize: 5 })], restaurant);
+    const split = proposeAllocation(candidates, 23);
+    expect(sum(split)).toBe(10);
+    expect(Object.values(split).every((n) => n <= 5)).toBe(true);
+  });
+
+  it("hands out a handful of trays one by one, best grower first", () => {
+    const candidates = scoreCandidates([grower("a", { compositeScore: 0.9 }), grower("b", { compositeScore: 0.8 }), grower("c", { compositeScore: 0.7 })], restaurant);
+    expect(sum(proposeAllocation(candidates, 2))).toBe(2);
+  });
+
+  it("is empty with nobody to give to", () => {
+    expect(proposeAllocation([], 10)).toEqual({});
+  });
+});
+
+describe("checkAllocation", () => {
+  const candidates = scoreCandidates([grower("a", { kitSize: 10 }), grower("b", { kitSize: 5 })], restaurant);
+
+  it("is sendable only when the trays add up exactly and nobody is over capacity", () => {
+    expect(checkAllocation({ a: 8, b: 5 }, candidates, 13)).toEqual({ assigned: 13, remaining: 0, overCapacity: [], ok: true });
+  });
+
+  it("reports what is still unassigned", () => {
+    expect(checkAllocation({ a: 8 }, candidates, 13)).toMatchObject({ remaining: 5, ok: false });
+  });
+
+  it("names anyone given more than they have room for", () => {
+    const result = checkAllocation({ a: 8, b: 9 }, candidates, 17);
+    expect(result.overCapacity).toEqual(["b"]);
+    expect(result.ok).toBe(false);
+  });
+
+  it("will not send more trays than the plan needs", () => {
+    expect(checkAllocation({ a: 10, b: 5 }, candidates, 13).ok).toBe(false);
   });
 });

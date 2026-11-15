@@ -752,6 +752,23 @@ export const translations: Record<string, TranslationEntry> = {
   "Days to harvest": { kn: "ಕೊಯ್ಲಿಗೆ ದಿನಗಳು", hi: "कटाई तक के दिन" },
   "Digital, hub & delivery checks": { kn: "ಡಿಜಿಟಲ್, ಹಬ್ ಮತ್ತು ವಿತರಣಾ ಪರಿಶೀಲನೆಗಳು", hi: "डिजिटल, हब और डिलीवरी जांच" },
   "Farm-to-fork, door to door.": { kn: "ಜಮೀನಿನಿಂದ ತಟ್ಟೆಗೆ, ಬಾಗಿಲಿಂದ ಬಾಗಿಲಿಗೆ.", hi: "खेत से थाली तक, दरवाज़े से दरवाज़े तक।" },
+  "All cities": { kn: "ಎಲ್ಲಾ ನಗರಗಳು", hi: "सभी शहर" },
+  "Auto-allocate": { kn: "ಸ್ವಯಂ ಹಂಚಿಕೆ", hi: "अपने-आप आवंटन" },
+  "FSSAI verified only": { kn: "FSSAI ಪರಿಶೀಲಿತರು ಮಾತ್ರ", hi: "केवल FSSAI सत्यापित" },
+  "Nearest": { kn: "ಹತ್ತಿರದವರು", hi: "सबसे नज़दीक" },
+  "Plans": { kn: "ಯೋಜನೆಗಳು", hi: "योजनाएं" },
+  "Search growers": { kn: "ಬೆಳೆಗಾರರನ್ನು ಹುಡುಕಿ", hi: "उत्पादक खोजें" },
+  "Send tasks to growers": { kn: "ಬೆಳೆಗಾರರಿಗೆ ಕೆಲಸಗಳನ್ನು ಕಳುಹಿಸಿ", hi: "उत्पादकों को काम भेजें" },
+  "Someone has more trays than their kit holds.": { kn: "ಯಾರಿಗೋ ಅವರ ಕಿಟ್ ಹಿಡಿಯುವುದಕ್ಕಿಂತ ಹೆಚ್ಚು ಟ್ರೇಗಳಿವೆ.", hi: "किसी के पास उनकी किट की क्षमता से ज़्यादा ट्रे हैं।" },
+  "Ready to send.": { kn: "ಕಳುಹಿಸಲು ಸಿದ್ಧ.", hi: "भेजने के लिए तैयार।" },
+  "Trays assigned": { kn: "ನಿಗದಿಪಡಿಸಿದ ಟ್ರೇಗಳು", hi: "आवंटित ट्रे" },
+  "Trays needed": { kn: "ಬೇಕಾದ ಟ್ರೇಗಳು", hi: "आवश्यक ट्रे" },
+  "No growers match.": { kn: "ಯಾವುದೇ ಬೆಳೆಗಾರರು ಹೊಂದಿಕೆಯಾಗುತ್ತಿಲ್ಲ.", hi: "कोई उत्पादक मेल नहीं खाता।" },
+  "Allocate trays": { kn: "ಟ್ರೇಗಳನ್ನು ಹಂಚಿ", hi: "ट्रे आवंटित करें" },
+  "Give each production plan to growers who are close to the restaurant and have room.": { kn: "ಪ್ರತಿ ಉತ್ಪಾದನಾ ಯೋಜನೆಯನ್ನು ರೆಸ್ಟೋರೆಂಟ್‌ಗೆ ಹತ್ತಿರವಿರುವ ಮತ್ತು ಜಾಗ ಇರುವ ಬೆಳೆಗಾರರಿಗೆ ನೀಡಿ.", hi: "हर उत्पादन योजना उन उत्पादकों को दें जो रेस्टोरेंट के पास हैं और जिनके पास जगह है।" },
+  "No plans waiting for growers": { kn: "ಬೆಳೆಗಾರರಿಗಾಗಿ ಯಾವುದೇ ಯೋಜನೆ ಕಾಯುತ್ತಿಲ್ಲ", hi: "उत्पादकों की प्रतीक्षा में कोई योजना नहीं" },
+  "Create a production plan in the Demand engine first.": { kn: "ಮೊದಲು ಬೇಡಿಕೆ ಎಂಜಿನ್‌ನಲ್ಲಿ ಉತ್ಪಾದನಾ ಯೋಜನೆ ರಚಿಸಿ.", hi: "पहले डिमांड इंजन में उत्पादन योजना बनाएं।" },
+  "Open the Demand engine": { kn: "ಬೇಡಿಕೆ ಎಂಜಿನ್ ತೆರೆಯಿರಿ", hi: "डिमांड इंजन खोलें" },
   "Demand engine": { kn: "ಬೇಡಿಕೆ ಎಂಜಿನ್", hi: "डिमांड इंजन" },
   "Turn paid orders into production plans, nearest delivery first.": { kn: "ಪಾವತಿಸಿದ ಆರ್ಡರ್‌ಗಳನ್ನು ಉತ್ಪಾದನಾ ಯೋಜನೆಗಳಾಗಿ ಪರಿವರ್ತಿಸಿ, ಹತ್ತಿರದ ವಿತರಣೆ ಮೊದಲು.", hi: "भुगतान किए गए ऑर्डर को उत्पादन योजनाओं में बदलें, नज़दीकी डिलीवरी पहले।" },
   "Base trays": { kn: "ಮೂಲ ಟ್ರೇಗಳು", hi: "आधार ट्रे" },
@@ -1216,6 +1233,46 @@ const MONTH_SHORT = {
 const MONTH_SHORT_EN = MONTHS.map((month) => month.slice(0, 3));
 
 const regexTranslations = [
+  {
+    pattern: /^Score (\d+)%$/,
+    replace: (language: Exclude<LanguageCode, "en">, n: string) => (language === "kn" ? `ಅಂಕ ${n}%` : `स्कोर ${n}%`),
+  },
+  {
+    pattern: /^(.+) kit use$/,
+    replace: (language: Exclude<LanguageCode, "en">, who: string) => (language === "kn" ? `${who} ಕಿಟ್ ಬಳಕೆ` : `${who} की किट का उपयोग`),
+  },
+  {
+    pattern: /^Trays for (.+)$/,
+    replace: (language: Exclude<LanguageCode, "en">, who: string) => (language === "kn" ? `${who} ಅವರಿಗೆ ಟ್ರೇಗಳು` : `${who} के लिए ट्रे`),
+  },
+  {
+    pattern: /^Only room for (\d+)$/,
+    replace: (language: Exclude<LanguageCode, "en">, n: string) => (language === "kn" ? `${n} ಕ್ಕೆ ಮಾತ್ರ ಜಾಗವಿದೆ` : `केवल ${n} के लिए जगह है`),
+  },
+  {
+    pattern: /^(\d+) trays still need a grower\.$/,
+    replace: (language: Exclude<LanguageCode, "en">, n: string) => (language === "kn" ? `${n} ಟ್ರೇಗಳಿಗೆ ಇನ್ನೂ ಬೆಳೆಗಾರರು ಬೇಕು.` : `${n} ट्रे को अभी उत्पादक चाहिए।`),
+  },
+  {
+    pattern: /^(\d+) trays too many\.$/,
+    replace: (language: Exclude<LanguageCode, "en">, n: string) => (language === "kn" ? `${n} ಟ್ರೇಗಳು ಹೆಚ್ಚು.` : `${n} ट्रे ज़्यादा हैं।`),
+  },
+  {
+    pattern: /^(\d+) of (\d+) trays$/,
+    replace: (language: Exclude<LanguageCode, "en">, a: string, b: string) => (language === "kn" ? `${b} ರಲ್ಲಿ ${a} ಟ್ರೇಗಳು` : `${b} में से ${a} ट्रे`),
+  },
+  {
+    pattern: /^(\d+) of (\d+) trays free$/,
+    replace: (language: Exclude<LanguageCode, "en">, a: string, b: string) => (language === "kn" ? `${b} ರಲ್ಲಿ ${a} ಟ್ರೇಗಳು ಖಾಲಿ` : `${b} में से ${a} ट्रे खाली`),
+  },
+  {
+    pattern: /^(\d+) \((\d+) buffer\)$/,
+    replace: (language: Exclude<LanguageCode, "en">, a: string, b: string) => (language === "kn" ? `${a} (${b} ಬಫರ್)` : `${a} (${b} बफ़र)`),
+  },
+  {
+    pattern: /^(.+), ([\d.]+) km$/,
+    replace: (language: Exclude<LanguageCode, "en">, city: string, km: string) => `${translateToken(city, language)}, ${km} ${language === "kn" ? "ಕಿ.ಮೀ" : "किमी"}`,
+  },
   {
     pattern: /^Buffer (\d+)%$/,
     replace: (language: Exclude<LanguageCode, "en">, n: string) => (language === "kn" ? `ಬಫರ್ ${n}%` : `बफ़र ${n}%`),

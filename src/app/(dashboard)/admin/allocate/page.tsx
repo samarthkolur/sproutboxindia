@@ -1,77 +1,56 @@
+import { PageHeader } from "@/components/ui/page-header";
 import { prisma } from "@/lib/prisma";
-import { Target } from "lucide-react";
 import { AllocateClient } from "./AllocateClient";
 
-async function getAllocationData() {
-  try {
-    const [plans, growers] = await Promise.all([
-      prisma.productionPlan.findMany({
-        where: { status: "DRAFT" },
-        include: {
-          order: {
-            include: {
-              // Fetch restaurant lat/lng for proximity scoring
-              restaurant: {
-                select: {
-                  businessName: true,
-                  city: true,
-                  lat: true,
-                  lng: true,
-                },
-              },
-            },
-          },
-        },
-        orderBy: { createdAt: "asc" },
-      }),
-      prisma.grower.findMany({
-        where: { isActive: true },
-        include: {
-          user: { select: { name: true } },
-          _count: { select: { tasks: { where: { status: { in: ["ASSIGNED", "IN_PROGRESS"] } } } } },
-        },
-        orderBy: { compositeScore: "desc" },
-      }),
-    ]);
-
-    return {
-      plans,
-      growers: growers.map((g) => ({
-        id: g.id,
-        name: g.user.name || "Unknown Grower",
-        city: g.city,
-        kitSize: g.kitSize,
-        compositeScore: g.compositeScore,
-        activeTasks: g._count.tasks,
-        lat: g.lat,
-        lng: g.lng,
-      })),
-    };
-  } catch {
-    return { plans: [], growers: [] };
-  }
-}
-
 export default async function AllocatePage() {
-  const { plans, growers } = await getAllocationData();
+  const [plans, growers] = await Promise.all([
+    prisma.productionPlan.findMany({
+      where: { status: "DRAFT" },
+      select: {
+        id: true,
+        totalTrays: true,
+        bufferTrays: true,
+        sowDate: true,
+        harvestDate: true,
+        order: { select: { cropType: true, quantityKg: true, deliveryDate: true, restaurant: { select: { businessName: true, city: true, lat: true, lng: true } } } },
+      },
+      orderBy: { order: { deliveryDate: "asc" } },
+    }),
+    prisma.grower.findMany({
+      where: { isActive: true },
+      select: {
+        id: true,
+        city: true,
+        kitSize: true,
+        compositeScore: true,
+        lat: true,
+        lng: true,
+        fssaiVerifiedAt: true,
+        user: { select: { name: true } },
+        // Trays already growing, so a grower is never given more than their kit holds.
+        tasks: { where: { status: { in: ["ASSIGNED", "IN_PROGRESS", "HARVEST_READY"] } }, select: { trayCount: true } },
+      },
+      orderBy: { compositeScore: "desc" },
+    }),
+  ]);
 
   return (
-    <div>
-      <div className="mb-6 sm:mb-8">
-        <div className="flex items-center gap-2 sm:gap-3 mb-1">
-          <Target className="w-6 h-6 sm:w-7 sm:h-7 text-sprout-700 flex-shrink-0" />
-          <h1 className="text-2xl sm:text-3xl font-black text-text-primary tracking-tight">
-            Allocate Tasks
-          </h1>
-        </div>
-        <p className="text-sm sm:text-base text-text-secondary">
-          Assign production plans to growers — nearby growers get priority ·{" "}
-          {plans.length} plan{plans.length !== 1 ? "s" : ""} awaiting ·{" "}
-          {growers.length} active grower{growers.length !== 1 ? "s" : ""}
-        </p>
-      </div>
-
-      <AllocateClient plans={plans} growers={growers} />
-    </div>
+    <>
+      <PageHeader title="Allocate trays" subtitle="Give each production plan to growers who are close to the restaurant and have room." />
+      <AllocateClient
+        plans={plans}
+        growers={growers.map((g) => ({
+          id: g.id,
+          name: g.user.name ?? "Grower",
+          city: g.city,
+          kitSize: g.kitSize,
+          activeTrays: g.tasks.reduce((sum, t) => sum + t.trayCount, 0),
+          compositeScore: g.compositeScore,
+          lat: g.lat,
+          lng: g.lng,
+          fssaiVerified: g.fssaiVerifiedAt !== null,
+        }))}
+      />
+    </>
   );
 }

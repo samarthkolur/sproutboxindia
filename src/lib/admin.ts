@@ -125,3 +125,97 @@ export const PIPELINE_STEPS = [
 export function qcPassPercent(passed: number, reviewed: number) {
   return reviewed > 0 ? Math.round((passed / reviewed) * 100) : null;
 }
+
+// ── Allocation: who grows an order ──────────────────────────────────────────
+
+export interface GrowerInput {
+  id: string;
+  name: string;
+  city: string;
+  kitSize: number;
+  /** Trays they are already growing (not tasks: a task can hold many trays). */
+  activeTrays: number;
+  compositeScore: number;
+  lat: number | null;
+  lng: number | null;
+  fssaiVerified: boolean;
+}
+
+export interface Candidate extends GrowerInput {
+  free: number;
+  distanceKm: number | null;
+  combined: number;
+}
+
+export function haversineKm(lat1: number, lng1: number, lat2: number, lng2: number) {
+  const R = 6371;
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLng = ((lng2 - lng1) * Math.PI) / 180;
+  const a = Math.sin(dLat / 2) ** 2 + Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) * Math.sin(dLng / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+const MAX_DISTANCE_KM = 30;
+
+/**
+ * Growers scored for one order: half how close they are to the restaurant (linear, nothing beyond
+ * 30 km, a middling 0.3 when a location is missing) and half their overall score, with the room
+ * they have left (kit size minus trays already growing). Best first.
+ */
+export function scoreCandidates(growers: GrowerInput[], restaurant: { lat: number | null; lng: number | null }): Candidate[] {
+  return growers
+    .map((g) => {
+      const distanceKm = g.lat != null && g.lng != null && restaurant.lat != null && restaurant.lng != null ? haversineKm(g.lat, g.lng, restaurant.lat, restaurant.lng) : null;
+      const proximity = distanceKm === null ? 0.3 : Math.max(0, 1 - distanceKm / MAX_DISTANCE_KM);
+      return { ...g, free: Math.max(0, g.kitSize - g.activeTrays), distanceKm, combined: proximity * 0.5 + g.compositeScore * 0.5 };
+    })
+    .sort((a, b) => b.combined - a.combined);
+}
+
+/**
+ * A starting split of `total` trays, in proportion to each grower's score but never more than
+ * they have room for. If everyone's room runs out, the rest is left unassigned and shown as such.
+ */
+export function proposeAllocation(candidates: Candidate[], total: number): Record<string, number> {
+  const give: Record<string, number> = {};
+  for (const c of candidates) give[c.id] = 0;
+  let left = total;
+
+  while (left > 0) {
+    const pool = candidates.filter((c) => give[c.id] < c.free);
+    if (pool.length === 0) break;
+    const weight = pool.reduce((sum, c) => sum + Math.max(c.combined, 0.01), 0);
+    let given = 0;
+    for (const c of pool) {
+      const share = Math.floor((left * Math.max(c.combined, 0.01)) / weight);
+      const take = Math.min(share, c.free - give[c.id]);
+      give[c.id] += take;
+      given += take;
+    }
+    left -= given;
+    if (given === 0) {
+      // Fewer trays left than growers: hand them out one at a time, best first.
+      for (const c of pool) {
+        if (left === 0) break;
+        give[c.id] += 1;
+        left -= 1;
+      }
+    }
+  }
+  return give;
+}
+
+export interface AllocationCheck {
+  assigned: number;
+  remaining: number;
+  /** Ids of growers given more trays than they have room for. */
+  overCapacity: string[];
+  /** Exactly the plan's trays, nobody over capacity: the only state that may be sent. */
+  ok: boolean;
+}
+
+export function checkAllocation(assignments: Record<string, number>, candidates: Candidate[], total: number): AllocationCheck {
+  const assigned = Object.values(assignments).reduce((sum, n) => sum + n, 0);
+  const overCapacity = candidates.filter((c) => (assignments[c.id] ?? 0) > c.free).map((c) => c.id);
+  return { assigned, remaining: total - assigned, overCapacity, ok: assigned === total && overCapacity.length === 0 };
+}
