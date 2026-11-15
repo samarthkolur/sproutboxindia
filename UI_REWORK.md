@@ -166,6 +166,35 @@ Findings worth a decision:
 - **API:** pay-now (role, ownership, paid, cancelled, no Stripe) and feedback (delivered only, never changes status, one per order).
 - **Pages and flows** (`tests/pages/restaurant/*`, plus the checkout and pay-now component tests): every page's states, the URL filters, the earliest-date rule, partial failure and safe retry, the unpaid-to-paid purchase tracking, feedback create and update, 404 for another restaurant's order, the redirect, and Kannada and Hindi for everything on every page.
 
+### Phase 4 status (done 2026-11-15)
+
+The admin portal is converted: dashboard, demand, allocate, dispatch, QC review (queue and per-tray page), hubs and hub detail, growers and grower detail, restaurants and the new restaurant detail page, deliveries, analytics, KPI scorecard and payouts. Checked in the browser against the real data; every page's states are covered by tests.
+
+What changed beyond the restyle:
+- **Admin server actions now check the caller.** `createProductionPlan`, `processQCCheckIn`, `markPayoutAsPaid` and a few more checked nothing, so any signed-in user who could send the request could call them. All now go through `requireAdmin()` (`lib/admin-auth.ts`), with a test that every admin action refuses signed-out, grower and restaurant callers without touching the database. Admin reads moved out of `"use server"` files into `lib/admin-data.ts`, so they are no longer callable as actions.
+- **Pipeline strip on the dashboard** (Demand, Allocate, Dispatch, QC, Payout) with live counts; the weekly chart is real ordered-vs-delivered kilos; the hardcoded series, "+12 this week" and "+18%" are gone; recent orders and top growers link to their pages.
+- **Demand:** one `planOrder()` is the single place the tray maths lives; the page previews it and the action stores it, and a test checks it against `calculateProductionPlan`. Urgency chips, crop filter, multi-select and "Create plans (n)".
+- **Allocate:** capacity is measured in trays (the old code counted tasks), a grower can't be given more than their kit holds, a send must add up to exactly the plan's trays (a plan leaves the queue once allocated, so a partial send could never be finished), nearest tag, filters.
+- **Dispatch:** grouped by grower, "Mark seeds delivered" (not "dispatch"), "Mark all delivered" with an undo that only works while nobody has started growing.
+- **QC:** one workspace with queue, every check-in as a day strip, photo lightbox with a close button, reason chips and a note that reaches the grower, a mandatory reason on reject, P / R / X and J / K shortcuts, auto-advance. A tray that already has a verdict can't be passed or rejected again, which used to send the grower a second notification. `/admin/qc/[batchId]` is a real page now.
+- **Growers:** the "FSSAI pending" chip is the verification queue with an inline Verify behind a confirmation; detail has Tasks, Payouts and Compliance tabs and an Active switch.
+- **Restaurants:** aggregate queries instead of loading every order; Active, Dormant (no order in 30 days) and Never ordered filters; the new detail page has history with invoices, ratings and feedback.
+- **Hubs:** the invented "expected 25 kg / received 0" meter is removed rather than shown.
+- **Deliveries:** filters with counts, a late flag, and the next step as a button on the row.
+- **Payouts:** totals are over every payout (they were over the 30 rows loaded), filters, search and a confirmed bulk "Mark paid"; order settlements with invoice links stay.
+- **Analytics and KPIs:** weekly revenue vs grower payouts vs what was kept, orders over time, per-crop and per-restaurant breakdowns, QC and grower quality; the KPI scorecard has tinted tiles, targets in one file (`lib/kpi.ts`) and a Definitions accordion. The QC pass rate counts harvested trays as passed (it read 0% on a finished order).
+- **Removed:** `GrowerComplianceCard`, `HubAggregator`, `QCReviewPanel`, `ActivityFeed`, the old payout client, `dashboard.actions` and `kpi.actions`.
+
+Findings worth a decision:
+1. **Notifications don't deep-link to `/admin/qc/[batchId]` yet.** The page exists, the notification panel just doesn't point at it.
+2. **KPI "grower acceptance" and "MRR" are stand-ins.** There is no accept step and no subscription billing; the Definitions section says so.
+3. **Hubs look like legacy.** Allocation talks about direct delivery. They are restyled, not expanded, and nothing can create one.
+4. **The team's real test data shows through.** Restaurants renamed "Test - ..." are tagged as test accounts; their old orders still count in revenue and demand.
+
+### Phase 4 tests (done 2026-11-15)
+
+Every admin page has a test file under `tests/pages/admin/`, plus `lib/admin`, `lib/kpi`, the action guard and the overview queries. Each page test also fails on any English text without a Kannada or Hindi entry.
+
 ## 1. Layouts and states
 
 - [x] `src/app/layout.tsx`: Outfit, ThemeProvider, toaster, top progress bar; drop the floating language toggle (moves into the top bars)
@@ -288,73 +317,73 @@ Nav: Overview · Tasks (**badge: check-ins due**) · Earnings · Tutorial · Pro
 
 Nav grouped as in the Shell section. Badges: Demand (confirmed orders without a plan), Allocations (draft plans), Dispatch (assigned tasks), QC Review (pending), Payouts (pending). Pinned card: "N batches awaiting QC". Primary "+": New allocation.
 
-- [ ] **`/admin/dashboard`**
+- [x] **`/admin/dashboard`**
   - **Layout:** greeting; tinted StatTiles; **Pipeline strip** (Demand → Allocate → Dispatch → QC → Payout, each a count linking to its page); weekly production chart with range pills; recent orders; top growers.
   - **Verdelo:** V6 (the pipeline is implicit today), V4, V2.
   - **Fix:** weekly chart is hardcoded (`[65,78,85…]`, labels W7–W14), replace with real data; remove fake deltas ("+12 this week", "+18%"); "Deliveries / In transit" shows the wrong number; top-growers "tasks" shown under trays; order rows link nowhere (drop the false affordance or link); top growers link to detail; use the unused `ActivityFeed` with real events.
   - **Data:** weekly production/delivery aggregation.
-- [ ] **`/admin/demand`**
+- [x] **`/admin/demand`**
   - **Layout:** master–detail: left list of orders needing plans sorted by urgency (days to delivery) with crop filter; right preview of the calculation (Base + Buffer = Total trays) and **planned sow/harvest dates**.
   - **Verdelo:** V5, V2.
   - **Fix:** tray math is duplicated on the client; use `calculateProductionPlan` in `src/lib/business.ts`.
   - **New:** multi-select + **Create plans (n)** bulk action.
   - **Decision:** buffer stays display-only (25% constant); editable buffer deferred.
-- [ ] **`/admin/allocate`**
+- [x] **`/admin/allocate`**
   - **Layout:** two sticky panels: plans left; right grower assignment with a **capacity meter per grower** ("5 of 15 trays free"), search and filters (city, FSSAI verified), NEAREST tag, score bar, thick assigned-vs-total Meter; mobile: panels stack with a sticky action bar.
   - **Verdelo:** V4, V5, V2.
   - **Fix:** `kitSize` and `activeTasks` are fetched but never shown and nothing stops over-allocation → warn and block over capacity; urgency chip on plans; `<a>` → `Link`; remove the unreachable "Done" state.
-- [ ] **`/admin/dispatch`**
+- [x] **`/admin/dispatch`**
   - **Layout:** tasks **grouped by grower** (accordion), waiting-time chip ("allocated 2 days ago"), grower city.
   - **Verdelo:** V5, V6.
   - **Fix:** the double card layer; "dispatch" is overloaded (Allocate's button is also "Dispatch Tasks") → rename this action "Mark seeds delivered".
   - **New:** per-grower "Mark all delivered"; undo toast.
-- [ ] **`/admin/qc`** (queue = review workspace)
+- [x] **`/admin/qc`** (queue = review workspace)
   - **Layout:** master–detail: left queue (grower, crop, tray, day, waiting time; filters by crop/grower; counts); right **review panel**: large photo pair, day strip of all check-ins, notes quote, **decision bar** Pass / Risk / Reject.
   - **Verdelo:** V5, V6, V1 (the decision bar is the only solid-accent area).
   - **Fix:** long scroll of huge images; lightbox has no close button; only the latest check-in is shown; no link to batch detail; Risk can be clicked repeatedly with no feedback.
   - **New:** reason chips + notes (`processQCCheckIn` already accepts `notes`, the UI never sends them); keyboard shortcuts (P/R/X, J/K); auto-advance after a decision. The reason reaches the grower (`/grower/tasks/[taskId]`).
-- [ ] **`/admin/qc/[batchId]`**
+- [x] **`/admin/qc/[batchId]`**
   - **Plan:** build it properly (a stub today: placeholder text, hidden form, nothing links to it): the same review component deep-linked, with the full check-in history; linked from queue rows and notifications. Remove `QCReviewPanel`'s placeholder.
-- [ ] **`/admin/hubs`**
+- [x] **`/admin/hubs`**
   - **Layout:** tiles: name, cluster, drop-off window, grower count, upcoming deliveries.
   - **Verdelo:** V2. **Fix:** the empty state says "create hubs" but no create exists (copy fix).
   - **Decision:** allocation now describes "direct delivery", so hubs may be legacy. Restyle, do not expand.
-- [ ] **`/admin/hubs/[hubId]`**
+- [x] **`/admin/hubs/[hubId]`**
   - **Layout:** master–detail: hub facts + drop-off window; deliveries for the hub; growers list.
   - **Verdelo:** V2.
   - **Fix:** `HubAggregator` is fed hardcoded `expectedKg=25 / receivedKg=0` → compute from deliveries, or **remove the meter** rather than show fake data; grower rows link to grower detail.
-- [ ] **`/admin/growers`**
+- [x] **`/admin/growers`**
   - **Layout:** People pattern: title + subtitle; FilterChips with counts (All · FSSAI verified · Pending · No FSSAI · Inactive); search pill; DataTable (name, city, kit, score with mini meter, FSSAI chip, active); row → detail.
   - **Verdelo:** V6, V5, V2.
   - **Fix:** the "Pending FSSAI" chip becomes the **verification queue** (today you open each grower); show `isActive` and cluster; score has no breakdown.
   - **New:** inline Verify (action exists) with confirm.
-- [ ] **`/admin/growers/[growerId]`**
+- [x] **`/admin/growers/[growerId]`**
   - **Layout:** profile panel + tinted StatTiles (composite, yield, quality, timeliness, earnings, each with a caption) + Tabs: **Tasks · Payouts · Compliance** (`GrowerComplianceCard` under Compliance).
   - **Verdelo:** V2, V5.
   - **Fix:** `tasks` and `payouts` are fetched and never shown; no contact info.
   - **New:** activate/deactivate toggle (small new server action on `Grower.isActive`).
-- [ ] **`/admin/restaurants`**
+- [x] **`/admin/restaurants`**
   - **Layout:** People pattern: DataTable (name, city, orders, revenue, last order, status, contact); FilterChips with counts: **All · Active · Dormant (no order in 30 days) · Never ordered** (the funnel findings as a working filter); search.
   - **Verdelo:** V2, V6.
   - **Fix:** it loads every order only to count them → aggregate query; cards link nowhere.
-- [ ] **`/admin/restaurants/[restaurantId]`** (**new page**)
+- [x] **`/admin/restaurants/[restaurantId]`** (**new page**)
   - **Layout:** profile panel; tiles (orders, revenue, average rating, last order); order history table; feedback list; status chip.
   - **Verdelo:** V2. **Why:** there is no restaurant detail anywhere today.
-- [ ] **`/admin/deliveries`**
+- [x] **`/admin/deliveries`**
   - **Layout:** DataTable + FilterChips by status (counts); columns: order, restaurant, kg, delivery date, hub, status, late flag; inline segmented progress; "Load more" beyond 20.
   - **Verdelo:** V5, V6.
   - **Fix:** nothing actionable today; FAILED has no state; no order id/kg/date/late flag.
   - **New:** advance status inline (check that `/api/admin/delivery/[id]` supports it).
-- [ ] **`/admin/analytics`**
+- [x] **`/admin/analytics`**
   - **Layout:** Verdelo Insights: 4 tinted StatTiles with sparklines; range pills; **Revenue vs Grower payouts vs Commission kept** as paired bars (our version of "Money in & out"); orders-over-time area chart; per-crop and top-restaurant breakdowns; underline Tabs: Revenue · Production · Quality.
   - **Verdelo:** V4 (the page's job), V2, V5.
   - **Fix:** no time dimension or charts today; overlaps the dashboard KPIs, so remove the duplicates.
   - **Data:** new time-bucketed aggregation actions.
-- [ ] **`/admin/kpis`**
+- [x] **`/admin/kpis`**
   - **Layout:** 7 StatTiles (tint by status: good / watch amber / no data grey), big number, thin target Meter, caption; sparkline only where a series can be computed (kg delivered, MRR); the long text table becomes a "Definitions" accordion.
   - **Verdelo:** V2, V1, V6.
   - **Fix:** targets are hardcoded strings → constants; the table scrolls on mobile (720px min).
-- [ ] **`/admin/payouts`**
+- [x] **`/admin/payouts`**
   - **Layout:** StatTiles (pending ₹, paid ₹); FilterChips (Pending · Paid · Failed); search; DataTable with a batch/task/crop column; grower names link.
   - **Verdelo:** V6, V5.
   - **Fix:** summaries are computed from the 30 loaded rows only → aggregate over all payouts.
