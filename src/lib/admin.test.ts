@@ -5,7 +5,7 @@ import { describe, expect, it, vi } from "vitest";
 vi.mock("@/lib/prisma", () => ({ prisma: {} }));
 
 import { calculateProductionPlan } from "@/lib/business";
-import { checkAllocation, composeQcNotes, daysUntil, decisionError, decisionForKey, nextIndex, haversineKm, pipelineSentence, proposeAllocation, scoreCandidates, type GrowerInput, planOrder, qcPassPercent, sortByUrgency, urgencyOf, waitingFor, weeklyTotals } from "./admin";
+import { checkAllocation, commission, composeQcNotes, fssaiKind, growerMatches, isLate, kpiVerdict, parseDeliveryFilter, parseGrowerFilter, parsePayoutFilter, parseRestaurantFilter, payoutFilterOf, restaurantActivity, scorePercent, daysUntil, decisionError, decisionForKey, nextIndex, haversineKm, pipelineSentence, proposeAllocation, scoreCandidates, type GrowerInput, planOrder, qcPassPercent, sortByUrgency, urgencyOf, waitingFor, weeklyTotals } from "./admin";
 
 const NOW = new Date(2026, 10, 15, 14, 0);
 const inDays = (n: number) => new Date(2026, 10, 15 + n);
@@ -236,5 +236,88 @@ describe("QC notes and decisions", () => {
     expect(nextIndex(2, 3)).toBe(0);
     expect(nextIndex(0, 3, -1)).toBe(2);
     expect(nextIndex(0, 0)).toBe(-1);
+  });
+});
+
+describe("growers", () => {
+  const g = (over: Record<string, unknown> = {}) => ({ fssaiRegNumber: null as string | null, fssaiVerifiedAt: null as Date | null, isActive: true, ...over });
+
+  it("classifies FSSAI as verified, pending or missing", () => {
+    expect(fssaiKind(g({ fssaiRegNumber: "123", fssaiVerifiedAt: NOW }))).toBe("verified");
+    expect(fssaiKind(g({ fssaiRegNumber: "123" }))).toBe("pending");
+    expect(fssaiKind(g())).toBe("missing");
+  });
+
+  it("filters by compliance, and by account status separately", () => {
+    expect(growerMatches(g({ fssaiRegNumber: "1" }), "pending")).toBe(true);
+    expect(growerMatches(g({ fssaiRegNumber: "1" }), "missing")).toBe(false);
+    expect(growerMatches(g({ isActive: false }), "inactive")).toBe(true);
+    expect(growerMatches(g({ isActive: false }), "missing")).toBe(true); // overlaps on purpose
+    expect(growerMatches(g(), "inactive")).toBe(false);
+    expect(growerMatches(g(), "all")).toBe(true);
+  });
+
+  it("parses the filter from the URL, falling back to all", () => {
+    expect(parseGrowerFilter("pending")).toBe("pending");
+    expect(parseGrowerFilter("nonsense")).toBe("all");
+    expect(parseGrowerFilter(undefined)).toBe("all");
+  });
+
+  it("shows a score only once a tray has finished", () => {
+    expect(scorePercent(0.5, 0)).toBeNull();
+    expect(scorePercent(0.94, 3)).toBe(94);
+  });
+});
+
+describe("restaurantActivity", () => {
+  it("is never, dormant after 30 days without an order, or active", () => {
+    expect(restaurantActivity(null, NOW)).toBe("never");
+    expect(restaurantActivity(inDays(-10), NOW)).toBe("active");
+    expect(restaurantActivity(inDays(-30), NOW)).toBe("active");
+    expect(restaurantActivity(inDays(-31), NOW)).toBe("dormant");
+  });
+  it("parses the filter", () => {
+    expect(parseRestaurantFilter("dormant")).toBe("dormant");
+    expect(parseRestaurantFilter("x")).toBe("all");
+  });
+});
+
+describe("isLate", () => {
+  const promised = new Date(2026, 9, 25);
+  it("counts a delivery any time on the promised day as on time", () => {
+    expect(isLate({ status: "DELIVERED", deliveredAt: new Date(2026, 9, 25, 23, 50) }, promised, NOW)).toBe(false);
+    expect(isLate({ status: "DELIVERED", deliveredAt: new Date(2026, 9, 26, 0, 10) }, promised, NOW)).toBe(true);
+  });
+  it("is late when the day has passed and it has not arrived", () => {
+    expect(isLate({ status: "IN_TRANSIT", deliveredAt: null }, new Date(2026, 10, 10), NOW)).toBe(true);
+    expect(isLate({ status: "PACKED", deliveredAt: null }, new Date(2026, 10, 20), NOW)).toBe(false);
+  });
+  it("does not call a failed delivery late: it is failed", () => {
+    expect(isLate({ status: "FAILED", deliveredAt: null }, new Date(2026, 10, 1), NOW)).toBe(false);
+  });
+  it("parses the delivery filter", () => {
+    expect(parseDeliveryFilter("IN_TRANSIT")).toBe("IN_TRANSIT");
+    expect(parseDeliveryFilter("lost")).toBe("all");
+  });
+});
+
+describe("payouts, money and KPIs", () => {
+  it("files processing under pending, and opens on pending", () => {
+    expect(["PENDING", "PROCESSING", "PAID", "FAILED"].map(payoutFilterOf)).toEqual(["pending", "pending", "paid", "failed"]);
+    expect(parsePayoutFilter(undefined)).toBe("pending");
+    expect(parsePayoutFilter("paid")).toBe("paid");
+  });
+
+  it("keeps revenue minus payouts as the commission, with a percentage", () => {
+    expect(commission(2680, 1850)).toEqual({ kept: 830, percent: 31 });
+    expect(commission(0, 0)).toEqual({ kept: 0, percent: null });
+  });
+
+  it("judges a KPI against its target, either way round, with no data as its own state", () => {
+    expect(kpiVerdict(0.96, 0.95)).toBe("met");
+    expect(kpiVerdict(0.9, 0.95)).toBe("below");
+    expect(kpiVerdict(0.02, 0.03, true)).toBe("met");
+    expect(kpiVerdict(0.05, 0.03, true)).toBe("below");
+    expect(kpiVerdict(null, 0.95)).toBe("nodata");
   });
 });

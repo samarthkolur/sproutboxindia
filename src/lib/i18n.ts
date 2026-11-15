@@ -752,6 +752,35 @@ export const translations: Record<string, TranslationEntry> = {
   "Days to harvest": { kn: "ಕೊಯ್ಲಿಗೆ ದಿನಗಳು", hi: "कटाई तक के दिन" },
   "Digital, hub & delivery checks": { kn: "ಡಿಜಿಟಲ್, ಹಬ್ ಮತ್ತು ವಿತರಣಾ ಪರಿಶೀಲನೆಗಳು", hi: "डिजिटल, हब और डिलीवरी जांच" },
   "Farm-to-fork, door to door.": { kn: "ಜಮೀನಿನಿಂದ ತಟ್ಟೆಗೆ, ಬಾಗಿಲಿಂದ ಬಾಗಿಲಿಗೆ.", hi: "खेत से थाली तक, दरवाज़े से दरवाज़े तक।" },
+  "Tray": { kn: "ಟ್ರೇ", hi: "ट्रे" },
+  "Filter growers": { kn: "ಬೆಳೆಗಾರರನ್ನು ಫಿಲ್ಟರ್ ಮಾಡಿ", hi: "उत्पादक फ़िल्टर करें" },
+  "Search by name, email or city": { kn: "ಹೆಸರು, ಇಮೇಲ್ ಅಥವಾ ನಗರದ ಮೂಲಕ ಹುಡುಕಿ", hi: "नाम, ईमेल या शहर से खोजें" },
+  "Everyone who grows for SproutBox.": { kn: "SproutBox ಗಾಗಿ ಬೆಳೆಸುವ ಎಲ್ಲರೂ.", hi: "SproutBox के लिए उगाने वाले सभी।" },
+  "1 FSSAI number is waiting to be verified.": { kn: "1 FSSAI ಸಂಖ್ಯೆ ಪರಿಶೀಲನೆಗಾಗಿ ಕಾಯುತ್ತಿದೆ.", hi: "1 FSSAI नंबर सत्यापन की प्रतीक्षा में है।" },
+  "No growers yet": { kn: "ಇನ್ನೂ ಬೆಳೆಗಾರರಿಲ್ಲ", hi: "अभी कोई उत्पादक नहीं" },
+  "Grower profiles appear here after they join.": { kn: "ಬೆಳೆಗಾರರು ಸೇರಿದ ನಂತರ ಅವರ ಪ್ರೊಫೈಲ್‌ಗಳು ಇಲ್ಲಿ ಕಾಣಿಸುತ್ತವೆ.", hi: "उत्पादकों के जुड़ने के बाद उनकी प्रोफ़ाइल यहां दिखेंगी।" },
+  "No growers match": { kn: "ಯಾವುದೇ ಬೆಳೆಗಾರರು ಹೊಂದಿಕೆಯಾಗುತ್ತಿಲ್ಲ", hi: "कोई उत्पादक मेल नहीं खाता" },
+  "No scores yet": { kn: "ಇನ್ನೂ ಅಂಕಗಳಿಲ್ಲ", hi: "अभी कोई स्कोर नहीं" },
+  "FSSAI": { kn: "FSSAI", hi: "FSSAI" },
+  "Verify": { kn: "ಪರಿಶೀಲಿಸಿ", hi: "सत्यापित करें" },
+  "Verify FSSAI registration": { kn: "FSSAI ನೋಂದಣಿಯನ್ನು ಪರಿಶೀಲಿಸಿ", hi: "FSSAI पंजीकरण सत्यापित करें" },
+  "Mark verified": { kn: "ಪರಿಶೀಲಿತ ಎಂದು ಗುರುತಿಸಿ", hi: "सत्यापित चिह्नित करें" },
+  "Confirm you have checked this registration number against the FSSAI register.": { kn: "ಈ ನೋಂದಣಿ ಸಂಖ್ಯೆಯನ್ನು FSSAI ನೋಂದಣಿಯೊಂದಿಗೆ ಪರಿಶೀಲಿಸಿದ್ದೀರಿ ಎಂದು ದೃಢೀಕರಿಸಿ.", hi: "पुष्टि करें कि आपने इस पंजीकरण नंबर को FSSAI रजिस्टर से जांचा है।" },
+  "Grower sections": { kn: "ಬೆಳೆಗಾರರ ವಿಭಾಗಗಳು", hi: "उत्पादक के अनुभाग" },
+  "Overall": { kn: "ಒಟ್ಟಾರೆ", hi: "कुल मिलाकर" },
+  "Yield, quality and timing combined": { kn: "ಇಳುವರಿ, ಗುಣಮಟ್ಟ ಮತ್ತು ಸಮಯಪಾಲನೆ ಸೇರಿ", hi: "उपज, गुणवत्ता और समय-पालन मिलाकर" },
+  "Joined": { kn: "ಸೇರಿದ ದಿನ", hi: "जुड़ने की तारीख" },
+  "Verified": { kn: "ಪರಿಶೀಲಿತ", hi: "सत्यापित" },
+  "Food safety law requires it before a grower supplies restaurants": { kn: "ಬೆಳೆಗಾರರು ರೆಸ್ಟೋರೆಂಟ್‌ಗಳಿಗೆ ಪೂರೈಸುವ ಮೊದಲು ಆಹಾರ ಸುರಕ್ಷತಾ ಕಾನೂನು ಇದನ್ನು ಕಡ್ಡಾಯಗೊಳಿಸುತ್ತದೆ", hi: "उत्पादक के रेस्टोरेंट को आपूर्ति से पहले खाद्य सुरक्षा कानून में यह ज़रूरी है" },
+  "No registration number has been submitted.": { kn: "ಯಾವುದೇ ನೋಂದಣಿ ಸಂಖ್ಯೆಯನ್ನು ಸಲ್ಲಿಸಿಲ್ಲ.", hi: "कोई पंजीकरण नंबर जमा नहीं किया गया।" },
+  "No tasks have been given to this grower yet.": { kn: "ಈ ಬೆಳೆಗಾರರಿಗೆ ಇನ್ನೂ ಯಾವುದೇ ಕೆಲಸ ನೀಡಿಲ್ಲ.", hi: "इस उत्पादक को अभी कोई काम नहीं दिया गया।" },
+  "No payouts yet.": { kn: "ಇನ್ನೂ ಪಾವತಿಗಳಿಲ್ಲ.", hi: "अभी कोई भुगतान नहीं।" },
+  "Can be given trays.": { kn: "ಟ್ರೇಗಳನ್ನು ನೀಡಬಹುದು.", hi: "ट्रे दी जा सकती हैं।" },
+  "Paused: skipped when allocating trays.": { kn: "ವಿರಾಮದಲ್ಲಿದೆ: ಟ್ರೇ ಹಂಚುವಾಗ ಬಿಟ್ಟುಬಿಡಲಾಗುತ್ತದೆ.", hi: "रोका गया: ट्रे आवंटन में छोड़ा जाता है।" },
+  "Grower is active again": { kn: "ಬೆಳೆಗಾರರು ಮತ್ತೆ ಸಕ್ರಿಯರಾಗಿದ್ದಾರೆ", hi: "उत्पादक फिर से सक्रिय है" },
+  "Grower paused": { kn: "ಬೆಳೆಗಾರರನ್ನು ವಿರಾಮಗೊಳಿಸಲಾಗಿದೆ", hi: "उत्पादक को रोका गया" },
+  "They can be given trays again.": { kn: "ಅವರಿಗೆ ಮತ್ತೆ ಟ್ರೇಗಳನ್ನು ನೀಡಬಹುದು.", hi: "उन्हें फिर से ट्रे दी जा सकती हैं।" },
+  "They will be skipped when allocating.": { kn: "ಹಂಚುವಾಗ ಅವರನ್ನು ಬಿಟ್ಟುಬಿಡಲಾಗುತ್ತದೆ.", hi: "आवंटन में उन्हें छोड़ दिया जाएगा।" },
   "QC review": { kn: "QC ಪರಿಶೀಲನೆ", hi: "QC समीक्षा" },
   "Review each tray's photos and decide: pass it, flag a risk, or reject it with a reason.": { kn: "ಪ್ರತಿ ಟ್ರೇಯ ಫೋಟೋಗಳನ್ನು ಪರಿಶೀಲಿಸಿ ನಿರ್ಧರಿಸಿ: ತೇರ್ಗಡೆ ಮಾಡಿ, ಅಪಾಯ ಗುರುತಿಸಿ ಅಥವಾ ಕಾರಣದೊಂದಿಗೆ ತಿರಸ್ಕರಿಸಿ.", hi: "हर ट्रे की फोटो देखकर तय करें: पास करें, जोखिम चिह्नित करें, या कारण के साथ अस्वीकार करें।" },
   "All crops": { kn: "ಎಲ್ಲಾ ಬೆಳೆಗಳು", hi: "सभी फसलें" },
@@ -1283,6 +1312,22 @@ const MONTH_SHORT = {
 const MONTH_SHORT_EN = MONTHS.map((month) => month.slice(0, 3));
 
 const regexTranslations = [
+  {
+    pattern: /^(\d+) FSSAI numbers are waiting to be verified\.$/,
+    replace: (language: Exclude<LanguageCode, "en">, n: string) => (language === "kn" ? `${n} FSSAI ಸಂಖ್ಯೆಗಳು ಪರಿಶೀಲನೆಗಾಗಿ ಕಾಯುತ್ತಿವೆ.` : `${n} FSSAI नंबर सत्यापन की प्रतीक्षा में हैं।`),
+  },
+  {
+    pattern: /^(\d+) of (\d+) trays$/,
+    replace: (language: Exclude<LanguageCode, "en">, a: string, b: string) => (language === "kn" ? `${b} ರಲ್ಲಿ ${a} ಟ್ರೇಗಳು` : `${b} में से ${a} ट्रे`),
+  },
+  {
+    pattern: /^Verify FSSAI for (.+)$/,
+    replace: (language: Exclude<LanguageCode, "en">, who: string) => (language === "kn" ? `${who} ಅವರ FSSAI ಪರಿಶೀಲಿಸಿ` : `${who} का FSSAI सत्यापित करें`),
+  },
+  {
+    pattern: /^(.+) is now marked as verified\.$/,
+    replace: (language: Exclude<LanguageCode, "en">, who: string) => (language === "kn" ? `${who} ಅವರನ್ನು ಈಗ ಪರಿಶೀಲಿತ ಎಂದು ಗುರುತಿಸಲಾಗಿದೆ.` : `${who} को अब सत्यापित चिह्नित किया गया है।`),
+  },
   {
     pattern: /^(.+) · Tray (\d+) · Day (\d+)$/,
     replace: (language: Exclude<LanguageCode, "en">, crop: string, tray: string, day: string) =>

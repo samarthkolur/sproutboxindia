@@ -254,3 +254,106 @@ export function nextIndex(current: number, length: number, direction: 1 | -1 = 1
   if (length <= 0) return -1;
   return (current + direction + length) % length;
 }
+
+// ── Growers ─────────────────────────────────────────────────────────────────
+
+export type GrowerFilter = "all" | "verified" | "pending" | "missing" | "inactive";
+export const GROWER_FILTERS: GrowerFilter[] = ["all", "verified", "pending", "missing", "inactive"];
+
+export function parseGrowerFilter(value: string | undefined): GrowerFilter {
+  return (GROWER_FILTERS as string[]).includes(value ?? "") ? (value as GrowerFilter) : "all";
+}
+
+export type FssaiKind = "verified" | "pending" | "missing";
+
+export function fssaiKind(g: { fssaiRegNumber: string | null; fssaiVerifiedAt: Date | null }): FssaiKind {
+  if (g.fssaiVerifiedAt) return "verified";
+  return g.fssaiRegNumber ? "pending" : "missing";
+}
+
+/** Chips overlap on purpose: "Inactive" is about the account, the FSSAI chips are about compliance. */
+export function growerMatches(g: { fssaiRegNumber: string | null; fssaiVerifiedAt: Date | null; isActive: boolean }, filter: GrowerFilter) {
+  if (filter === "all") return true;
+  if (filter === "inactive") return !g.isActive;
+  return fssaiKind(g) === filter;
+}
+
+/** Score as a whole percent, or null until a tray has finished (the stored 0.5 is only a default). */
+export function scorePercent(score: number, scoredTrays: number) {
+  return scoredTrays > 0 ? Math.round(score * 100) : null;
+}
+
+// ── Restaurants ─────────────────────────────────────────────────────────────
+
+export type RestaurantFilter = "all" | "active" | "dormant" | "never";
+export const RESTAURANT_FILTERS: RestaurantFilter[] = ["all", "active", "dormant", "never"];
+export const DORMANT_AFTER_DAYS = 30;
+
+export function parseRestaurantFilter(value: string | undefined): RestaurantFilter {
+  return (RESTAURANT_FILTERS as string[]).includes(value ?? "") ? (value as RestaurantFilter) : "all";
+}
+
+/** Never ordered, ordered but not in the last 30 days (dormant), or ordering. */
+export function restaurantActivity(lastOrderAt: Date | null, now: Date = new Date()): Exclude<RestaurantFilter, "all"> {
+  if (!lastOrderAt) return "never";
+  return daysUntil(now, lastOrderAt) > DORMANT_AFTER_DAYS ? "dormant" : "active";
+}
+
+// ── Deliveries ──────────────────────────────────────────────────────────────
+
+export type DeliveryFilter = "all" | "PREPARING" | "PACKED" | "IN_TRANSIT" | "DELIVERED" | "FAILED";
+export const DELIVERY_FILTERS: DeliveryFilter[] = ["all", "PREPARING", "PACKED", "IN_TRANSIT", "DELIVERED", "FAILED"];
+
+export function parseDeliveryFilter(value: string | undefined): DeliveryFilter {
+  return (DELIVERY_FILTERS as string[]).includes(value ?? "") ? (value as DeliveryFilter) : "all";
+}
+
+/** The one step a delivery can take next, with the button's label. */
+export const NEXT_DELIVERY_STEP: Record<string, { status: "PACKED" | "IN_TRANSIT" | "DELIVERED"; label: string } | undefined> = {
+  PREPARING: { status: "PACKED", label: "Mark packed" },
+  PACKED: { status: "IN_TRANSIT", label: "Mark in transit" },
+  IN_TRANSIT: { status: "DELIVERED", label: "Mark delivered" },
+};
+
+/**
+ * Late means it arrived after the promised day, or the promised day has passed and it has not
+ * arrived. The promised day runs to its end: a 10:40 delivery on the delivery date is on time.
+ */
+export function isLate(delivery: { status: string; deliveredAt: Date | null }, promised: Date, now: Date = new Date()) {
+  const deadline = new Date(promised.getFullYear(), promised.getMonth(), promised.getDate() + 1).getTime();
+  if (delivery.deliveredAt) return delivery.deliveredAt.getTime() >= deadline;
+  if (delivery.status === "FAILED") return false;
+  return now.getTime() >= deadline;
+}
+
+// ── Payouts ─────────────────────────────────────────────────────────────────
+
+export type PayoutFilter = "pending" | "paid" | "failed";
+export const PAYOUT_FILTERS: PayoutFilter[] = ["pending", "paid", "failed"];
+
+export function parsePayoutFilter(value: string | undefined): PayoutFilter {
+  return (PAYOUT_FILTERS as string[]).includes(value ?? "") ? (value as PayoutFilter) : "pending";
+}
+
+/** Processing is still owed, so it sits under Pending. */
+export function payoutFilterOf(status: string): PayoutFilter {
+  return status === "PAID" ? "paid" : status === "FAILED" ? "failed" : "pending";
+}
+
+// ── Money ───────────────────────────────────────────────────────────────────
+
+/** What SproutBox keeps: what restaurants paid minus what growers were paid. */
+export function commission(revenue: number, payouts: number) {
+  const kept = revenue - payouts;
+  return { kept, percent: revenue > 0 ? Math.round((kept / revenue) * 100) : null };
+}
+
+// ── KPI scorecard ───────────────────────────────────────────────────────────
+
+export type KpiVerdict = "met" | "below" | "nodata";
+
+/** Met, below or no data. `lowerIsBetter` is for churn. */
+export function kpiVerdict(value: number | null, target: number, lowerIsBetter = false): KpiVerdict {
+  if (value === null) return "nodata";
+  return (lowerIsBetter ? value <= target : value >= target) ? "met" : "below";
+}

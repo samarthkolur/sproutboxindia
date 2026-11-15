@@ -84,3 +84,53 @@ export async function getAdminOverview(adminUserId: string, now: Date = new Date
     activity,
   };
 }
+
+// ── Growers ─────────────────────────────────────────────────────────────────
+
+export async function getAdminGrowers() {
+  const growers = await prisma.grower.findMany({
+    include: {
+      user: { select: { name: true, email: true } },
+      tasks: { where: { status: { in: ["ASSIGNED", "IN_PROGRESS", "HARVEST_READY"] } }, select: { trayCount: true } },
+      _count: { select: { payouts: true } },
+    },
+    orderBy: { compositeScore: "desc" },
+  });
+  // Scored trays: the scores come from finished (harvested or rejected) trays only.
+  const finished = await prisma.batch.groupBy({ by: ["taskId"], where: { status: { in: ["HARVESTED", "REJECTED"] } }, _count: true });
+  const taskGrower = await prisma.task.findMany({ where: { id: { in: finished.map((f) => f.taskId) } }, select: { id: true, growerId: true } });
+  const growerOfTask = new Map(taskGrower.map((t) => [t.id, t.growerId]));
+  const scored = new Map<string, number>();
+  for (const f of finished) {
+    const growerId = growerOfTask.get(f.taskId);
+    if (growerId) scored.set(growerId, (scored.get(growerId) ?? 0) + f._count);
+  }
+  return growers.map((g) => ({
+    id: g.id,
+    name: g.user.name ?? g.user.email,
+    email: g.user.email,
+    city: g.city,
+    kitSize: g.kitSize,
+    activeTrays: g.tasks.reduce((sum, t) => sum + t.trayCount, 0),
+    compositeScore: g.compositeScore,
+    scoredTrays: scored.get(g.id) ?? 0,
+    fssaiRegNumber: g.fssaiRegNumber,
+    fssaiVerifiedAt: g.fssaiVerifiedAt,
+    isActive: g.isActive,
+  }));
+}
+
+export async function getAdminGrower(growerId: string) {
+  const grower = await prisma.grower.findUnique({
+    where: { id: growerId },
+    include: {
+      user: { select: { name: true, email: true } },
+      cluster: { select: { name: true } },
+      tasks: { orderBy: { sowDate: "desc" }, include: { plan: { select: { orderId: true, order: { select: { restaurant: { select: { businessName: true } } } } } } } },
+      payouts: { orderBy: { createdAt: "desc" }, include: { batch: { select: { trayNumber: true, task: { select: { id: true, cropType: true } } } } } },
+    },
+  });
+  if (!grower) return null;
+  const scoredTrays = await prisma.batch.count({ where: { task: { growerId }, status: { in: ["HARVESTED", "REJECTED"] } } });
+  return { grower, scoredTrays };
+}
