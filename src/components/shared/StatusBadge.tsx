@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils";
+import { StatusChip, type Tone } from "@/components/ui/status-chip";
 
 type StatusType =
   | "pending"
@@ -17,60 +17,21 @@ interface StatusBadgeProps {
   className?: string;
 }
 
-const statusConfig: Record<StatusType, { label: string; classes: string }> = {
-  pending: {
-    label: "Pending",
-    classes: "bg-amber-50 text-amber-700 border-amber-200",
-  },
-  active: {
-    label: "Active",
-    classes: "bg-blue-50 text-blue-700 border-blue-200",
-  },
-  completed: {
-    label: "Completed",
-    classes: "bg-sprout-50 text-sprout-700 border-sprout-200",
-  },
-  cancelled: {
-    label: "Cancelled",
-    classes: "bg-red-50 text-red-700 border-red-200",
-  },
-  growing: {
-    label: "Growing",
-    classes: "bg-green-50 text-green-700 border-green-200",
-  },
-  sowing: {
-    label: "Sowing",
-    classes: "bg-amber-50 text-amber-700 border-amber-200",
-  },
-  ready: {
-    label: "Ready",
-    classes: "bg-sprout-50 text-sprout-700 border-sprout-200",
-  },
-  delivered: {
-    label: "Delivered",
-    classes: "bg-blue-50 text-blue-700 border-blue-200",
-  },
-  failed: {
-    label: "Failed",
-    classes: "bg-red-50 text-red-700 border-red-200",
-  },
-  review: {
-    label: "In Review",
-    classes: "bg-purple-50 text-purple-700 border-purple-200",
-  },
+// Legacy wrapper: old lowercase statuses now render through the single StatusChip map.
+const LEGACY: Record<StatusType, { label: string; tone: Tone }> = {
+  pending: { label: "Pending", tone: "watch" },
+  active: { label: "Active", tone: "info" },
+  completed: { label: "Completed", tone: "good" },
+  cancelled: { label: "Cancelled", tone: "risk" },
+  growing: { label: "Growing", tone: "info" },
+  sowing: { label: "Sowing", tone: "neutral" },
+  ready: { label: "Ready", tone: "good" },
+  delivered: { label: "Delivered", tone: "good" },
+  failed: { label: "Failed", tone: "risk" },
+  review: { label: "In Review", tone: "watch" },
 };
 
 export function StatusBadge({ status, className }: StatusBadgeProps) {
-  const config = statusConfig[status];
-  return (
-    <span
-      className={cn(
-        "inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold border",
-        config.classes,
-        className
-      )}
-    >
-      {config.label}
-    </span>
-  );
+  const config = LEGACY[status];
+  return <StatusChip label={config.label} tone={config.tone} className={className} />;
 }

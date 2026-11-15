@@ -7,6 +7,8 @@ interface GlassCardProps {
   padding?: "sm" | "md" | "lg";
 }
 
+// Legacy container kept so unconverted pages pick up the new panel look.
+// New code should use <Panel> from components/ui/panel.
 export function GlassCard({
   children,
   className,
@@ -22,9 +24,9 @@ export function GlassCard({
   return (
     <div
       className={cn(
-        "glass-card",
+        "panel",
         paddings[padding],
-        hover && "cursor-pointer",
+        hover && "cursor-pointer transition-colors hover:bg-panel/80",
         className
       )}
     >

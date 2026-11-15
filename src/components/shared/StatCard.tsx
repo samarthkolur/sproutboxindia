@@ -10,6 +10,8 @@ interface StatCardProps {
   className?: string;
 }
 
+// Legacy stat card (restyled onto the new tokens). New pages use <StatTile>,
+// which requires a plain-language caption (V2).
 export function StatCard({
   label,
   value,
@@ -19,35 +21,29 @@ export function StatCard({
   className,
 }: StatCardProps) {
   const changeColors = {
-    positive: "text-sprout-600",
-    negative: "text-status-error",
-    neutral: "text-text-muted",
+    positive: "text-good",
+    negative: "text-risk",
+    neutral: "text-ink-muted",
   };
 
   const TrendIcon =
-    changeType === "positive"
-      ? TrendingUp
-      : changeType === "negative"
-        ? TrendingDown
-        : Minus;
+    changeType === "positive" ? TrendingUp : changeType === "negative" ? TrendingDown : Minus;
 
   return (
-    <div className={cn("glass-card p-4 sm:p-5 group hover:shadow-lg hover:shadow-sprout-500/10 transition-all duration-300", className)}>
-      <div className="flex items-start justify-between mb-3">
-        <p className="text-[10px] sm:text-[11px] font-semibold text-text-muted uppercase tracking-wider leading-tight">
-          {label}
-        </p>
+    <div className={cn("rounded-tile border border-white/50 bg-panel/55 p-4 shadow-panel sm:p-5", className)}>
+      <div className="mb-3 flex items-start justify-between gap-2">
+        <p className="text-sm leading-tight text-ink-soft">{label}</p>
         {icon && (
-          <div className="w-9 h-9 bg-sprout-100 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:bg-sprout-200 transition-colors duration-300">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-leaf-soft text-ink-soft">
             {icon}
           </div>
         )}
       </div>
-      <p className="text-xl sm:text-2xl font-black text-text-primary mb-1 tracking-tight break-words">{value}</p>
+      <p className="mb-1 break-words text-2xl font-light tracking-tight text-ink tabular-nums sm:text-3xl">{value}</p>
       {change && (
         <div className={cn("flex items-center gap-1", changeColors[changeType])}>
-          <TrendIcon className="w-3 h-3" strokeWidth={2.5} />
-          <span className="text-xs font-semibold">{change}</span>
+          <TrendIcon className="h-3 w-3" strokeWidth={2.5} />
+          <span className="text-micro font-medium">{change}</span>
         </div>
       )}
     </div>
