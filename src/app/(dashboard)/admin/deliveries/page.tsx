@@ -1,74 +1,121 @@
-import { GlassCard } from "@/components/shared/GlassCard";
-import { prisma } from "@/lib/prisma";
-import { Truck, MapPin } from "lucide-react";
+import Link from "next/link";
+import { format } from "date-fns";
+import { Truck } from "lucide-react";
+import { DeliveryActions } from "@/components/admin/DeliveryActions";
+import { EmptyState } from "@/components/shared/EmptyState";
+import { DataTable, type Column } from "@/components/ui/data-table";
+import { FilterChips } from "@/components/ui/filter-chips";
+import { PageHeader } from "@/components/ui/page-header";
+import { StatusChip } from "@/components/ui/status-chip";
+import { DELIVERY_FILTERS, cropName, isLate, parseDeliveryFilter, shortId, type DeliveryFilter } from "@/lib/admin";
+import { getAdminDeliveries } from "@/lib/admin-data";
+import { cn } from "@/lib/utils";
 
-async function getDeliveries() {
-  try {
-    return await prisma.delivery.findMany({
-      include: { order: { include: { restaurant: { select: { businessName: true, address: true } } } }, hub: { select: { name: true } } },
-      orderBy: { createdAt: "desc" },
-      take: 20,
-    });
-  } catch { return []; }
+type Row = Awaited<ReturnType<typeof getAdminDeliveries>>["deliveries"][number];
+
+const LABEL: Record<DeliveryFilter, string> = { all: "All", PREPARING: "Preparing", PACKED: "Packed", IN_TRANSIT: "In transit", DELIVERED: "Delivered", FAILED: "Failed" };
+const STEPS = ["PREPARING", "PACKED", "IN_TRANSIT", "DELIVERED"];
+
+// Four segments, filled up to the current step. A failed delivery shows none, and says so with its chip.
+function Progress({ status }: { status: string }) {
+  const at = STEPS.indexOf(status);
+  return (
+    <span aria-hidden="true" className="flex w-24 gap-1">
+      {STEPS.map((step, i) => (
+        <span key={step} className={cn("h-1.5 flex-1 rounded-full", i <= at ? "bg-leaf" : "bg-inset")} />
+      ))}
+    </span>
+  );
 }
 
-const statusSteps = ["PREPARING", "PACKED", "IN_TRANSIT", "DELIVERED"];
-const statusLabels: Record<string, string> = { PREPARING: "Preparing", PACKED: "Packed", IN_TRANSIT: "In Transit", DELIVERED: "Delivered", FAILED: "Failed" };
+function columns(now: Date): Column<Row>[] {
+  return [
+    {
+      key: "order",
+      header: "Order",
+      mobile: "title",
+      cell: (d) => (
+        <>
+          <span data-i18n-ignore>{d.order.restaurant.businessName}</span>
+          <span className="block text-micro font-normal text-ink-muted">{`${cropName(d.order.cropType)}, ${d.order.quantityKg} kg · ${shortId(d.order.id)}`}</span>
+        </>
+      ),
+    },
+    {
+      key: "date",
+      header: "Delivery date",
+      cell: (d) => (
+        <span className="inline-flex flex-wrap items-center gap-2">
+          <time dateTime={d.order.deliveryDate.toISOString()}>{format(d.order.deliveryDate, "d MMM yyyy")}</time>
+          {isLate(d, d.order.deliveryDate, now) ? <StatusChip tone="risk" label="Late" /> : null}
+        </span>
+      ),
+    },
+    { key: "hub", header: "Hub", cell: (d) => <span data-i18n-ignore>{d.hub.name}</span> },
+    {
+      key: "status",
+      header: "Status",
+      cell: (d) => (
+        <span className="flex flex-col items-start gap-1.5">
+          <StatusChip status={d.status} />
+          <Progress status={d.status} />
+        </span>
+      ),
+    },
+    {
+      key: "actions",
+      header: "Actions",
+      align: "right",
+      cell: (d) => <DeliveryActions deliveryId={d.id} status={d.status} label={`${d.order.restaurant.businessName}, ${shortId(d.order.id)}`} />,
+    },
+  ];
+}
 
-export default async function DeliveriesPage() {
-  const deliveries = await getDeliveries();
+export default async function AdminDeliveriesPage({ searchParams }: { searchParams: { status?: string; limit?: string } }) {
+  const status = parseDeliveryFilter(searchParams.status);
+  const limit = Math.min(200, Math.max(20, Math.floor(Number(searchParams.limit) / 20) * 20 || 20));
+  const { deliveries, hasMore, counts } = await getAdminDeliveries(status, limit);
+  const total = Object.values(counts).reduce((sum, n) => sum + n, 0);
+  const now = new Date();
+
+  const href = (value: string, nextLimit?: number) => {
+    const next = new URLSearchParams();
+    if (value !== "all") next.set("status", value);
+    if (nextLimit && nextLimit > 20) next.set("limit", String(nextLimit));
+    const qs = next.toString();
+    return qs ? `/admin/deliveries?${qs}` : "/admin/deliveries";
+  };
 
   return (
-    <div>
-      <div className="mb-6 sm:mb-8">
-        <div className="flex items-center gap-2 sm:gap-3 mb-1">
-          <Truck className="w-6 h-6 sm:w-7 sm:h-7 text-sprout-700 flex-shrink-0" />
-          <h1 className="text-2xl sm:text-3xl font-black text-text-primary tracking-tight">Deliveries</h1>
-        </div>
-        <p className="text-sm sm:text-base text-text-secondary">Track all deliveries from hub to restaurant</p>
-      </div>
-
-      {deliveries.length > 0 ? (
-        <div className="space-y-4">
-          {deliveries.map((d) => {
-            const currentStep = statusSteps.indexOf(d.status);
-            return (
-              <GlassCard key={d.id}>
-                <div className="mb-4 flex flex-col gap-2 min-[420px]:flex-row min-[420px]:items-start min-[420px]:justify-between">
-                  <div className="min-w-0">
-                    <p className="text-sm font-semibold text-text-primary">{d.order.restaurant.businessName}</p>
-                    <p className="text-xs text-text-muted flex items-center gap-1"><MapPin className="w-3 h-3" /> {d.hub.name}</p>
-                  </div>
-                  <span className={`w-fit shrink-0 rounded-full px-3 py-1 text-[11px] font-semibold ${
-                    d.status === "DELIVERED" ? "bg-sprout-50 text-sprout-700" :
-                    d.status === "IN_TRANSIT" ? "bg-blue-50 text-blue-700" :
-                    d.status === "FAILED" ? "bg-red-50 text-red-700" : "bg-amber-50 text-amber-700"
-                  }`}>{statusLabels[d.status]}</span>
-                </div>
-                {/* Progress pipeline */}
-                <div className="flex items-center gap-1 mb-3">
-                  {statusSteps.map((step, i) => (
-                    <div key={step} className="flex items-center flex-1">
-                      <div className={`w-full h-1.5 rounded-full ${i <= currentStep ? "bg-sprout-500" : "bg-sprout-100"}`} />
-                    </div>
-                  ))}
-                </div>
-                <div className="flex justify-between gap-2 text-[9px] text-text-muted min-[420px]:text-[10px]">
-                  {statusSteps.map((step) => <span key={step}>{statusLabels[step]}</span>)}
-                </div>
-              </GlassCard>
-            );
-          })}
-        </div>
+    <>
+      <PageHeader title="Deliveries" subtitle="Every delivery from the hub to the restaurant. Move each one along as it happens." />
+      {total === 0 ? (
+        <EmptyState icon={Truck} title="No deliveries yet" description="A delivery appears here once an order's trays reach the hub." />
       ) : (
-        <GlassCard>
-          <div className="text-center py-16">
-            <Truck className="w-12 h-12 text-text-muted/30 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-text-primary mb-1">No deliveries</h3>
-            <p className="text-sm text-text-muted">Deliveries will appear once orders are dispatched from hubs</p>
-          </div>
-        </GlassCard>
+        <>
+          <FilterChips
+            ariaLabel="Filter deliveries"
+            value={status}
+            hrefFor={(value) => href(value)}
+            chips={DELIVERY_FILTERS.map((value) => ({ value, label: LABEL[value], count: value === "all" ? total : counts[value] ?? 0 }))}
+            className="mb-5"
+          />
+          <DataTable
+            caption="Deliveries"
+            columns={columns(now)}
+            rows={deliveries}
+            rowKey={(d) => d.id}
+            empty={<EmptyState icon={Truck} title="No deliveries with this status" description="Choose another status to see more." />}
+          />
+          {hasMore ? (
+            <div className="mt-4 text-center">
+              <Link href={href(status, limit + 20)} scroll={false} className="inline-flex rounded-full border border-hairline bg-panel/60 px-5 py-2 text-sm font-medium text-ink-soft transition-colors hover:text-ink">
+                Load more
+              </Link>
+            </div>
+          ) : null}
+        </>
       )}
-    </div>
+    </>
   );
 }

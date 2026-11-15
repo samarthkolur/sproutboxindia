@@ -752,6 +752,32 @@ export const translations: Record<string, TranslationEntry> = {
   "Days to harvest": { kn: "ಕೊಯ್ಲಿಗೆ ದಿನಗಳು", hi: "कटाई तक के दिन" },
   "Digital, hub & delivery checks": { kn: "ಡಿಜಿಟಲ್, ಹಬ್ ಮತ್ತು ವಿತರಣಾ ಪರಿಶೀಲನೆಗಳು", hi: "डिजिटल, हब और डिलीवरी जांच" },
   "Farm-to-fork, door to door.": { kn: "ಜಮೀನಿನಿಂದ ತಟ್ಟೆಗೆ, ಬಾಗಿಲಿಂದ ಬಾಗಿಲಿಗೆ.", hi: "खेत से थाली तक, दरवाज़े से दरवाज़े तक।" },
+  "Drop-off": { kn: "ಡ್ರಾಪ್-ಆಫ್", hi: "ड्रॉप-ऑफ़" },
+  "Where harvests are checked and packed before they go out.": { kn: "ಕೊಯ್ಲುಗಳನ್ನು ಹೊರಗೆ ಕಳುಹಿಸುವ ಮೊದಲು ಪರಿಶೀಲಿಸಿ ಪ್ಯಾಕ್ ಮಾಡುವ ಸ್ಥಳ.", hi: "जहां कटाई की जांच और पैकिंग बाहर भेजने से पहले होती है।" },
+  "No hubs yet": { kn: "ಇನ್ನೂ ಹಬ್‌ಗಳಿಲ್ಲ", hi: "अभी कोई हब नहीं" },
+  "Hubs are set up by the team. Once one exists, its drop-off window and deliveries appear here.": { kn: "ಹಬ್‌ಗಳನ್ನು ತಂಡ ಸ್ಥಾಪಿಸುತ್ತದೆ. ಒಂದು ಇದ್ದಾಗ, ಅದರ ಡ್ರಾಪ್-ಆಫ್ ಸಮಯ ಮತ್ತು ವಿತರಣೆಗಳು ಇಲ್ಲಿ ಕಾಣಿಸುತ್ತವೆ.", hi: "हब टीम द्वारा बनाए जाते हैं। एक बनने पर उसका ड्रॉप-ऑफ़ समय और डिलीवरी यहां दिखेंगे।" },
+  "Cluster": { kn: "ಕ್ಲಸ್ಟರ್", hi: "क्लस्टर" },
+  "Details": { kn: "ವಿವರಗಳು", hi: "विवरण" },
+  "Drop-off window": { kn: "ಡ್ರಾಪ್-ಆಫ್ ಸಮಯ", hi: "ड्रॉप-ऑफ़ का समय" },
+  "In this hub's cluster": { kn: "ಈ ಹಬ್‌ನ ಕ್ಲಸ್ಟರ್‌ನಲ್ಲಿ", hi: "इस हब के क्लस्टर में" },
+  "No growers are assigned to this cluster.": { kn: "ಈ ಕ್ಲಸ್ಟರ್‌ಗೆ ಯಾವುದೇ ಬೆಳೆಗಾರರನ್ನು ನಿಗದಿಪಡಿಸಿಲ್ಲ.", hi: "इस क्लस्टर में कोई उत्पादक नहीं है।" },
+  "No deliveries have gone through this hub yet.": { kn: "ಈ ಹಬ್ ಮೂಲಕ ಇನ್ನೂ ಯಾವುದೇ ವಿತರಣೆ ಹೋಗಿಲ್ಲ.", hi: "इस हब से अभी कोई डिलीवरी नहीं गई।" },
+  "Hub": { kn: "ಹಬ್", hi: "हब" },
+  "Every delivery from the hub to the restaurant. Move each one along as it happens.": { kn: "ಹಬ್‌ನಿಂದ ರೆಸ್ಟೋರೆಂಟ್‌ವರೆಗಿನ ಪ್ರತಿ ವಿತರಣೆ. ಪ್ರತಿಯೊಂದು ನಡೆದಂತೆ ಮುಂದುವರಿಸಿ.", hi: "हब से रेस्टोरेंट तक की हर डिलीवरी। हर एक को होते ही आगे बढ़ाएं।" },
+  "Filter deliveries": { kn: "ವಿತರಣೆಗಳನ್ನು ಫಿಲ್ಟರ್ ಮಾಡಿ", hi: "डिलीवरी फ़िल्टर करें" },
+  "Mark packed": { kn: "ಪ್ಯಾಕ್ ಆಗಿದೆ ಎಂದು ಗುರುತಿಸಿ", hi: "पैक चिह्नित करें" },
+  "Mark in transit": { kn: "ದಾರಿಯಲ್ಲಿದೆ ಎಂದು ಗುರುತಿಸಿ", hi: "रास्ते में चिह्नित करें" },
+  "Mark delivered": { kn: "ತಲುಪಿದೆ ಎಂದು ಗುರುತಿಸಿ", hi: "डिलीवर चिह्नित करें" },
+  "Marked packed": { kn: "ಪ್ಯಾಕ್ ಆಗಿದೆ ಎಂದು ಗುರುತಿಸಲಾಗಿದೆ", hi: "पैक चिह्नित किया गया" },
+  "Marked in transit": { kn: "ದಾರಿಯಲ್ಲಿದೆ ಎಂದು ಗುರುತಿಸಲಾಗಿದೆ", hi: "रास्ते में चिह्नित किया गया" },
+  "Marked delivered": { kn: "ತಲುಪಿದೆ ಎಂದು ಗುರುತಿಸಲಾಗಿದೆ", hi: "डिलीवर चिह्नित किया गया" },
+  "Could not update the delivery": { kn: "ವಿತರಣೆಯನ್ನು ನವೀಕರಿಸಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ", hi: "डिलीवरी अपडेट नहीं हो सकी" },
+  "Late": { kn: "ತಡ", hi: "देर से" },
+  "Load more": { kn: "ಇನ್ನಷ್ಟು ಲೋಡ್ ಮಾಡಿ", hi: "और लोड करें" },
+  "No deliveries yet": { kn: "ಇನ್ನೂ ವಿತರಣೆಗಳಿಲ್ಲ", hi: "अभी कोई डिलीवरी नहीं" },
+  "A delivery appears here once an order's trays reach the hub.": { kn: "ಆರ್ಡರ್‌ನ ಟ್ರೇಗಳು ಹಬ್ ತಲುಪಿದ ನಂತರ ವಿತರಣೆ ಇಲ್ಲಿ ಕಾಣಿಸುತ್ತದೆ.", hi: "ऑर्डर की ट्रे हब पहुंचने पर डिलीवरी यहां दिखती है।" },
+  "No deliveries with this status": { kn: "ಈ ಸ್ಥಿತಿಯ ಯಾವುದೇ ವಿತರಣೆಗಳಿಲ್ಲ", hi: "इस स्थिति की कोई डिलीवरी नहीं" },
+  "Choose another status to see more.": { kn: "ಇನ್ನಷ್ಟು ನೋಡಲು ಬೇರೆ ಸ್ಥಿತಿ ಆರಿಸಿ.", hi: "और देखने के लिए कोई और स्थिति चुनें।" },
   "Filter restaurants": { kn: "ರೆಸ್ಟೋರೆಂಟ್‌ಗಳನ್ನು ಫಿಲ್ಟರ್ ಮಾಡಿ", hi: "रेस्टोरेंट फ़िल्टर करें" },
   "Search restaurants": { kn: "ರೆಸ್ಟೋರೆಂಟ್‌ಗಳನ್ನು ಹುಡುಕಿ", hi: "रेस्टोरेंट खोजें" },
   "Search by name, city or contact": { kn: "ಹೆಸರು, ನಗರ ಅಥವಾ ಸಂಪರ್ಕದ ಮೂಲಕ ಹುಡುಕಿ", hi: "नाम, शहर या संपर्क से खोजें" },
@@ -1329,12 +1355,17 @@ const MONTH_SHORT_EN = MONTHS.map((month) => month.slice(0, 3));
 
 const regexTranslations = [
   {
+    pattern: /^(Mark (?:packed|in transit|delivered)) for (.+), ([A-Z0-9]{8})$/,
+    replace: (language: Exclude<LanguageCode, "en">, action: string, who: string, ref: string) =>
+      `${translateToken(action, language)}: ${who}, ${ref}`,
+  },
+  {
     pattern: /^(\d+) dormant and (\d+) never ordered\. Open one to see its history\.$/,
     replace: (language: Exclude<LanguageCode, "en">, a: string, b: string) =>
       language === "kn" ? `${a} ನಿಷ್ಕ್ರಿಯ ಮತ್ತು ${b} ಎಂದಿಗೂ ಆರ್ಡರ್ ಮಾಡಿಲ್ಲ. ಇತಿಹಾಸ ನೋಡಲು ಒಂದನ್ನು ತೆರೆಯಿರಿ.` : `${a} निष्क्रिय और ${b} ने कभी ऑर्डर नहीं किया। इतिहास देखने के लिए एक खोलें।`,
   },
   {
-    pattern: /^(.+) · ([A-Z0-9]{8})$/,
+    pattern: /^([^,·]+) · ([A-Z0-9]{8})$/,
     replace: (language: Exclude<LanguageCode, "en">, crop: string, ref: string) => `${translateToken(crop, language)} · ${ref}`,
   },
   {

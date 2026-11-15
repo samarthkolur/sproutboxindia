@@ -169,3 +169,59 @@ export async function getAdminRestaurant(restaurantId: string) {
     },
   });
 }
+
+// ── Hubs ────────────────────────────────────────────────────────────────────
+
+export async function getAdminHubs() {
+  const hubs = await prisma.hub.findMany({
+    orderBy: { name: "asc" },
+    include: {
+      cluster: { select: { name: true, _count: { select: { growers: true } } } },
+      deliveries: { where: { status: { notIn: ["DELIVERED", "FAILED"] } }, select: { id: true } },
+    },
+  });
+  return hubs.map((h) => ({
+    id: h.id,
+    name: h.name,
+    address: h.address,
+    clusterName: h.cluster.name,
+    growers: h.cluster._count.growers,
+    upcoming: h.deliveries.length,
+    dropoffStart: h.dropoffStart,
+    dropoffEnd: h.dropoffEnd,
+    isActive: h.isActive,
+  }));
+}
+
+export async function getAdminHub(hubId: string) {
+  return prisma.hub.findUnique({
+    where: { id: hubId },
+    include: {
+      cluster: { select: { name: true, growers: { select: { id: true, city: true, isActive: true, user: { select: { name: true } } }, orderBy: { compositeScore: "desc" } } } },
+      deliveries: {
+        orderBy: { createdAt: "desc" },
+        take: 30,
+        include: { order: { select: { id: true, cropType: true, quantityKg: true, deliveryDate: true, restaurant: { select: { businessName: true } } } } },
+      },
+    },
+  });
+}
+
+// ── Deliveries ──────────────────────────────────────────────────────────────
+
+export async function getAdminDeliveries(status: string, limit: number) {
+  const [rows, counts] = await Promise.all([
+    prisma.delivery.findMany({
+      where: status === "all" ? {} : { status: status as "PREPARING" | "PACKED" | "IN_TRANSIT" | "DELIVERED" | "FAILED" },
+      orderBy: { createdAt: "desc" },
+      take: limit + 1,
+      include: { hub: { select: { name: true } }, order: { select: { id: true, cropType: true, quantityKg: true, deliveryDate: true, restaurant: { select: { businessName: true } } } } },
+    }),
+    prisma.delivery.groupBy({ by: ["status"], _count: true }),
+  ]);
+  return {
+    deliveries: rows.slice(0, limit),
+    hasMore: rows.length > limit,
+    counts: Object.fromEntries(counts.map((c) => [c.status, c._count])) as Record<string, number>,
+  };
+}
