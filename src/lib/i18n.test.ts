@@ -1,6 +1,7 @@
 // @vitest-environment node
 import { describe, expect, it } from "vitest";
 import { STATUS_MAP } from "@/components/ui/status-chip";
+import { CROP_INSTRUCTIONS } from "@/lib/constants";
 import { NAV_GROUPS, ROLE_LABEL } from "@/lib/nav";
 import { translateText, translations } from "./i18n";
 
@@ -103,5 +104,17 @@ describe("translateText", () => {
     expect(translateText("Day 4", "kn")).toBe("ದಿನ 4");
     expect(translateText("Day 4", "hi")).toBe("दिन 4");
     expect(translateText("Day 4 of 9", "hi")).toBe("9 में से दिन 4");
+  });
+});
+
+describe("crop instructions", () => {
+  it("has Kannada and Hindi for every day of every crop, since growers read them daily", () => {
+    for (const [crop, days] of Object.entries(CROP_INSTRUCTIONS)) {
+      for (const [day, text] of Object.entries(days)) {
+        for (const language of ["kn", "hi"] as const) {
+          expect(translateText(text, language), `${crop} day ${day} (${language})`).not.toBe(text);
+        }
+      }
+    }
   });
 });
