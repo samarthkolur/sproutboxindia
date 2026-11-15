@@ -21,7 +21,7 @@ export default async function SubscriptionsPage() {
 
   return (
     <>
-      <PageHeader title="Repeat orders" subtitle="The crops you want on a regular schedule." />
+      <PageHeader title="Subscriptions" subtitle="The crops you want on a regular schedule." />
 
       <div className="mb-4 flex gap-3 rounded-panel bg-inset/60 p-4 text-sm text-ink-soft">
         <Info className="mt-0.5 h-5 w-5 shrink-0 text-ink-muted" aria-hidden="true" />
@@ -55,8 +55,9 @@ export default async function SubscriptionsPage() {
                   </div>
                   <p className="mt-3 flex-1 text-micro text-ink-muted">
                     <span>First order </span>
-                    <Link href={`/restaurant/orders/${order.id}`} className="underline underline-offset-2">{shortId(order.id)}</Link>
-                    <span>, delivered on </span>
+                    <Link href={`/restaurant/orders/${order.id}`} data-i18n-ignore className="underline underline-offset-2">{shortId(order.id)}</Link>
+                    <span aria-hidden="true"> · </span>
+                    <span>Delivered on </span>
                     <time dateTime={order.deliveryDate.toISOString()}>{format(order.deliveryDate, "d MMM yyyy")}</time>
                   </p>
                   <Link

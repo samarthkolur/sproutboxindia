@@ -752,6 +752,122 @@ export const translations: Record<string, TranslationEntry> = {
   "Days to harvest": { kn: "ಕೊಯ್ಲಿಗೆ ದಿನಗಳು", hi: "कटाई तक के दिन" },
   "Digital, hub & delivery checks": { kn: "ಡಿಜಿಟಲ್, ಹಬ್ ಮತ್ತು ವಿತರಣಾ ಪರಿಶೀಲನೆಗಳು", hi: "डिजिटल, हब और डिलीवरी जांच" },
   "Farm-to-fork, door to door.": { kn: "ಜಮೀನಿನಿಂದ ತಟ್ಟೆಗೆ, ಬಾಗಿಲಿಂದ ಬಾಗಿಲಿಗೆ.", hi: "खेत से थाली तक, दरवाज़े से दरवाज़े तक।" },
+  "Active orders": { kn: "ಸಕ್ರಿಯ ಆರ್ಡರ್‌ಗಳು", hi: "सक्रिय ऑर्डर" },
+  "Being grown or on the way": { kn: "ಬೆಳೆಯುತ್ತಿದೆ ಅಥವಾ ದಾರಿಯಲ್ಲಿದೆ", hi: "उग रहे हैं या रास्ते में" },
+  "Nothing in progress": { kn: "ಯಾವುದೂ ಪ್ರಗತಿಯಲ್ಲಿಲ್ಲ", hi: "कुछ भी प्रगति में नहीं" },
+  "This month": { kn: "ಈ ತಿಂಗಳು", hi: "इस महीने" },
+  "No orders this month": { kn: "ಈ ತಿಂಗಳು ಆರ್ಡರ್‌ಗಳಿಲ್ಲ", hi: "इस महीने कोई ऑर्डर नहीं" },
+  "Total orders": { kn: "ಒಟ್ಟು ಆರ್ಡರ್‌ಗಳು", hi: "कुल ऑर्डर" },
+  "Place your first order": { kn: "ನಿಮ್ಮ ಮೊದಲ ಆರ್ಡರ್ ಮಾಡಿ", hi: "अपना पहला ऑर्डर दें" },
+  "Average rating": { kn: "ಸರಾಸರಿ ರೇಟಿಂಗ್", hi: "औसत रेटिंग" },
+  "No ratings yet. Rate a delivered order.": { kn: "ಇನ್ನೂ ರೇಟಿಂಗ್‌ಗಳಿಲ್ಲ. ತಲುಪಿದ ಆರ್ಡರ್‌ಗೆ ರೇಟಿಂಗ್ ನೀಡಿ.", hi: "अभी कोई रेटिंग नहीं। डिलीवर हुए ऑर्डर को रेट करें।" },
+  "Your orders on their way to the kitchen": { kn: "ಅಡುಗೆಮನೆಗೆ ಬರುತ್ತಿರುವ ನಿಮ್ಮ ಆರ್ಡರ್‌ಗಳು", hi: "रसोई की ओर आ रहे आपके ऑर्डर" },
+  "View all": { kn: "ಎಲ್ಲವನ್ನೂ ನೋಡಿ", hi: "सभी देखें" },
+  "Delivery": { kn: "ವಿತರಣೆ", hi: "डिलीवरी" },
+  "Nothing is growing for you right now.": { kn: "ಈಗ ನಿಮಗಾಗಿ ಯಾವುದೂ ಬೆಳೆಯುತ್ತಿಲ್ಲ.", hi: "अभी आपके लिए कुछ भी नहीं उग रहा।" },
+  "No delivery is scheduled. Place an order and pick a date.": { kn: "ಯಾವುದೇ ವಿತರಣೆ ನಿಗದಿಯಾಗಿಲ್ಲ. ಆರ್ಡರ್ ಮಾಡಿ ಮತ್ತು ದಿನಾಂಕ ಆರಿಸಿ.", hi: "कोई डिलीवरी तय नहीं है। ऑर्डर दें और तारीख चुनें।" },
+  "View order": { kn: "ಆರ್ಡರ್ ನೋಡಿ", hi: "ऑर्डर देखें" },
+  "Order a crop": { kn: "ಬೆಳೆಯನ್ನು ಆರ್ಡರ್ ಮಾಡಿ", hi: "फसल ऑर्डर करें" },
+  "Pick one to start a new order": { kn: "ಹೊಸ ಆರ್ಡರ್ ಪ್ರಾರಂಭಿಸಲು ಒಂದನ್ನು ಆರಿಸಿ", hi: "नया ऑर्डर शुरू करने के लिए एक चुनें" },
+  "Review and pay": { kn: "ಪರಿಶೀಲಿಸಿ ಪಾವತಿಸಿ", hi: "देखें और भुगतान करें" },
+  "We start growing as soon as the payment arrives.": { kn: "ಪಾವತಿ ಬಂದ ತಕ್ಷಣ ನಾವು ಬೆಳೆಸಲು ಪ್ರಾರಂಭಿಸುತ್ತೇವೆ.", hi: "भुगतान आते ही हम उगाना शुरू कर देते हैं।" },
+  "No restaurant profile found": { kn: "ರೆಸ್ಟೋರೆಂಟ್ ಪ್ರೊಫೈಲ್ ಸಿಗಲಿಲ್ಲ", hi: "रेस्टोरेंट प्रोफ़ाइल नहीं मिली" },
+  "Your restaurant profile is not set up yet.": { kn: "ನಿಮ್ಮ ರೆಸ್ಟೋರೆಂಟ್ ಪ್ರೊಫೈಲ್ ಇನ್ನೂ ಸಿದ್ಧವಾಗಿಲ್ಲ.", hi: "आपकी रेस्टोरेंट प्रोफ़ाइल अभी तैयार नहीं है।" },
+  "Finish joining as a restaurant and your orders will appear here.": { kn: "ರೆಸ್ಟೋರೆಂಟ್ ಆಗಿ ಸೇರುವುದನ್ನು ಪೂರ್ಣಗೊಳಿಸಿ, ನಿಮ್ಮ ಆರ್ಡರ್‌ಗಳು ಇಲ್ಲಿ ಕಾಣಿಸುತ್ತವೆ.", hi: "रेस्टोरेंट के रूप में जुड़ना पूरा करें, फिर आपके ऑर्डर यहां दिखेंगे।" },
+  "Join as a restaurant": { kn: "ರೆಸ್ಟೋರೆಂಟ್ ಆಗಿ ಸೇರಿ", hi: "रेस्टोरेंट के रूप में जुड़ें" },
+  "1 order is waiting for payment.": { kn: "1 ಆರ್ಡರ್ ಪಾವತಿಗಾಗಿ ಕಾಯುತ್ತಿದೆ.", hi: "1 ऑर्डर भुगतान की प्रतीक्षा में है।" },
+  "1 order is on its way.": { kn: "1 ಆರ್ಡರ್ ದಾರಿಯಲ್ಲಿದೆ.", hi: "1 ऑर्डर रास्ते में है।" },
+  "Nothing is on its way. Place an order and we will start growing it.": { kn: "ಯಾವುದೂ ದಾರಿಯಲ್ಲಿಲ್ಲ. ಆರ್ಡರ್ ಮಾಡಿ, ನಾವು ಅದನ್ನು ಬೆಳೆಸಲು ಪ್ರಾರಂಭಿಸುತ್ತೇವೆ.", hi: "कुछ भी रास्ते में नहीं है। ऑर्डर दें, हम उसे उगाना शुरू कर देंगे।" },
+  "Everything you have ordered, in one place.": { kn: "ನೀವು ಆರ್ಡರ್ ಮಾಡಿದ ಎಲ್ಲವೂ ಒಂದೇ ಸ್ಥಳದಲ್ಲಿ.", hi: "आपके सभी ऑर्डर एक ही जगह।" },
+  "My orders": { kn: "ನನ್ನ ಆರ್ಡರ್‌ಗಳು", hi: "मेरे ऑर्डर" },
+  "Filter orders": { kn: "ಆರ್ಡರ್‌ಗಳನ್ನು ಫಿಲ್ಟರ್ ಮಾಡಿ", hi: "ऑर्डर फ़िल्टर करें" },
+  "Search orders": { kn: "ಆರ್ಡರ್‌ಗಳನ್ನು ಹುಡುಕಿ", hi: "ऑर्डर खोजें" },
+  "Search by order or crop": { kn: "ಆರ್ಡರ್ ಅಥವಾ ಬೆಳೆಯ ಮೂಲಕ ಹುಡುಕಿ", hi: "ऑर्डर या फसल से खोजें" },
+  "Sort orders": { kn: "ಆರ್ಡರ್‌ಗಳನ್ನು ವಿಂಗಡಿಸಿ", hi: "ऑर्डर क्रमबद्ध करें" },
+  "Newest": { kn: "ಹೊಸದು", hi: "नया" },
+  "Oldest": { kn: "ಹಳೆಯದು", hi: "पुराना" },
+  "Highest": { kn: "ಅತ್ಯಧಿಕ", hi: "सबसे अधिक" },
+  "All": { kn: "ಎಲ್ಲಾ", hi: "सभी" },
+  "Order": { kn: "ಆರ್ಡರ್", hi: "ऑर्डर" },
+  "Placed": { kn: "ಮಾಡಿದ್ದು", hi: "दिया गया" },
+  "Actions": { kn: "ಕ್ರಿಯೆಗಳು", hi: "कार्रवाइयां" },
+  "Rate": { kn: "ರೇಟ್ ಮಾಡಿ", hi: "रेट करें" },
+  "No orders match": { kn: "ಯಾವುದೇ ಆರ್ಡರ್ ಹೊಂದಿಕೆಯಾಗುತ್ತಿಲ್ಲ", hi: "कोई ऑर्डर मेल नहीं खाता" },
+  "Try another status or a different search.": { kn: "ಬೇರೆ ಸ್ಥಿತಿ ಅಥವಾ ಬೇರೆ ಹುಡುಕಾಟ ಪ್ರಯತ್ನಿಸಿ.", hi: "कोई और स्थिति या दूसरी खोज आज़माएं।" },
+  "Clear filters": { kn: "ಫಿಲ್ಟರ್‌ಗಳನ್ನು ತೆರವುಗೊಳಿಸಿ", hi: "फ़िल्टर हटाएं" },
+  "Place your first microgreens order and we will start growing it for you.": { kn: "ನಿಮ್ಮ ಮೊದಲ ಮೈಕ್ರೋಗ್ರೀನ್ಸ್ ಆರ್ಡರ್ ಮಾಡಿ, ನಾವು ಅದನ್ನು ನಿಮಗಾಗಿ ಬೆಳೆಸಲು ಪ್ರಾರಂಭಿಸುತ್ತೇವೆ.", hi: "अपना पहला माइक्रोग्रीन्स ऑर्डर दें, हम उसे आपके लिए उगाना शुरू कर देंगे।" },
+  "Pay now": { kn: "ಈಗ ಪಾವತಿಸಿ", hi: "अभी भुगतान करें" },
+  "Order details": { kn: "ಆರ್ಡರ್ ವಿವರಗಳು", hi: "ऑर्डर का विवरण" },
+  "Quantity": { kn: "ಪ್ರಮಾಣ", hi: "मात्रा" },
+  "Price": { kn: "ಬೆಲೆ", hi: "कीमत" },
+  "Total": { kn: "ಒಟ್ಟು", hi: "कुल" },
+  "Delivery date": { kn: "ವಿತರಣಾ ದಿನಾಂಕ", hi: "डिलीवरी की तारीख" },
+  "Delivered on": { kn: "ತಲುಪಿದ ದಿನ", hi: "डिलीवर हुआ" },
+  "Payment": { kn: "ಪಾವತಿ", hi: "भुगतान" },
+  "Repeat": { kn: "ಪುನರಾವರ್ತನೆ", hi: "दोहराव" },
+  "Your notes": { kn: "ನಿಮ್ಮ ಟಿಪ್ಪಣಿಗಳು", hi: "आपके नोट" },
+  "Leave feedback": { kn: "ಪ್ರತಿಕ್ರಿಯೆ ನೀಡಿ", hi: "प्रतिक्रिया दें" },
+  "Order again": { kn: "ಮತ್ತೆ ಆರ್ಡರ್ ಮಾಡಿ", hi: "फिर से ऑर्डर करें" },
+  "Your feedback": { kn: "ನಿಮ್ಮ ಪ್ರತಿಕ್ರಿಯೆ", hi: "आपकी प्रतिक्रिया" },
+  "Edit feedback": { kn: "ಪ್ರತಿಕ್ರಿಯೆ ಸಂಪಾದಿಸಿ", hi: "प्रतिक्रिया संपादित करें" },
+  "Where your order is": { kn: "ನಿಮ್ಮ ಆರ್ಡರ್ ಎಲ್ಲಿದೆ", hi: "आपका ऑर्डर कहां है" },
+  "From booking to your kitchen": { kn: "ಬುಕಿಂಗ್‌ನಿಂದ ನಿಮ್ಮ ಅಡುಗೆಮನೆಯವರೆಗೆ", hi: "बुकिंग से आपकी रसोई तक" },
+  "Your order is booked.": { kn: "ನಿಮ್ಮ ಆರ್ಡರ್ ಬುಕ್ ಆಗಿದೆ.", hi: "आपका ऑर्डर बुक हो गया है।" },
+  "Growers are growing your crop.": { kn: "ಬೆಳೆಗಾರರು ನಿಮ್ಮ ಬೆಳೆಯನ್ನು ಬೆಳೆಸುತ್ತಿದ್ದಾರೆ.", hi: "उत्पादक आपकी फसल उगा रहे हैं।" },
+  "Harvested, checked and packed at our hub.": { kn: "ನಮ್ಮ ಹಬ್‌ನಲ್ಲಿ ಕೊಯ್ಲು ಮಾಡಿ, ಪರಿಶೀಲಿಸಿ ಮತ್ತು ಪ್ಯಾಕ್ ಮಾಡಲಾಗಿದೆ.", hi: "हमारे हब पर कटाई, जांच और पैकिंग हो चुकी है।" },
+  "On its way to your kitchen.": { kn: "ನಿಮ್ಮ ಅಡುಗೆಮನೆಗೆ ಬರುತ್ತಿದೆ.", hi: "आपकी रसोई की ओर आ रहा है।" },
+  "Delivered to your kitchen.": { kn: "ನಿಮ್ಮ ಅಡುಗೆಮನೆಗೆ ತಲುಪಿಸಲಾಗಿದೆ.", hi: "आपकी रसोई में पहुंचा दिया गया।" },
+  "Waiting for payment": { kn: "ಪಾವತಿಗಾಗಿ ಕಾಯಲಾಗುತ್ತಿದೆ", hi: "भुगतान की प्रतीक्षा" },
+  "We start growing as soon as the payment arrives. You can pay now from the actions on this page.": { kn: "ಪಾವತಿ ಬಂದ ತಕ್ಷಣ ನಾವು ಬೆಳೆಸಲು ಪ್ರಾರಂಭಿಸುತ್ತೇವೆ. ಈ ಪುಟದ ಕ್ರಿಯೆಗಳಿಂದ ನೀವು ಈಗ ಪಾವತಿಸಬಹುದು.", hi: "भुगतान आते ही हम उगाना शुरू कर देते हैं। आप इस पेज की कार्रवाइयों से अभी भुगतान कर सकते हैं।" },
+  "This order was cancelled": { kn: "ಈ ಆರ್ಡರ್ ರದ್ದಾಗಿದೆ", hi: "यह ऑर्डर रद्द कर दिया गया" },
+  "Packaging": { kn: "ಪ್ಯಾಕೇಜಿಂಗ್", hi: "पैकेजिंग" },
+  "Freshness": { kn: "ತಾಜಾತನ", hi: "ताज़गी" },
+  "On time": { kn: "ಸಮಯಕ್ಕೆ", hi: "समय पर" },
+  "Choose your microgreens, set a delivery date and we start growing them for you.": { kn: "ನಿಮ್ಮ ಮೈಕ್ರೋಗ್ರೀನ್ಸ್ ಆರಿಸಿ, ವಿತರಣಾ ದಿನಾಂಕ ನಿಗದಿಪಡಿಸಿ, ನಾವು ಅವುಗಳನ್ನು ನಿಮಗಾಗಿ ಬೆಳೆಸಲು ಪ್ರಾರಂಭಿಸುತ್ತೇವೆ.", hi: "अपने माइक्रोग्रीन्स चुनें, डिलीवरी की तारीख तय करें, हम उन्हें आपके लिए उगाना शुरू कर देंगे।" },
+  "Your order": { kn: "ನಿಮ್ಮ ಆರ್ಡರ್", hi: "आपका ऑर्डर" },
+  "Your order is empty": { kn: "ನಿಮ್ಮ ಆರ್ಡರ್ ಖಾಲಿಯಾಗಿದೆ", hi: "आपका ऑर्डर खाली है" },
+  "Choose a crop on the left to start.": { kn: "ಪ್ರಾರಂಭಿಸಲು ಎಡಭಾಗದಲ್ಲಿ ಬೆಳೆಯನ್ನು ಆರಿಸಿ.", hi: "शुरू करने के लिए बाईं ओर से फसल चुनें।" },
+  "Earliest delivery": { kn: "ಆರಂಭಿಕ ವಿತರಣೆ", hi: "सबसे जल्दी डिलीवरी" },
+  "One time": { kn: "ಒಮ್ಮೆ", hi: "एक बार" },
+  "We note how often you want this. Repeat orders are not placed for you yet, so order again when you need the next one.": { kn: "ನಿಮಗೆ ಇದು ಎಷ್ಟು ಬಾರಿ ಬೇಕು ಎಂದು ನಾವು ಗಮನಿಸುತ್ತೇವೆ. ಪುನರಾವರ್ತಿತ ಆರ್ಡರ್‌ಗಳನ್ನು ಇನ್ನೂ ನಿಮಗಾಗಿ ಮಾಡಲಾಗುವುದಿಲ್ಲ, ಆದ್ದರಿಂದ ಮುಂದಿನದು ಬೇಕಾದಾಗ ಮತ್ತೆ ಆರ್ಡರ್ ಮಾಡಿ.", hi: "आपको यह कितनी बार चाहिए, यह हम दर्ज करते हैं। दोहराए जाने वाले ऑर्डर अभी आपके लिए अपने-आप नहीं दिए जाते, इसलिए अगला चाहिए तब फिर से ऑर्डर करें।" },
+  "Delivery instructions or anything we should know": { kn: "ವಿತರಣಾ ಸೂಚನೆಗಳು ಅಥವಾ ನಾವು ತಿಳಿಯಬೇಕಾದ ಯಾವುದಾದರೂ", hi: "डिलीवरी के निर्देश या कुछ भी जो हमें पता होना चाहिए" },
+  "Placing order…": { kn: "ಆರ್ಡರ್ ಮಾಡಲಾಗುತ್ತಿದೆ…", hi: "ऑर्डर दिया जा रहा है…" },
+  "Grown to order, harvested fresh and delivered on your date.": { kn: "ಆರ್ಡರ್‌ಗೆ ತಕ್ಕಂತೆ ಬೆಳೆಸಿ, ತಾಜಾ ಕೊಯ್ಲು ಮಾಡಿ ನಿಮ್ಮ ದಿನಾಂಕದಂದು ತಲುಪಿಸಲಾಗುತ್ತದೆ.", hi: "ऑर्डर पर उगाया गया, ताज़ा काटकर आपकी तारीख पर पहुंचाया जाता है।" },
+  "Add at least one crop to your order.": { kn: "ನಿಮ್ಮ ಆರ್ಡರ್‌ಗೆ ಕನಿಷ್ಠ ಒಂದು ಬೆಳೆಯನ್ನು ಸೇರಿಸಿ.", hi: "अपने ऑर्डर में कम से कम एक फसल जोड़ें।" },
+  "Choose a delivery date.": { kn: "ವಿತರಣಾ ದಿನಾಂಕ ಆರಿಸಿ.", hi: "डिलीवरी की तारीख चुनें।" },
+  "We could not place your order. Nothing was charged. Please try again.": { kn: "ನಿಮ್ಮ ಆರ್ಡರ್ ಮಾಡಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ. ಯಾವುದೇ ಶುಲ್ಕ ವಿಧಿಸಲಾಗಿಲ್ಲ. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.", hi: "हम आपका ऑर्डर नहीं दे सके। कोई शुल्क नहीं लिया गया। कृपया फिर कोशिश करें।" },
+  "See the orders already placed": { kn: "ಈಗಾಗಲೇ ಮಾಡಿದ ಆರ್ಡರ್‌ಗಳನ್ನು ನೋಡಿ", hi: "पहले से दिए गए ऑर्डर देखें" },
+  "Complete payment": { kn: "ಪಾವತಿ ಪೂರ್ಣಗೊಳಿಸಿ", hi: "भुगतान पूरा करें" },
+  "Your order is held until it is paid.": { kn: "ಪಾವತಿಸುವವರೆಗೆ ನಿಮ್ಮ ಆರ್ಡರ್ ಅನ್ನು ಕಾಯ್ದಿರಿಸಲಾಗಿದೆ.", hi: "भुगतान होने तक आपका ऑर्डर रोककर रखा गया है।" },
+  "Pay later from the Orders page": { kn: "ಆರ್ಡರ್‌ಗಳ ಪುಟದಿಂದ ನಂತರ ಪಾವತಿಸಿ", hi: "ऑर्डर पेज से बाद में भुगतान करें" },
+  "Online payment is not set up yet. Your order is saved and can be paid from the Orders page once it is.": { kn: "ಆನ್‌ಲೈನ್ ಪಾವತಿ ಇನ್ನೂ ಸಿದ್ಧವಾಗಿಲ್ಲ. ನಿಮ್ಮ ಆರ್ಡರ್ ಉಳಿಸಲಾಗಿದೆ ಮತ್ತು ಅದು ಸಿದ್ಧವಾದ ನಂತರ ಆರ್ಡರ್‌ಗಳ ಪುಟದಿಂದ ಪಾವತಿಸಬಹುದು.", hi: "ऑनलाइन भुगतान अभी तैयार नहीं है। आपका ऑर्डर सहेजा गया है और तैयार होने पर ऑर्डर पेज से भुगतान किया जा सकता है।" },
+  "Feedback": { kn: "ಪ್ರತಿಕ್ರಿಯೆ", hi: "प्रतिक्रिया" },
+  "You can rate an order once it has been delivered.": { kn: "ಆರ್ಡರ್ ತಲುಪಿದ ನಂತರ ನೀವು ಅದನ್ನು ರೇಟ್ ಮಾಡಬಹುದು.", hi: "ऑर्डर डिलीवर होने के बाद आप उसे रेट कर सकते हैं।" },
+  "This order is not delivered yet. Come back after it arrives to tell us how it went.": { kn: "ಈ ಆರ್ಡರ್ ಇನ್ನೂ ತಲುಪಿಲ್ಲ. ಅದು ಬಂದ ನಂತರ ಹೇಗಿತ್ತು ಎಂದು ಹೇಳಲು ಮರಳಿ ಬನ್ನಿ.", hi: "यह ऑर्डर अभी डिलीवर नहीं हुआ है। आने के बाद लौटकर बताएं कि कैसा रहा।" },
+  "Back to the order": { kn: "ಆರ್ಡರ್‌ಗೆ ಹಿಂತಿರುಗಿ", hi: "ऑर्डर पर वापस जाएं" },
+  "How was your delivery?": { kn: "ನಿಮ್ಮ ವಿತರಣೆ ಹೇಗಿತ್ತು?", hi: "आपकी डिलीवरी कैसी रही?" },
+  "Rating": { kn: "ರೇಟಿಂಗ್", hi: "रेटिंग" },
+  "Poor": { kn: "ಕಳಪೆ", hi: "खराब" },
+  "Fair": { kn: "ಸಾಧಾರಣ", hi: "ठीक-ठाक" },
+  "Very good": { kn: "ತುಂಬಾ ಒಳ್ಳೆಯದು", hi: "बहुत अच्छा" },
+  "What stood out?": { kn: "ಯಾವುದು ಎದ್ದು ಕಾಣಿಸಿತು?", hi: "क्या खास रहा?" },
+  "Anything else?": { kn: "ಇನ್ನೇನಾದರೂ?", hi: "और कुछ?" },
+  "Tell us how the crop looked, tasted and arrived": { kn: "ಬೆಳೆ ಹೇಗೆ ಕಾಣಿಸಿತು, ರುಚಿ ಹೇಗಿತ್ತು ಮತ್ತು ಹೇಗೆ ತಲುಪಿತು ಎಂದು ನಮಗೆ ತಿಳಿಸಿ", hi: "बताएं कि फसल कैसी दिखी, कैसा स्वाद था और कैसे पहुंची" },
+  "Send feedback": { kn: "ಪ್ರತಿಕ್ರಿಯೆ ಕಳುಹಿಸಿ", hi: "प्रतिक्रिया भेजें" },
+  "Update feedback": { kn: "ಪ್ರತಿಕ್ರಿಯೆ ನವೀಕರಿಸಿ", hi: "प्रतिक्रिया अपडेट करें" },
+  "Sending…": { kn: "ಕಳುಹಿಸಲಾಗುತ್ತಿದೆ…", hi: "भेजा जा रहा है…" },
+  "Thank you for your feedback": { kn: "ನಿಮ್ಮ ಪ್ರತಿಕ್ರಿಯೆಗೆ ಧನ್ಯವಾದಗಳು", hi: "आपकी प्रतिक्रिया के लिए धन्यवाद" },
+  "It helps us keep every delivery fresh, and it goes straight to the growers who supplied your order.": { kn: "ಪ್ರತಿ ವಿತರಣೆಯನ್ನು ತಾಜಾ ಆಗಿರಿಸಲು ಇದು ನಮಗೆ ಸಹಾಯ ಮಾಡುತ್ತದೆ, ಮತ್ತು ಇದು ನಿಮ್ಮ ಆರ್ಡರ್ ಪೂರೈಸಿದ ಬೆಳೆಗಾರರಿಗೆ ನೇರವಾಗಿ ತಲುಪುತ್ತದೆ.", hi: "यह हर डिलीवरी को ताज़ा रखने में हमारी मदद करता है, और सीधे उन उत्पादकों तक पहुंचता है जिन्होंने आपका ऑर्डर पूरा किया।" },
+  "Back to my orders": { kn: "ನನ್ನ ಆರ್ಡರ್‌ಗಳಿಗೆ ಹಿಂತಿರುಗಿ", hi: "मेरे ऑर्डर पर वापस जाएं" },
+  "Choose a star rating first.": { kn: "ಮೊದಲು ಸ್ಟಾರ್ ರೇಟಿಂಗ್ ಆರಿಸಿ.", hi: "पहले स्टार रेटिंग चुनें।" },
+  "Could not send your feedback": { kn: "ನಿಮ್ಮ ಪ್ರತಿಕ್ರಿಯೆ ಕಳುಹಿಸಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ", hi: "आपकी प्रतिक्रिया भेजी नहीं जा सकी" },
+  "The crops you want on a regular schedule.": { kn: "ನಿಯಮಿತ ವೇಳಾಪಟ್ಟಿಯಲ್ಲಿ ನೀವು ಬಯಸುವ ಬೆಳೆಗಳು.", hi: "नियमित समय पर आपको चाहिए फसलें।" },
+  "We note how often you want each crop. Repeat orders are not placed for you yet, so use Order again when you need the next delivery.": { kn: "ಪ್ರತಿ ಬೆಳೆ ನಿಮಗೆ ಎಷ್ಟು ಬಾರಿ ಬೇಕು ಎಂದು ನಾವು ಗಮನಿಸುತ್ತೇವೆ. ಪುನರಾವರ್ತಿತ ಆರ್ಡರ್‌ಗಳನ್ನು ಇನ್ನೂ ನಿಮಗಾಗಿ ಮಾಡಲಾಗುವುದಿಲ್ಲ, ಆದ್ದರಿಂದ ಮುಂದಿನ ವಿತರಣೆ ಬೇಕಾದಾಗ “ಮತ್ತೆ ಆರ್ಡರ್ ಮಾಡಿ” ಬಳಸಿ.", hi: "हम दर्ज करते हैं कि आपको हर फसल कितनी बार चाहिए। दोहराए जाने वाले ऑर्डर अभी आपके लिए अपने-आप नहीं दिए जाते, इसलिए अगली डिलीवरी चाहिए तब “फिर से ऑर्डर करें” का उपयोग करें।" },
+  "No repeat orders yet": { kn: "ಇನ್ನೂ ಪುನರಾವರ್ತಿತ ಆರ್ಡರ್‌ಗಳಿಲ್ಲ", hi: "अभी कोई दोहराए जाने वाले ऑर्डर नहीं" },
+  "Choose Weekly or Every 2 weeks when you place an order and it will be listed here.": { kn: "ಆರ್ಡರ್ ಮಾಡುವಾಗ ವಾರಕ್ಕೊಮ್ಮೆ ಅಥವಾ 2 ವಾರಗಳಿಗೊಮ್ಮೆ ಆರಿಸಿ, ಅದು ಇಲ್ಲಿ ಪಟ್ಟಿಯಾಗುತ್ತದೆ.", hi: "ऑर्डर देते समय साप्ताहिक या हर 2 सप्ताह चुनें, वह यहां सूचीबद्ध होगा।" },
+  "Set up a repeat order": { kn: "ಪುನರಾವರ್ತಿತ ಆರ್ಡರ್ ಹೊಂದಿಸಿ", hi: "दोहराया जाने वाला ऑर्डर सेट करें" },
+  "First order": { kn: "ಮೊದಲ ಆರ್ಡರ್", hi: "पहला ऑर्डर" },
+  "delivered on": { kn: "ತಲುಪಿದ ದಿನ", hi: "डिलीवर हुआ" },
   "Payout statement": { kn: "ಪಾವತಿ ಹೇಳಿಕೆ", hi: "भुगतान विवरण" },
   "Payout statements": { kn: "ಪಾವತಿ ಹೇಳಿಕೆಗಳು", hi: "भुगतान विवरण" },
   "Statement": { kn: "ಹೇಳಿಕೆ", hi: "विवरण" },
@@ -1056,6 +1172,152 @@ const MONTH_SHORT_EN = MONTHS.map((month) => month.slice(0, 3));
 
 const regexTranslations = [
   {
+    pattern: /^(₹[\d,]+) per kg$/,
+    replace: (language: Exclude<LanguageCode, "en">, price: string) => (language === "kn" ? `ಪ್ರತಿ ಕೆಜಿಗೆ ${price}` : `${price} प्रति किलो`),
+  },
+  {
+    pattern: /^(₹[\d,]+) is waiting to be paid$/,
+    replace: (language: Exclude<LanguageCode, "en">, amount: string) =>
+      language === "kn" ? `${amount} ಪಾವತಿಗಾಗಿ ಕಾಯುತ್ತಿದೆ` : `${amount} का भुगतान बाकी है`,
+  },
+  {
+    pattern: /^([A-Z0-9]{8}) · ([\d.]+) kg$/,
+    replace: (language: Exclude<LanguageCode, "en">, ref: string, kg: string) => `${ref} · ${kg} ${language === "kn" ? "ಕೆಜಿ" : "किलो"}`,
+  },
+  {
+    pattern: /^Order ([A-Z0-9]{8})$/,
+    replace: (language: Exclude<LanguageCode, "en">, ref: string) => (language === "kn" ? `ಆರ್ಡರ್ ${ref}` : `ऑर्डर ${ref}`),
+  },
+  {
+    pattern: /^(.+), order ([A-Z0-9]{8})$/,
+    replace: (language: Exclude<LanguageCode, "en">, crop: string, ref: string) =>
+      language === "kn" ? `${translateToken(crop, language)}, ಆರ್ಡರ್ ${ref}` : `${translateToken(crop, language)}, ऑर्डर ${ref}`,
+  },
+  {
+    pattern: /^Rate order ([A-Z0-9]{8})$/,
+    replace: (language: Exclude<LanguageCode, "en">, ref: string) => (language === "kn" ? `ಆರ್ಡರ್ ${ref} ಅನ್ನು ರೇಟ್ ಮಾಡಿ` : `ऑर्डर ${ref} को रेट करें`),
+  },
+  {
+    pattern: /^Rated (\d) of 5$/,
+    replace: (language: Exclude<LanguageCode, "en">, n: string) => (language === "kn" ? `5 ರಲ್ಲಿ ${n} ರೇಟಿಂಗ್` : `5 में से ${n} रेटिंग`),
+  },
+  {
+    pattern: /^(.+), ([\d.]+) kg$/,
+    replace: (language: Exclude<LanguageCode, "en">, crop: string, kg: string) => `${translateToken(crop, language)}, ${kg} ${language === "kn" ? "ಕೆಜಿ" : "किलो"}`,
+  },
+  {
+    pattern: /^([\d.]+) kg · (₹[\d,]+)$/,
+    replace: (language: Exclude<LanguageCode, "en">, kg: string, amount: string) => `${kg} ${language === "kn" ? "ಕೆಜಿ" : "किलो"} · ${amount}`,
+  },
+  {
+    pattern: /^([\d.]+) kg × (₹[\d,]+)$/,
+    replace: (language: Exclude<LanguageCode, "en">, kg: string, price: string) => `${kg} ${language === "kn" ? "ಕೆಜಿ" : "किलो"} × ${price}`,
+  },
+  {
+    pattern: /^From (\d+) ratings?$/,
+    replace: (language: Exclude<LanguageCode, "en">, n: string) => (language === "kn" ? `${n} ರೇಟಿಂಗ್‌ಗಳಿಂದ` : `${n} रेटिंग से`),
+  },
+  {
+    pattern: /^(\d+) delivered$/,
+    replace: (language: Exclude<LanguageCode, "en">, n: string) => (language === "kn" ? `${n} ತಲುಪಿದೆ` : `${n} डिलीवर हुए`),
+  },
+  {
+    pattern: /^(\d+) orders? this month$/,
+    replace: (language: Exclude<LanguageCode, "en">, n: string) => (language === "kn" ? `ಈ ತಿಂಗಳು ${n} ಆರ್ಡರ್‌ಗಳು` : `इस महीने ${n} ऑर्डर`),
+  },
+  {
+    pattern: /^([+-]?\d+)% vs last month$/,
+    replace: (language: Exclude<LanguageCode, "en">, n: string) => (language === "kn" ? `ಕಳೆದ ತಿಂಗಳಿಗಿಂತ ${n}%` : `पिछले महीने से ${n}%`),
+  },
+  {
+    pattern: /^(\d+) orders are waiting for payment\.$/,
+    replace: (language: Exclude<LanguageCode, "en">, n: string) =>
+      language === "kn" ? `${n} ಆರ್ಡರ್‌ಗಳು ಪಾವತಿಗಾಗಿ ಕಾಯುತ್ತಿವೆ.` : `${n} ऑर्डर भुगतान की प्रतीक्षा में हैं।`,
+  },
+  {
+    pattern: /^(\d+) orders are on their way\.(?: Next delivery (\w+)\.)?$/,
+    replace: (language: Exclude<LanguageCode, "en">, n: string, weekday?: string) => {
+      const day = weekday ? WEEKDAY_NAMES[language][WEEKDAYS.indexOf(weekday as (typeof WEEKDAYS)[number])] : "";
+      return language === "kn"
+        ? `${n} ಆರ್ಡರ್‌ಗಳು ದಾರಿಯಲ್ಲಿವೆ.${day ? ` ಮುಂದಿನ ವಿತರಣೆ ${day}.` : ""}`
+        : `${n} ऑर्डर रास्ते में हैं।${day ? ` अगली डिलीवरी ${day}।` : ""}`;
+    },
+  },
+  {
+    pattern: /^1 order is on its way\. Next delivery (\w+)\.$/,
+    replace: (language: Exclude<LanguageCode, "en">, weekday: string) => {
+      const day = WEEKDAY_NAMES[language][WEEKDAYS.indexOf(weekday as (typeof WEEKDAYS)[number])];
+      return language === "kn" ? `1 ಆರ್ಡರ್ ದಾರಿಯಲ್ಲಿದೆ. ಮುಂದಿನ ವಿತರಣೆ ${day}.` : `1 ऑर्डर रास्ते में है। अगली डिलीवरी ${day}।`;
+    },
+  },
+  {
+    pattern: /^(Sun|Mon|Tue|Wed|Thu|Fri|Sat) (\d{1,2}) (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)$/,
+    replace: (language: Exclude<LanguageCode, "en">, weekday: string, day: string, month: string) =>
+      `${WEEKDAY_NAMES[language][WEEKDAYS.findIndex((w) => w.startsWith(weekday))]}, ${day} ${MONTH_SHORT[language][MONTH_SHORT_EN.indexOf(month)]}`,
+  },
+  {
+    pattern: /^(\d+) days to grow$/,
+    replace: (language: Exclude<LanguageCode, "en">, n: string) => (language === "kn" ? `ಬೆಳೆಯಲು ${n} ದಿನಗಳು` : `उगने में ${n} दिन`),
+  },
+  {
+    pattern: /^(\d+) items?$/,
+    replace: (language: Exclude<LanguageCode, "en">, n: string) => (language === "kn" ? `${n} ವಸ್ತುಗಳು` : `${n} आइटम`),
+  },
+  {
+    pattern: /^Add (.+)$/,
+    replace: (language: Exclude<LanguageCode, "en">, what: string) =>
+      language === "kn" ? `${translateToken(what, language)} ಸೇರಿಸಿ` : `${translateToken(what, language)} जोड़ें`,
+  },
+  {
+    pattern: /^(Add|Remove) half a kilo of (.+)$/,
+    replace: (language: Exclude<LanguageCode, "en">, action: string, what: string) =>
+      language === "kn"
+        ? `${translateToken(what, language)} ಅರ್ಧ ಕೆಜಿ ${action === "Add" ? "ಸೇರಿಸಿ" : "ಕಡಿಮೆ ಮಾಡಿ"}`
+        : `${translateToken(what, language)} आधा किलो ${action === "Add" ? "जोड़ें" : "घटाएं"}`,
+  },
+  {
+    pattern: /^Remove (.+)$/,
+    replace: (language: Exclude<LanguageCode, "en">, what: string) =>
+      language === "kn" ? `${translateToken(what, language)} ತೆಗೆದುಹಾಕಿ` : `${translateToken(what, language)} हटाएं`,
+  },
+  {
+    pattern: /^(\d+) days: the slowest crop's grow time plus 2 to harvest and deliver\.$/,
+    replace: (language: Exclude<LanguageCode, "en">, n: string) =>
+      language === "kn"
+        ? `${n} ದಿನಗಳು: ನಿಧಾನವಾಗಿ ಬೆಳೆಯುವ ಬೆಳೆಯ ಬೆಳವಣಿಗೆ ಸಮಯ ಜೊತೆಗೆ ಕೊಯ್ಲು ಮತ್ತು ವಿತರಣೆಗೆ 2.`
+        : `${n} दिन: सबसे धीमी फसल का उगने का समय और कटाई व डिलीवरी के 2 दिन।`,
+  },
+  {
+    pattern: /^The earliest delivery for this order is (\d{1,2} [A-Z][a-z]{2})\.$/,
+    replace: (language: Exclude<LanguageCode, "en">, date: string) =>
+      language === "kn" ? `ಈ ಆರ್ಡರ್‌ನ ಆರಂಭಿಕ ವಿತರಣೆ ${translateText(date, language)}.` : `इस ऑर्डर की सबसे जल्दी डिलीवरी ${translateText(date, language)} है।`,
+  },
+  {
+    pattern: /^(\d+) orders? (?:was|were) placed, but not everything went through$/,
+    replace: (language: Exclude<LanguageCode, "en">, n: string) =>
+      language === "kn" ? `${n} ಆರ್ಡರ್ ಮಾಡಲಾಗಿದೆ, ಆದರೆ ಎಲ್ಲವೂ ಆಗಲಿಲ್ಲ` : `${n} ऑर्डर दिए गए, लेकिन सब कुछ पूरा नहीं हुआ`,
+  },
+  {
+    pattern: /^Still in your cart: (.+)\. Press Place order to try again\.$/,
+    replace: (language: Exclude<LanguageCode, "en">, list: string) => {
+      const names = list.split(", ").map((name) => translateToken(name, language)).join(", ");
+      return language === "kn" ? `ಇನ್ನೂ ನಿಮ್ಮ ಆರ್ಡರ್‌ನಲ್ಲಿದೆ: ${names}. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಲು "ಆರ್ಡರ್ ಮಾಡಿ" ಒತ್ತಿ.` : `अभी भी आपके ऑर्डर में है: ${names}। फिर कोशिश करने के लिए "ऑर्डर दें" दबाएं।`;
+    },
+  },
+  {
+    pattern: /^Payment (\d+) of (\d+)$/,
+    replace: (language: Exclude<LanguageCode, "en">, n: string, total: string) =>
+      language === "kn" ? `ಪಾವತಿ ${n} / ${total}` : `भुगतान ${n} / ${total}`,
+  },
+  {
+    pattern: /^Pay (₹[\d,]+)$/,
+    replace: (language: Exclude<LanguageCode, "en">, amount: string) => (language === "kn" ? `${amount} ಪಾವತಿಸಿ` : `${amount} का भुगतान करें`),
+  },
+  {
+    pattern: /^(\d) stars?$/,
+    replace: (language: Exclude<LanguageCode, "en">, n: string) => (language === "kn" ? `${n} ಸ್ಟಾರ್` : `${n} स्टार`),
+  },
+  {
     pattern: /^Download payout statement for (.+)$/,
     replace: (language: Exclude<LanguageCode, "en">, what: string) =>
       language === "kn" ? `${translateToken(what, language)} ಪಾವತಿ ಹೇಳಿಕೆ ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ` : `${translateToken(what, language)} का भुगतान विवरण डाउनलोड करें`,
@@ -1239,7 +1501,7 @@ function getTranslationKey(value: string) {
   return value.replace(/\s+/g, " ").trim();
 }
 
-export function translateText(value: string, language: LanguageCode) {
+export function translateText(value: string, language: LanguageCode): string {
   if (language === "en") return value;
 
   const leading = value.match(/^\s*/)?.[0] ?? "";
