@@ -103,6 +103,41 @@ Findings worth a decision (found while porting, not fixed here):
 
 **Must not break:** GA4 events (`sign_up`, `purchase`, `checkin_submitted`, `pickup_requested` in `src/lib/gtag.ts`), middleware role routing, Stripe and UploadThing flows, every API route.
 
+### Phase 2 status (done 2026-11-15)
+
+The grower portal is converted: dashboard, task list, task detail, earnings, profile and tutorial. Built, tested, and checked in the browser (desktop and 375px, empty states for a seeded grower with no tasks; populated states are covered by the tests).
+
+What changed beyond the restyle:
+- **Data layer:** `lib/grower.ts` (pure helpers: IST greeting, real weekly earnings buckets, QC tile, FSSAI state, masking, task filters, day plan) and `lib/grower-data.ts` (reads scoped to the signed-in user, no swallowed errors, so a failed read reaches the error page with its retry instead of showing "no tasks"). `getTaskState` is generic so callers keep their own batch type.
+- **One action per task** (`TaskAction`): check in, request pickup, or a quiet "checked in / pickup requested" note. `CheckinModal` now uses the shared `Modal`; the uploader and pickup button use the new tokens.
+- **Dashboard:** weekly earnings are real 7-day buckets (the old chart was the last seven payouts), range pills 4/8/12 weeks, Recent activity comes from notifications, the QC tile no longer shows a default 50% as a result.
+- **Task list:** `HARVEST_READY` tasks have their own "Ready for pickup" filter (they vanished before); filters live in the URL; list and detail agree on total days.
+- **Task detail:** crop photo hero, per-tray status and payout, check-in photo history in a lightbox with a close button, QC reviewer notes shown beside each check-in, and a banner with the reason when a tray fails.
+- **Earnings:** each payout names its crop and tray and links to its task.
+- **Profile:** edit per group (contact, payout, space, FSSAI) through the existing `PATCH /api/grower/profile`; bank account masked with a reveal; FSSAI number can be submitted from here.
+- **Tutorial:** uses each crop's own `CROP_INSTRUCTIONS` instead of one generic schedule; tips as an accordion; `Timeline` gained a plain numbered "step" state.
+- **Removed:** `TaskCard`, `DayInstructions`, `TrayStatusBoard`, the dashboard `client.tsx` wrapper, and the `getGrowerDashboard` server action (it took any `userId` from the caller and nothing uses it now).
+- **Translations:** every new string has Kannada and Hindi, including all 42 crop instructions and the date, count and plural patterns.
+
+Deviations from the plan, on purpose:
+- **Landing growth animation reverted.** An experimental 3D scroll hero was started in Phase 1 and rolled back; its engine and timeline code (`lib/acts`, `lib/plant-growth`, `lib/quality-tier`, `components/marketing/world/*`) is still in the repo, unused, for the landing rework later.
+- **"Earned" is the sum of paid payouts**, not the stored `totalEarnings` column, so the tile, the chart and the table always add up.
+- **Scores only show once a tray has finished.** The yield, quality and timeliness scores are computed from harvested or rejected trays (`updateGrowerScores`), not from QC check-ins; until the first one the stored 0.5 is a default, so the tiles show a dash and the radar is hidden.
+
+Findings worth a decision:
+1. **A verified FSSAI number could be edited silently.** `PATCH /api/grower/profile` kept `fssaiVerifiedAt` when the number changed. It now clears it, so the grower goes back to the admin's queue. The profile UI also locks a verified number.
+2. **QC reasons reach the grower only if the reviewer wrote one.** The page shows `qcNotes` when present and says "No reason was recorded" otherwise. Phase 4 (`/admin/qc`) should make a reason mandatory on a reject.
+3. **Quality score is the share of finished trays that were harvested, not rejected**, so it says nothing about QC risk flags. The tile captions say exactly that; rename or redefine it if the product means something else.
+4. **Bottom dock label** "Dashboard" is cut to "Dashboa…" at 375px (Phase 0 component). Not touched here.
+5. **Dashboard and earnings pull recharts** (about 237 kB and 211 kB first load). Fine for now; lazy-load the chart if mobile performance becomes a problem.
+
+### Phase 2 tests (done 2026-11-15)
+
+431 tests in 36 files, all passing; `tsc`, `next lint` and `next build` are clean.
+- **Logic:** `lib/grower` (greeting by IST, weekly buckets, paid vs pending, QC tile, FSSAI state, masking, filters, day plan), `lib/grower-profile` (validation, request bodies checked against the server zod schema, every schema field editable), `lib/i18n` (all crop instructions, number-leading patterns, dates).
+- **API:** `PATCH /api/grower/profile` (role check, scoped to the caller, validation, verification cleared only when the number changes).
+- **Pages** (`tests/pages/grower/*`, rendering the real server components with mocked reads): each page's states, the one-action rule, URL filters, 404 for another grower's task, QC reasons, lightbox, masked values and reveal, edit/validate/save/cancel flows, and "no Kannada/Hindi missing" on every page and every crop.
+
 ## 1. Layouts and states
 
 - [x] `src/app/layout.tsx`: Outfit, ThemeProvider, toaster, top progress bar; drop the floating language toggle (moves into the top bars)
@@ -191,30 +226,30 @@ Nav: Overview · New order · Orders (**badge: awaiting payment**) · Subscripti
 
 Nav: Overview · Tasks (**badge: check-ins due**) · Earnings · Tutorial · Profile. Mobile dock: Home, Tasks, Earnings, Profile (+ More → Tutorial). Pinned card: "Next check-in: Tray 3, Day 4". Primary "+": Check in.
 
-- [ ] **`/grower/dashboard`**
+- [x] **`/grower/dashboard`**
   - **Layout:** greeting + sentence ("2 trays need a check-in today"); 4 StatTiles; **dark inset "Today's tasks" card** (G) with inline Check in; grow-cycle **ring** ("Day 4 of 9"); weekly earnings chart with range pills; recent activity from real notifications.
   - **Verdelo:** V2, V4, V5, V6.
   - **Fix:** rows become links; "Tasks due" label; QC score shows "No reviews yet" for new growers (0% / "Needs improvement" is misleading); "Weekly earnings" is the last 7 payouts, make it real weekly buckets; Recent Activity duplicates Active Tasks, use notifications; add "View all tasks".
   - **Data:** weekly payout aggregation.
-- [ ] **`/grower/tasks`**
+- [x] **`/grower/tasks`**
   - **Layout:** FilterChips (Active · Ready for pickup · Completed) with counts; task cards with crop photo, ring, trays, date range, today's instruction, **one** primary action (Check in / Request pickup / Checked in ✓).
   - **Verdelo:** V5, V6.
   - **Fix:** `HARVEST_READY` tasks vanish from the list today; shared `lib/tasks.ts` for day math and check-in state (list and detail disagree on `totalDays`); cards link to detail.
-- [ ] **`/grower/tasks/[taskId]`**
+- [x] **`/grower/tasks/[taskId]`**
   - **Layout:** master–detail: left hero (crop photo, ring, status) + actions; right vertical **Timeline** of day-by-day instructions (done ✓ / today / upcoming) + batches panel (per-tray status chips, check-in photo history with lightbox).
   - **Verdelo:** V2, V5.
   - **Fix:** crop display name; breadcrumb as a real link.
   - **New:** QC failed/rejected messaging **with the reason** (depends on the QC reason flow, `/admin/qc`).
-- [ ] **`/grower/earnings`**
+- [x] **`/grower/earnings`**
   - **Layout:** hero numeral (total earned) with caption ("₹X paid · ₹Y pending"); range pills; earnings chart (reuse `EarningsChart`); payouts table.
   - **Verdelo:** V2, V4.
   - **Fix:** payout rows say which task/crop they belong to (all say "Batch Payout" today) and link to it; pending vs paid summary.
-- [ ] **`/grower/profile`**
+- [x] **`/grower/profile`**
   - **Layout:** panels: Account (read-only), Contact & address (editable), Payout details (UPI/bank **masked** with reveal), Space & kit, FSSAI card, performance (restyled `PerformanceRadar` + three score tiles with captions).
   - **Verdelo:** V5 (edit beside each field group), V2.
   - **Fix:** bank account is shown in full today; 11 identical stacked rows.
   - **New:** editing (`PATCH /api/grower/profile` exists, no form uses it); FSSAI submit field with status chip ("required" has no action today).
-- [ ] **`/grower/tutorial`**
+- [x] **`/grower/tutorial`**
   - **Layout:** crop FilterChips; vertical Timeline of steps; Pro Tips as an accordion.
   - **Verdelo:** V2.
   - **Fix:** use per-crop `CROP_INSTRUCTIONS` (generic hardcoded ranges today); reachable from the mobile "More".
