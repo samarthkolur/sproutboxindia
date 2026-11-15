@@ -752,6 +752,59 @@ export const translations: Record<string, TranslationEntry> = {
   "Days to harvest": { kn: "ಕೊಯ್ಲಿಗೆ ದಿನಗಳು", hi: "कटाई तक के दिन" },
   "Digital, hub & delivery checks": { kn: "ಡಿಜಿಟಲ್, ಹಬ್ ಮತ್ತು ವಿತರಣಾ ಪರಿಶೀಲನೆಗಳು", hi: "डिजिटल, हब और डिलीवरी जांच" },
   "Farm-to-fork, door to door.": { kn: "ಜಮೀನಿನಿಂದ ತಟ್ಟೆಗೆ, ಬಾಗಿಲಿಂದ ಬಾಗಿಲಿಗೆ.", hi: "खेत से थाली तक, दरवाज़े से दरवाज़े तक।" },
+  "All time": { kn: "ಎಲ್ಲಾ ಸಮಯ", hi: "अब तक" },
+  "Analytics sections": { kn: "ವಿಶ್ಲೇಷಣೆ ವಿಭಾಗಗಳು", hi: "विश्लेषण के अनुभाग" },
+  "By revenue, all time": { kn: "ಆದಾಯದ ಪ್ರಕಾರ, ಎಲ್ಲಾ ಸಮಯ", hi: "राजस्व के अनुसार, अब तक" },
+  "Kept": { kn: "ಉಳಿಸಿಕೊಂಡಿದ್ದು", hi: "रखा गया" },
+  "Kept by SproutBox": { kn: "SproutBox ಉಳಿಸಿಕೊಂಡಿದ್ದು", hi: "SproutBox ने रखा" },
+  "Orders over time": { kn: "ಕಾಲಾನುಕ್ರಮದಲ್ಲಿ ಆರ್ಡರ್‌ಗಳು", hi: "समय के साथ ऑर्डर" },
+  "Paid by restaurants and paid to growers, each week": { kn: "ಪ್ರತಿ ವಾರ ರೆಸ್ಟೋರೆಂಟ್‌ಗಳು ಪಾವತಿಸಿದ್ದು ಮತ್ತು ಬೆಳೆಗಾರರಿಗೆ ಪಾವತಿಸಿದ್ದು", hi: "हर सप्ताह रेस्टोरेंट ने जो चुकाया और उत्पादकों को जो दिया गया" },
+  "Paid orders placed": { kn: "ಮಾಡಿದ ಪಾವತಿಸಿದ ಆರ್ಡರ್‌ಗಳು", hi: "दिए गए भुगतान वाले ऑर्डर" },
+  "Paid orders placed each week": { kn: "ಪ್ರತಿ ವಾರ ಮಾಡಿದ ಪಾವತಿಸಿದ ಆರ್ಡರ್‌ಗಳು", hi: "हर सप्ताह दिए गए भुगतान वाले ऑर्डर" },
+  "Paid orders, last 12 weeks": { kn: "ಪಾವತಿಸಿದ ಆರ್ಡರ್‌ಗಳು, ಕಳೆದ 12 ವಾರಗಳು", hi: "भुगतान वाले ऑर्डर, पिछले 12 सप्ताह" },
+  "Paid to growers": { kn: "ಬೆಳೆಗಾರರಿಗೆ ಪಾವತಿಸಿದ್ದು", hi: "उत्पादकों को चुकाया" },
+  "Payouts marked paid": { kn: "ಪಾವತಿಸಲಾಗಿದೆ ಎಂದು ಗುರುತಿಸಿದ ಪಾವತಿಗಳು", hi: "चुकाए हुए चिह्नित भुगतान" },
+  "Production": { kn: "ಉತ್ಪಾದನೆ", hi: "उत्पादन" },
+  "Revenue and grower payouts": { kn: "ಆದಾಯ ಮತ್ತು ಬೆಳೆಗಾರರ ಪಾವತಿಗಳು", hi: "राजस्व और उत्पादक भुगतान" },
+  "Revenue by crop": { kn: "ಬೆಳೆಯ ಪ್ರಕಾರ ಆದಾಯ", hi: "फसल के अनुसार राजस्व" },
+  "Top restaurants": { kn: "ಅತ್ಯುತ್ತಮ ರೆಸ್ಟೋರೆಂಟ್‌ಗಳು", hi: "शीर्ष रेस्टोरेंट" },
+  "The last twelve weeks: what came in, what went out to growers, and what was kept.": { kn: "ಕಳೆದ ಹನ್ನೆರಡು ವಾರಗಳು: ಏನು ಬಂತು, ಬೆಳೆಗಾರರಿಗೆ ಏನು ಹೋಯಿತು ಮತ್ತು ಏನು ಉಳಿಯಿತು.", hi: "पिछले बारह सप्ताह: क्या आया, उत्पादकों को क्या गया और क्या रखा गया।" },
+  "Nothing earned yet": { kn: "ಇನ್ನೂ ಏನೂ ಗಳಿಸಿಲ್ಲ", hi: "अभी कुछ नहीं कमाया" },
+  "No paid orders yet.": { kn: "ಇನ್ನೂ ಪಾವತಿಸಿದ ಆರ್ಡರ್‌ಗಳಿಲ್ಲ.", hi: "अभी कोई भुगतान वाला ऑर्डर नहीं।" },
+  "Kilos by crop": { kn: "ಬೆಳೆಯ ಪ್ರಕಾರ ಕಿಲೋಗಳು", hi: "फसल के अनुसार किलो" },
+  "Ordered, all time": { kn: "ಆರ್ಡರ್ ಮಾಡಿದ್ದು, ಎಲ್ಲಾ ಸಮಯ", hi: "ऑर्डर किया, अब तक" },
+  "QC results": { kn: "QC ಫಲಿತಾಂಶಗಳು", hi: "QC नतीजे" },
+  "Every reviewed check-in": { kn: "ಪರಿಶೀಲಿಸಿದ ಪ್ರತಿ ಚೆಕ್-ಇನ್", hi: "हर जांचा गया चेक-इन" },
+  "Passed": { kn: "ತೇರ್ಗಡೆಯಾದವು", hi: "पास हुए" },
+  "Grower quality": { kn: "ಬೆಳೆಗಾರರ ಗುಣಮಟ್ಟ", hi: "उत्पादक की गुणवत्ता" },
+  "Share of finished trays that passed": { kn: "ಪೂರ್ಣಗೊಂಡ ಟ್ರೇಗಳಲ್ಲಿ ತೇರ್ಗಡೆಯಾದ ಪಾಲು", hi: "पूरी हुई ट्रे में से पास हिस्सा" },
+  "No check-ins have been reviewed yet.": { kn: "ಇನ್ನೂ ಯಾವುದೇ ಚೆಕ್-ಇನ್ ಪರಿಶೀಲಿಸಿಲ್ಲ.", hi: "अभी कोई चेक-इन नहीं जांचा गया।" },
+  "No trays have finished yet.": { kn: "ಇನ್ನೂ ಯಾವುದೇ ಟ್ರೇ ಪೂರ್ಣಗೊಂಡಿಲ್ಲ.", hi: "अभी कोई ट्रे पूरी नहीं हुई।" },
+  "KPI scorecard": { kn: "KPI ಸ್ಕೋರ್‌ಕಾರ್ಡ್", hi: "KPI स्कोरकार्ड" },
+  "Definitions": { kn: "ವ್ಯಾಖ್ಯಾನಗಳು", hi: "परिभाषाएं" },
+  "How each number is worked out, and which are stand-ins": { kn: "ಪ್ರತಿ ಸಂಖ್ಯೆಯನ್ನು ಹೇಗೆ ಲೆಕ್ಕ ಹಾಕಲಾಗುತ್ತದೆ ಮತ್ತು ಯಾವುವು ಬದಲಿ ಅಳತೆಗಳು", hi: "हर संख्या कैसे निकाली जाती है, और कौन-सी विकल्प के तौर पर हैं" },
+  "Target met": { kn: "ಗುರಿ ತಲುಪಲಾಗಿದೆ", hi: "लक्ष्य पूरा" },
+  "Below target": { kn: "ಗುರಿಗಿಂತ ಕಡಿಮೆ", hi: "लक्ष्य से कम" },
+  "No data yet": { kn: "ಇನ್ನೂ ಡೇಟಾ ಇಲ್ಲ", hi: "अभी डेटा नहीं" },
+  "Kg delivered per week": { kn: "ವಾರಕ್ಕೆ ತಲುಪಿಸಿದ ಕೆಜಿ", hi: "प्रति सप्ताह डिलीवर किलो" },
+  "On-time delivery rate": { kn: "ಸಮಯಕ್ಕೆ ವಿತರಣೆ ಪ್ರಮಾಣ", hi: "समय पर डिलीवरी दर" },
+  "Active certified growers": { kn: "ಸಕ್ರಿಯ ಪ್ರಮಾಣೀಕೃತ ಬೆಳೆಗಾರರು", hi: "सक्रिय प्रमाणित उत्पादक" },
+  "Grower acceptance rate": { kn: "ಬೆಳೆಗಾರರ ಸ್ವೀಕಾರ ಪ್ರಮಾಣ", hi: "उत्पादक स्वीकृति दर" },
+  "Monthly recurring revenue": { kn: "ಮಾಸಿಕ ಪುನರಾವರ್ತಿತ ಆದಾಯ", hi: "मासिक आवर्ती राजस्व" },
+  "Restaurant churn rate": { kn: "ರೆಸ್ಟೋರೆಂಟ್ ಚರ್ನ್ ಪ್ರಮಾಣ", hi: "रेस्टोरेंट छोड़ने की दर" },
+  "Engagement and operations (North Star)": { kn: "ತೊಡಗಿಸಿಕೊಳ್ಳುವಿಕೆ ಮತ್ತು ಕಾರ್ಯಾಚರಣೆ (ಧ್ರುವ ನಕ್ಷತ್ರ)", hi: "जुड़ाव और संचालन (नॉर्थ स्टार)" },
+  "Retention": { kn: "ಉಳಿಸಿಕೊಳ್ಳುವಿಕೆ", hi: "प्रतिधारण" },
+  "Acquisition (supply)": { kn: "ಸ್ವಾಧೀನ (ಪೂರೈಕೆ)", hi: "अधिग्रहण (आपूर्ति)" },
+  "Engagement (supply)": { kn: "ತೊಡಗಿಸಿಕೊಳ್ಳುವಿಕೆ (ಪೂರೈಕೆ)", hi: "जुड़ाव (आपूर्ति)" },
+  "Cannot be measured yet.": { kn: "ಇನ್ನೂ ಅಳೆಯಲು ಸಾಧ್ಯವಿಲ್ಲ.", hi: "अभी मापा नहीं जा सकता।" },
+  "Not enough order history yet.": { kn: "ಇನ್ನೂ ಸಾಕಷ್ಟು ಆರ್ಡರ್ ಇತಿಹಾಸವಿಲ್ಲ.", hi: "अभी पर्याप्त ऑर्डर इतिहास नहीं।" },
+  "No check-ins have been reviewed yet.": { kn: "ಇನ್ನೂ ಯಾವುದೇ ಚೆಕ್-ಇನ್ ಪರಿಶೀಲಿಸಿಲ್ಲ.", hi: "अभी कोई चेक-इन नहीं जांचा गया।" },
+  "No deliveries have completed yet.": { kn: "ಇನ್ನೂ ಯಾವುದೇ ವಿತರಣೆ ಪೂರ್ಣಗೊಂಡಿಲ್ಲ.", hi: "अभी कोई डिलीवरी पूरी नहीं हुई।" },
+  "Kilos on orders whose delivery was marked delivered in the last seven days.": { kn: "ಕಳೆದ ಏಳು ದಿನಗಳಲ್ಲಿ ವಿತರಣೆ ತಲುಪಿದೆ ಎಂದು ಗುರುತಿಸಲಾದ ಆರ್ಡರ್‌ಗಳ ಕಿಲೋಗಳು.", hi: "पिछले सात दिनों में जिनकी डिलीवरी हो चुकी चिह्नित है, उन ऑर्डर के किलो।" },
+  "A stand-in: the number of active growers. The product has no separate certification flag yet.": { kn: "ಬದಲಿ ಅಳತೆ: ಸಕ್ರಿಯ ಬೆಳೆಗಾರರ ಸಂಖ್ಯೆ. ಉತ್ಪನ್ನದಲ್ಲಿ ಇನ್ನೂ ಪ್ರತ್ಯೇಕ ಪ್ರಮಾಣೀಕರಣ ಗುರುತು ಇಲ್ಲ.", hi: "विकल्प के तौर पर: सक्रिय उत्पादकों की संख्या। उत्पाद में अभी अलग प्रमाणन संकेत नहीं है।" },
+  "A stand-in: revenue from paid, non-cancelled orders in the last 30 days. True recurring revenue needs subscription billing, which is not built yet.": { kn: "ಬದಲಿ ಅಳತೆ: ಕಳೆದ 30 ದಿನಗಳಲ್ಲಿ ಪಾವತಿಸಿದ, ರದ್ದಾಗದ ಆರ್ಡರ್‌ಗಳ ಆದಾಯ. ನಿಜವಾದ ಪುನರಾವರ್ತಿತ ಆದಾಯಕ್ಕೆ ಚಂದಾ ಬಿಲ್ಲಿಂಗ್ ಬೇಕು, ಅದು ಇನ್ನೂ ನಿರ್ಮಿಸಿಲ್ಲ.", hi: "विकल्प के तौर पर: पिछले 30 दिनों के भुगतान वाले, अरद्द ऑर्डर का राजस्व। असली आवर्ती राजस्व के लिए सदस्यता बिलिंग चाहिए, जो अभी बनी नहीं है।" },
+  "Not trackable yet. The product has no accept or reject step for allocated tray tasks.": { kn: "ಇನ್ನೂ ಟ್ರ್ಯಾಕ್ ಮಾಡಲು ಸಾಧ್ಯವಿಲ್ಲ. ಹಂಚಿದ ಟ್ರೇ ಕೆಲಸಗಳಿಗೆ ಉತ್ಪನ್ನದಲ್ಲಿ ಸ್ವೀಕರಿಸುವ ಅಥವಾ ತಿರಸ್ಕರಿಸುವ ಹಂತ ಇಲ್ಲ.", hi: "अभी ट्रैक नहीं हो सकता। उत्पाद में आवंटित ट्रे कामों के लिए स्वीकार या अस्वीकार का चरण नहीं है।" },
+  "Not trackable yet.": { kn: "ಇನ್ನೂ ಟ್ರ್ಯಾಕ್ ಮಾಡಲು ಸಾಧ್ಯವಿಲ್ಲ.", hi: "अभी ट्रैक नहीं हो सकता।" },
   "Billed": { kn: "ಬಿಲ್ ಮಾಡಲಾಗಿದೆ", hi: "बिल किया" },
   "SproutBox": { kn: "SproutBox", hi: "SproutBox" },
   "Filter payouts": { kn: "ಪಾವತಿಗಳನ್ನು ಫಿಲ್ಟರ್ ಮಾಡಿ", hi: "भुगतान फ़िल्टर करें" },
@@ -1369,6 +1422,84 @@ const MONTH_SHORT = {
 const MONTH_SHORT_EN = MONTHS.map((month) => month.slice(0, 3));
 
 const regexTranslations = [
+  {
+    pattern: /^Target at most (\d+%) a month\. Cohort of (\d+)\.$/,
+    replace: (language: Exclude<LanguageCode, "en">, p: string, n: string) => (language === "kn" ? `ತಿಂಗಳಿಗೆ ಗರಿಷ್ಠ ${p} ಗುರಿ. ${n} ರ ಗುಂಪು.` : `मासिक लक्ष्य अधिकतम ${p}। ${n} का समूह।`),
+  },
+  {
+    pattern: /^Target at most (\d+%)$/,
+    replace: (language: Exclude<LanguageCode, "en">, p: string) => (language === "kn" ? `ಗುರಿ ಗರಿಷ್ಠ ${p}` : `लक्ष्य अधिकतम ${p}`),
+  },
+  {
+    pattern: /^Delivered in the last 7 days\. Target (\d+) kg\.$/,
+    replace: (language: Exclude<LanguageCode, "en">, n: string) => (language === "kn" ? `ಕಳೆದ 7 ದಿನಗಳಲ್ಲಿ ತಲುಪಿಸಿದ್ದು. ಗುರಿ ${n} ಕೆಜಿ.` : `पिछले 7 दिनों में डिलीवर। लक्ष्य ${n} किलो।`),
+  },
+  {
+    pattern: /^Target (\d+%)\. From (\d+) reviewed check-ins\.$/,
+    replace: (language: Exclude<LanguageCode, "en">, p: string, n: string) => (language === "kn" ? `ಗುರಿ ${p}. ${n} ಪರಿಶೀಲಿತ ಚೆಕ್-ಇನ್‌ಗಳಿಂದ.` : `लक्ष्य ${p}। ${n} जांचे गए चेक-इन से।`),
+  },
+  {
+    pattern: /^Target (\d+%)\. From (\d+) completed deliveries\.$/,
+    replace: (language: Exclude<LanguageCode, "en">, p: string, n: string) => (language === "kn" ? `ಗುರಿ ${p}. ${n} ಪೂರ್ಣಗೊಂಡ ವಿತರಣೆಗಳಿಂದ.` : `लक्ष्य ${p}। ${n} पूरी हुई डिलीवरी से।`),
+  },
+  {
+    pattern: /^Target (\d+) growers\.$/,
+    replace: (language: Exclude<LanguageCode, "en">, n: string) => (language === "kn" ? `ಗುರಿ ${n} ಬೆಳೆಗಾರರು.` : `लक्ष्य ${n} उत्पादक।`),
+  },
+  {
+    pattern: /^Last 30 days\. Target (₹[\d,]+)\.$/,
+    replace: (language: Exclude<LanguageCode, "en">, a: string) => (language === "kn" ? `ಕಳೆದ 30 ದಿನಗಳು. ಗುರಿ ${a}.` : `पिछले 30 दिन। लक्ष्य ${a}।`),
+  },
+  {
+    pattern: /^Target (.+)$/,
+    replace: (language: Exclude<LanguageCode, "en">, v: string) => (language === "kn" ? `ಗುರಿ ${v}` : `लक्ष्य ${v}`),
+  },
+  {
+    pattern: /^Share of reviewed check-ins that passed\. Based on (\d+) reviewed check-ins \(qcResult set\)\.$/,
+    replace: (language: Exclude<LanguageCode, "en">, n: string) => (language === "kn" ? `ತೇರ್ಗಡೆಯಾದ ಪರಿಶೀಲಿತ ಚೆಕ್-ಇನ್‌ಗಳ ಪಾಲು. ${n} ಪರಿಶೀಲಿತ ಚೆಕ್-ಇನ್‌ಗಳನ್ನು ಆಧರಿಸಿದೆ.` : `पास हुए जांचे गए चेक-इन का हिस्सा। ${n} जांचे गए चेक-इन पर आधारित।`),
+  },
+  {
+    pattern: /^Share of completed deliveries that arrived by the end of the delivery date\. Based on (\d+) completed deliveries\.$/,
+    replace: (language: Exclude<LanguageCode, "en">, n: string) => (language === "kn" ? `ವಿತರಣಾ ದಿನಾಂಕದ ಅಂತ್ಯದೊಳಗೆ ತಲುಪಿದ ಪೂರ್ಣಗೊಂಡ ವಿತರಣೆಗಳ ಪಾಲು. ${n} ಪೂರ್ಣಗೊಂಡ ವಿತರಣೆಗಳನ್ನು ಆಧರಿಸಿದೆ.` : `डिलीवरी की तारीख के अंत तक पहुंचीं पूरी हुई डिलीवरी का हिस्सा। ${n} पूरी हुई डिलीवरी पर आधारित।`),
+  },
+  {
+    pattern: /^Cohort: (\d+) restaurants with an order older than 30 days\. Churned means no order in the last 30 days\.$/,
+    replace: (language: Exclude<LanguageCode, "en">, n: string) => (language === "kn" ? `ಗುಂಪು: 30 ದಿನಗಳಿಗಿಂತ ಹಳೆಯ ಆರ್ಡರ್ ಇರುವ ${n} ರೆಸ್ಟೋರೆಂಟ್‌ಗಳು. ಚರ್ನ್ ಎಂದರೆ ಕಳೆದ 30 ದಿನಗಳಲ್ಲಿ ಆರ್ಡರ್ ಇಲ್ಲ.` : `समूह: 30 दिन से पुराने ऑर्डर वाले ${n} रेस्टोरेंट। छोड़ने का मतलब पिछले 30 दिनों में कोई ऑर्डर नहीं।`),
+  },
+  {
+    pattern: /^(.+): progress towards the target$/,
+    replace: (language: Exclude<LanguageCode, "en">, name: string) => (language === "kn" ? `${translateToken(name, language)}: ಗುರಿಯತ್ತ ಪ್ರಗತಿ` : `${translateToken(name, language)}: लक्ष्य की ओर प्रगति`),
+  },
+  {
+    pattern: /^(\d+) of (\d+) measured KPIs are on target\. Values come from live data against the Month-6 targets, not from GA4\.$/,
+    replace: (language: Exclude<LanguageCode, "en">, a: string, b: string) =>
+      language === "kn" ? `ಅಳೆಯಲಾದ ${b} KPI ಗಳಲ್ಲಿ ${a} ಗುರಿಯಲ್ಲಿವೆ. ಮೌಲ್ಯಗಳು GA4 ಅಲ್ಲ, ನೇರ ಡೇಟಾದಿಂದ 6ನೇ ತಿಂಗಳ ಗುರಿಗಳ ವಿರುದ್ಧ ಬರುತ್ತವೆ.` : `मापे गए ${b} KPI में से ${a} लक्ष्य पर हैं। मान GA4 से नहीं, लाइव डेटा से 6ठे महीने के लक्ष्यों के विरुद्ध आते हैं।`,
+  },
+  {
+    pattern: /^Orders per week for the last (\d+) weeks\. (\d+) in total\.$/,
+    replace: (language: Exclude<LanguageCode, "en">, weeks: string, n: string) => (language === "kn" ? `ಕಳೆದ ${weeks} ವಾರಗಳ ವಾರದ ಆರ್ಡರ್‌ಗಳು. ಒಟ್ಟು ${n}.` : `पिछले ${weeks} सप्ताह के साप्ताहिक ऑर्डर। कुल ${n}।`),
+  },
+  {
+    pattern: /^Revenue and grower payouts per week for the last (\d+) weeks\. Revenue (₹[\d,]+), paid to growers (₹[\d,]+)\.$/,
+    replace: (language: Exclude<LanguageCode, "en">, weeks: string, a: string, b: string) =>
+      language === "kn" ? `ಕಳೆದ ${weeks} ವಾರಗಳ ವಾರದ ಆದಾಯ ಮತ್ತು ಬೆಳೆಗಾರರ ಪಾವತಿಗಳು. ಆದಾಯ ${a}, ಬೆಳೆಗಾರರಿಗೆ ${b}.` : `पिछले ${weeks} सप्ताह का साप्ताहिक राजस्व और उत्पादक भुगतान। राजस्व ${a}, उत्पादकों को ${b}।`,
+  },
+  {
+    pattern: /^(.+) (revenue|kilos|quality)$/,
+    replace: (language: Exclude<LanguageCode, "en">, name: string, what: string) => {
+      const word = what === "revenue" ? (language === "kn" ? "ಆದಾಯ" : "राजस्व") : what === "kilos" ? (language === "kn" ? "ಕಿಲೋಗಳು" : "किलो") : language === "kn" ? "ಗುಣಮಟ್ಟ" : "गुणवत्ता";
+      return `${translateToken(name, language)} ${word}`;
+    },
+  },
+  {
+    pattern: /^(\d+)% of revenue$/,
+    replace: (language: Exclude<LanguageCode, "en">, n: string) => (language === "kn" ? `ಆದಾಯದ ${n}%` : `राजस्व का ${n}%`),
+  },
+  {
+    pattern: /^Restaurants rate deliveries ([\d.]+) out of 5 on average \((\d+) ratings?\)\.$/,
+    replace: (language: Exclude<LanguageCode, "en">, r: string, n: string) =>
+      language === "kn" ? `ರೆಸ್ಟೋರೆಂಟ್‌ಗಳು ವಿತರಣೆಗಳಿಗೆ ಸರಾಸರಿ 5 ರಲ್ಲಿ ${r} ರೇಟಿಂಗ್ ನೀಡುತ್ತವೆ (${n} ರೇಟಿಂಗ್‌ಗಳು).` : `रेस्टोरेंट डिलीवरी को औसतन 5 में से ${r} रेटिंग देते हैं (${n} रेटिंग)।`,
+  },
   {
     pattern: /^(₹[\d,]+) is waiting to be paid to growers\.$/,
     replace: (language: Exclude<LanguageCode, "en">, amount: string) =>

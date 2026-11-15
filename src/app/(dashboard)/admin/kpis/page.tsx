@@ -1,168 +1,71 @@
-import { GlassCard } from "@/components/shared/GlassCard";
-import { getKpiSnapshot } from "@/actions/kpi.actions";
-import { Gauge, CheckCircle2, XCircle, MinusCircle } from "lucide-react";
+import { ChevronDown } from "lucide-react";
+import { Meter } from "@/components/ui/meter";
+import { PageHeader } from "@/components/ui/page-header";
+import { Panel, PanelHeader } from "@/components/ui/panel";
+import { Sparkline } from "@/components/ui/sparkline";
+import { getKpiSnapshot } from "@/lib/admin-data";
+import { kpiCards, type KpiCard } from "@/lib/kpi";
+import { cn } from "@/lib/utils";
 
-function formatPercent(value: number | null) {
-  return value === null ? "—" : `${Math.round(value * 100)}%`;
-}
+const TINT = { met: "bg-leaf-soft/70", below: "bg-watch-soft/80", nodata: "bg-panel/55" } as const;
+const VERDICT = { met: "Target met", below: "Below target", nodata: "No data yet" } as const;
+const TONE = { met: "leaf", below: "watch", nodata: "leaf" } as const;
 
-function formatCurrency(value: number) {
-  return `₹${value.toLocaleString("en-IN")}`;
-}
-
-type Verdict = "met" | "below" | "no-data";
-
-function StatusPill({ verdict }: { verdict: Verdict }) {
-  if (verdict === "met") {
-    return (
-      <span className="inline-flex items-center gap-1 rounded-full bg-sprout-100 px-2.5 py-1 text-xs font-semibold text-sprout-700">
-        <CheckCircle2 className="h-3.5 w-3.5" /> Target met
-      </span>
-    );
-  }
-  if (verdict === "below") {
-    return (
-      <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-600">
-        <XCircle className="h-3.5 w-3.5" /> Below target
-      </span>
-    );
-  }
+function Card({ card }: { card: KpiCard }) {
   return (
-    <span className="inline-flex items-center gap-1 rounded-full bg-gray-100 px-2.5 py-1 text-xs font-semibold text-gray-500">
-      <MinusCircle className="h-3.5 w-3.5" /> No data yet
-    </span>
+    <li className={cn("flex flex-col rounded-tile border border-white/50 p-4 shadow-panel backdrop-blur-[2px] dark:border-white/5", TINT[card.verdict])}>
+      <div className="flex items-start justify-between gap-2">
+        <p className="text-sm text-ink-soft">{card.name}</p>
+        <span className={cn("shrink-0 text-micro font-medium", card.verdict === "met" ? "text-good" : card.verdict === "below" ? "text-watch" : "text-ink-muted")}>{VERDICT[card.verdict]}</span>
+      </div>
+      <div className="mt-2 flex items-end justify-between gap-3">
+        <p className="text-3xl font-light leading-none tracking-tight tabular-nums text-ink">{card.value}</p>
+        {card.series ? <Sparkline values={card.series} tone={TONE[card.verdict]} /> : null}
+      </div>
+      <div className="mt-3">
+        {card.progress !== null ? <Meter value={Math.round(card.progress * 100)} tone={TONE[card.verdict]} label={`${card.name}: progress towards the target`} /> : <div className="h-1.5 rounded-full bg-inset" aria-hidden="true" />}
+      </div>
+      <p className="mt-2 text-micro text-ink-muted">{card.caption}</p>
+    </li>
   );
 }
 
 export default async function AdminKpisPage() {
-  const kpi = await getKpiSnapshot();
-
-  const rows: {
-    name: string;
-    category: string;
-    target: string;
-    actual: string;
-    verdict: Verdict;
-    note?: string;
-  }[] = [
-    {
-      name: "Kg Delivered / Week (North Star)",
-      category: "Engagement / Operations",
-      target: "≥ 300 kg",
-      actual: `${kpi.kgDeliveredPerWeek.value.toFixed(1)} kg`,
-      verdict: kpi.kgDeliveredPerWeek.value >= kpi.kgDeliveredPerWeek.target ? "met" : "below",
-      note: "Sum of quantityKg on deliveries marked DELIVERED in the last 7 days.",
-    },
-    {
-      name: "QC Pass Rate",
-      category: "Quality / Retention",
-      target: "≥ 95%",
-      actual: formatPercent(kpi.qcPassRate.value),
-      verdict:
-        kpi.qcPassRate.value === null
-          ? "no-data"
-          : kpi.qcPassRate.value >= kpi.qcPassRate.target
-            ? "met"
-            : "below",
-      note: `Based on ${kpi.qcPassRate.sampleSize} reviewed check-ins (qcResult set).`,
-    },
-    {
-      name: "On-Time Delivery Rate",
-      category: "Retention",
-      target: "≥ 95%",
-      actual: formatPercent(kpi.onTimeDeliveryRate.value),
-      verdict:
-        kpi.onTimeDeliveryRate.value === null
-          ? "no-data"
-          : kpi.onTimeDeliveryRate.value >= kpi.onTimeDeliveryRate.target
-            ? "met"
-            : "below",
-      note: `Based on ${kpi.onTimeDeliveryRate.sampleSize} completed deliveries (deliveredAt vs. order.deliveryDate).`,
-    },
-    {
-      name: "Active Certified Growers",
-      category: "Acquisition (Supply)",
-      target: "≥ 150",
-      actual: `${kpi.activeCertifiedGrowers.value}`,
-      verdict: kpi.activeCertifiedGrowers.value >= kpi.activeCertifiedGrowers.target ? "met" : "below",
-      note: "Proxy: Grower.isActive count. The product has no separate SBCG certification flag yet.",
-    },
-    {
-      name: "Grower Acceptance Rate",
-      category: "Engagement (Supply)",
-      target: "≥ 90%",
-      actual: "—",
-      verdict: "no-data",
-      note: kpi.growerAcceptanceRate.note,
-    },
-    {
-      name: "Monthly Recurring Revenue (MRR)",
-      category: "Revenue",
-      target: "≥ ₹5.4L",
-      actual: formatCurrency(kpi.mrr.value),
-      verdict: kpi.mrr.value >= kpi.mrr.target ? "met" : "below",
-      note: "Proxy: revenue from non-cancelled, paid orders in the trailing 30 days. True MRR needs subscription-cycle modeling not yet built (Order.recurrence is unused for billing).",
-    },
-    {
-      name: "Restaurant Churn Rate",
-      category: "Retention",
-      target: "≤ 3% / month",
-      actual: formatPercent(kpi.restaurantChurnRate.value),
-      verdict:
-        kpi.restaurantChurnRate.value === null
-          ? "no-data"
-          : kpi.restaurantChurnRate.value <= kpi.restaurantChurnRate.target
-            ? "met"
-            : "below",
-      note: `Cohort: ${kpi.restaurantChurnRate.cohortSize} restaurants with an order older than 30 days; churned = no order in the trailing 30 days.`,
-    },
-  ];
+  const cards = kpiCards(await getKpiSnapshot());
+  const met = cards.filter((c) => c.verdict === "met").length;
+  const measured = cards.filter((c) => c.verdict !== "nodata").length;
 
   return (
-    <div>
-      <div className="mb-6 sm:mb-8">
-        <div className="mb-1 flex items-center gap-2 sm:gap-3">
-          <Gauge className="h-6 w-6 flex-shrink-0 text-sprout-700 sm:h-7 sm:w-7" />
-          <h1 className="text-2xl font-black tracking-tight text-text-primary sm:text-3xl">
-            KPI Scorecard
-          </h1>
-        </div>
-        <p className="text-sm text-text-secondary sm:text-base">
-          Live, database-computed values against the Month-6 targets from the product measurement
-          framework — not GA4 data. GA4 tracks the acquisition/engagement/conversion funnel
-          separately; see the Analytics page there for that.
-        </p>
-      </div>
+    <>
+      <PageHeader
+        title="KPI scorecard"
+        subtitle={`${met} of ${measured} measured KPIs are on target. Values come from live data against the Month-6 targets, not from GA4.`}
+      />
 
-      <GlassCard>
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[720px] border-collapse text-left text-sm">
-            <thead>
-              <tr className="border-b border-sprout-200/40 text-xs font-semibold uppercase tracking-wider text-text-muted">
-                <th className="py-3 pr-4">KPI</th>
-                <th className="py-3 pr-4">Category</th>
-                <th className="py-3 pr-4">Target (M6)</th>
-                <th className="py-3 pr-4">Actual</th>
-                <th className="py-3 pr-4">Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((row) => (
-                <tr key={row.name} className="border-b border-sprout-200/20 align-top last:border-0">
-                  <td className="py-4 pr-4 font-semibold text-text-primary">{row.name}</td>
-                  <td className="py-4 pr-4 text-text-muted">{row.category}</td>
-                  <td className="py-4 pr-4 font-medium text-text-primary">{row.target}</td>
-                  <td className="py-4 pr-4 text-lg font-black text-text-primary">{row.actual}</td>
-                  <td className="py-4 pr-4">
-                    <StatusPill verdict={row.verdict} />
-                    {row.note && <p className="mt-2 max-w-xs text-xs text-text-muted">{row.note}</p>}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      <ul className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        {cards.map((card) => (
+          <Card key={card.key} card={card} />
+        ))}
+      </ul>
+
+      <Panel className="mt-5">
+        <PanelHeader title="Definitions" subtitle="How each number is worked out, and which are stand-ins" />
+        <div className="divide-y divide-hairline/70">
+          {cards.map((card) => (
+            <details key={card.key} className="group py-3 first:pt-0 last:pb-0">
+              <summary className="flex cursor-pointer list-none items-center justify-between gap-3 rounded text-sm font-medium text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50 [&::-webkit-details-marker]:hidden">
+                <span>
+                  {card.name}
+                  <span className="ml-2 text-micro font-normal text-ink-muted">{card.category}</span>
+                </span>
+                <ChevronDown className="h-4 w-4 shrink-0 text-ink-muted transition-transform group-open:rotate-180 motion-reduce:transition-none" aria-hidden="true" />
+              </summary>
+              <p className="mt-2 text-sm text-ink-soft">{card.definition}</p>
+              <p className="mt-1 text-micro text-ink-muted">{card.target}</p>
+            </details>
+          ))}
         </div>
-      </GlassCard>
-    </div>
+      </Panel>
+    </>
   );
 }

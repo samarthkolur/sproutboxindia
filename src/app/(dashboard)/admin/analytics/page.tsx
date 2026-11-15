@@ -1,130 +1,170 @@
-import { GlassCard } from "@/components/shared/GlassCard";
-import { prisma } from "@/lib/prisma";
-import { BarChart3, IndianRupee, Package, Users, Star, Sprout, TrendingUp } from "lucide-react";
-import { OrderStatus } from "@prisma/client";
+import Link from "next/link";
+import { CheckCircle2, IndianRupee, Package, Wallet } from "lucide-react";
+import { KgChartCard } from "@/components/admin/KgChartCard";
+import { MoneyChartCard, OrdersChartCard } from "@/components/admin/AnalyticsCharts";
+import { Meter } from "@/components/ui/meter";
+import { PageHeader } from "@/components/ui/page-header";
+import { Panel, PanelHeader } from "@/components/ui/panel";
+import { Sparkline } from "@/components/ui/sparkline";
+import { StatTile } from "@/components/ui/stat-tile";
+import { Tabs } from "@/components/ui/tabs";
+import { commission, cropName, rupees } from "@/lib/admin";
+import { getAdminAnalytics } from "@/lib/admin-data";
 
-async function getAnalytics() {
-  try {
-    const [orderCount, totalRevenue, fulfilledRevenue, growerPayouts, growerCount, avgRating, trayCount] = await Promise.all([
-      prisma.order.count(),
-      prisma.order.aggregate({ _sum: { totalPrice: true } }),
-      // Commission is only earned on orders that actually got paid for —
-      // PENDING_PAYMENT/cancelled orders never converted to real revenue.
-      prisma.order.aggregate({
-        _sum: { totalPrice: true },
-        where: { status: { notIn: [OrderStatus.PENDING_PAYMENT, OrderStatus.CANCELLED] } },
-      }),
-      prisma.payout.aggregate({ _sum: { amount: true } }),
-      prisma.grower.count({ where: { isActive: true } }),
-      prisma.feedback.aggregate({ _avg: { rating: true } }),
-      prisma.batch.count(),
-    ]);
+const TABS = [
+  { value: "revenue", label: "Revenue" },
+  { value: "production", label: "Production" },
+  { value: "quality", label: "Quality" },
+];
 
-    const fulfilled = fulfilledRevenue._sum.totalPrice || 0;
-    const payouts = growerPayouts._sum.amount || 0;
-    const commission = fulfilled - payouts;
-    const commissionRate = fulfilled > 0 ? (commission / fulfilled) * 100 : 0;
+const sum = (weeks: { value: number }[]) => weeks.reduce((total, w) => total + w.value, 0);
 
-    return {
-      orderCount,
-      totalRevenue: totalRevenue._sum.totalPrice || 0,
-      fulfilledRevenue: fulfilled,
-      growerPayouts: payouts,
-      commission,
-      commissionRate,
-      growerCount,
-      avgRating: avgRating._avg.rating || 0,
-      trayCount,
-    };
-  } catch {
-    return {
-      orderCount: 0,
-      totalRevenue: 0,
-      fulfilledRevenue: 0,
-      growerPayouts: 0,
-      commission: 0,
-      commissionRate: 0,
-      growerCount: 0,
-      avgRating: 0,
-      trayCount: 0,
-    };
-  }
-}
-
-export default async function AnalyticsPage() {
-  const data = await getAnalytics();
-
-  const metrics = [
-    { label: "Total Orders", value: data.orderCount, icon: <Package className="w-6 h-6 text-blue-600" />, bg: "bg-blue-50" },
-    { label: "Total Revenue", value: `₹${data.totalRevenue.toLocaleString("en-IN")}`, icon: <IndianRupee className="w-6 h-6 text-sprout-600" />, bg: "bg-sprout-50" },
-    { label: "Active Growers", value: data.growerCount, icon: <Users className="w-6 h-6 text-purple-600" />, bg: "bg-purple-50" },
-    { label: "Avg Rating", value: data.avgRating > 0 ? data.avgRating.toFixed(1) : "--", icon: <Star className="w-6 h-6 text-amber-600" />, bg: "bg-amber-50" },
-    { label: "Total Trays", value: data.trayCount, icon: <Sprout className="w-6 h-6 text-sprout-600" />, bg: "bg-sprout-50" },
-  ];
+export default async function AnalyticsPage({ searchParams }: { searchParams: { tab?: string } }) {
+  const data = await getAdminAnalytics();
+  const tab = TABS.some((t) => t.value === searchParams.tab) ? searchParams.tab! : "revenue";
+  const revenue = sum(data.revenue);
+  const paidOut = sum(data.payouts);
+  const kept = commission(revenue, paidOut);
+  const orders = sum(data.orders);
+  const reviewed = (data.qc.PASS ?? 0) + (data.qc.RISK ?? 0) + (data.qc.REJECT ?? 0);
 
   return (
-    <div>
-      <div className="mb-6 sm:mb-8">
-        <div className="flex items-center gap-2 sm:gap-3 mb-1">
-          <BarChart3 className="w-6 h-6 sm:w-7 sm:h-7 text-sprout-700 flex-shrink-0" />
-          <h1 className="text-2xl sm:text-3xl font-black text-text-primary tracking-tight">Analytics</h1>
-        </div>
-        <p className="text-sm sm:text-base text-text-secondary">Platform-wide performance metrics</p>
+    <>
+      <PageHeader title="Analytics" subtitle="The last twelve weeks: what came in, what went out to growers, and what was kept." />
+
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+        <StatTile label="Revenue" icon={<IndianRupee />} value={rupees(revenue)} caption="Paid orders, last 12 weeks" trailing={<Sparkline values={data.revenue.map((w) => w.value)} />} />
+        <StatTile label="Paid to growers" icon={<Wallet />} value={rupees(paidOut)} caption="Payouts marked paid" trailing={<Sparkline values={data.payouts.map((w) => w.value)} tone="brand" />} />
+        <StatTile
+          label="Kept by SproutBox"
+          icon={<CheckCircle2 />}
+          value={rupees(kept.kept)}
+          tone={kept.percent !== null ? "good" : "neutral"}
+          caption={kept.percent === null ? "Nothing earned yet" : `${kept.percent}% of revenue`}
+        />
+        <StatTile label="Orders" icon={<Package />} value={orders} caption="Paid orders placed" trailing={<Sparkline values={data.orders.map((w) => w.value)} />} />
       </div>
 
-      <div className="mb-6 sm:mb-8 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-5">
-        {metrics.map((m) => (
-          <GlassCard key={m.label}>
-            <div className={`w-12 h-12 ${m.bg} rounded-xl flex items-center justify-center mb-3`}>
-              {m.icon}
-            </div>
-            <p className="text-[11px] font-semibold text-text-muted uppercase tracking-wider mb-1">{m.label}</p>
-            <p className="text-2xl font-black text-text-primary">{m.value}</p>
-          </GlassCard>
-        ))}
-      </div>
+      <Tabs ariaLabel="Analytics sections" items={TABS} value={tab} hrefFor={(value) => `/admin/analytics?tab=${value}`} className="my-5" />
 
-      <GlassCard>
-        <div className="mb-5 flex items-center gap-2">
-          <TrendingUp className="h-5 w-5 text-sprout-700" />
-          <h2 className="text-lg font-bold text-text-primary">Revenue Breakdown</h2>
+      {tab === "revenue" ? (
+        <div className="space-y-4">
+          <MoneyChartCard revenue={data.revenue} payouts={data.payouts} />
+          <OrdersChartCard orders={data.orders} />
+          <div className="grid gap-4 lg:grid-cols-2">
+            <Panel>
+              <PanelHeader title="Top restaurants" subtitle="By revenue, all time" />
+              {data.topRestaurants.length > 0 ? (
+                <ul className="space-y-3">
+                  {data.topRestaurants.map((r) => (
+                    <li key={r.id}>
+                      <div className="flex items-baseline justify-between gap-3">
+                        <Link href={`/admin/restaurants/${r.id}`} className="text-sm font-medium text-ink hover:underline" data-i18n-ignore>
+                          {r.name}
+                        </Link>
+                        <span className="text-sm font-medium tabular-nums text-ink">{rupees(r.revenue)}</span>
+                      </div>
+                      <p className="mb-1.5 text-micro text-ink-muted">{`${r.orders} ${r.orders === 1 ? "order" : "orders"}`}</p>
+                      <Meter value={r.revenue} max={data.topRestaurants[0].revenue} label={`${r.name} revenue`} />
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="text-sm text-ink-muted">No paid orders yet.</p>
+              )}
+            </Panel>
+            <Panel>
+              <PanelHeader title="Revenue by crop" subtitle="All time" />
+              {data.crops.length > 0 ? (
+                <ul className="space-y-3">
+                  {data.crops.map((c) => (
+                    <li key={c.cropType}>
+                      <div className="flex items-baseline justify-between gap-3">
+                        <span className="text-sm font-medium text-ink">{cropName(c.cropType)}</span>
+                        <span className="text-sm font-medium tabular-nums text-ink">{rupees(c.revenue)}</span>
+                      </div>
+                      <p className="mb-1.5 text-micro text-ink-muted">{`${Math.round(c.kg * 10) / 10} kg · ${c.orders} ${c.orders === 1 ? "order" : "orders"}`}</p>
+                      <Meter value={c.revenue} max={data.crops[0].revenue} label={`${cropName(c.cropType)} revenue`} />
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="text-sm text-ink-muted">No paid orders yet.</p>
+              )}
+            </Panel>
+          </div>
         </div>
-        <div className="grid gap-4 sm:grid-cols-3">
-          <div className="rounded-xl border border-white/50 bg-white/50 p-4">
-            <p className="text-xs font-semibold uppercase tracking-wider text-text-muted mb-1">
-              Fulfilled Order Revenue
-            </p>
-            <p className="text-2xl font-black text-text-primary">
-              ₹{data.fulfilledRevenue.toLocaleString("en-IN")}
-            </p>
-            <p className="mt-1 text-xs text-text-muted">Excludes unpaid / cancelled orders</p>
-          </div>
-          <div className="rounded-xl border border-white/50 bg-white/50 p-4">
-            <p className="text-xs font-semibold uppercase tracking-wider text-text-muted mb-1">
-              Grower Payouts
-            </p>
-            <p className="text-2xl font-black text-text-primary">
-              ₹{data.growerPayouts.toLocaleString("en-IN")}
-            </p>
-            <p className="mt-1 text-xs text-text-muted">Sum of all created payouts</p>
-          </div>
-          <div className="rounded-xl border border-sprout-200/60 bg-sprout-50/60 p-4">
-            <p className="text-xs font-semibold uppercase tracking-wider text-sprout-800 mb-1">
-              Platform Commission
-            </p>
-            <p className="text-2xl font-black text-sprout-800">
-              ₹{data.commission.toLocaleString("en-IN")}
-            </p>
-            <p className="mt-1 text-xs text-sprout-700">
-              {data.commissionRate.toFixed(1)}% of fulfilled revenue
-            </p>
-          </div>
+      ) : null}
+
+      {tab === "production" ? (
+        <div className="space-y-4">
+          <KgChartCard ordered={data.orderedKg} delivered={data.deliveredKg} />
+          <Panel>
+            <PanelHeader title="Kilos by crop" subtitle="Ordered, all time" />
+            {data.crops.length > 0 ? (
+              <ul className="space-y-3">
+                {[...data.crops].sort((a, b) => b.kg - a.kg).map((c) => (
+                  <li key={c.cropType}>
+                    <div className="flex items-baseline justify-between gap-3">
+                      <span className="text-sm font-medium text-ink">{cropName(c.cropType)}</span>
+                      <span className="text-sm font-medium tabular-nums text-ink">{`${Math.round(c.kg * 10) / 10} kg`}</span>
+                    </div>
+                    <Meter value={c.kg} max={Math.max(...data.crops.map((x) => x.kg), 1)} label={`${cropName(c.cropType)} kilos`} className="mt-1.5" />
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-sm text-ink-muted">No paid orders yet.</p>
+            )}
+          </Panel>
         </div>
-        <p className="mt-4 text-xs text-text-muted">
-          Commission = fulfilled order revenue − grower payouts. It is not yet split out per-order
-          or per-crop; this is a platform-wide figure.
-        </p>
-      </GlassCard>
-    </div>
+      ) : null}
+
+      {tab === "quality" ? (
+        <div className="grid gap-4 lg:grid-cols-2">
+          <Panel>
+            <PanelHeader title="QC results" subtitle="Every reviewed check-in" />
+            {reviewed > 0 ? (
+              <ul className="space-y-3">
+                {([["PASS", "Passed", "leaf"], ["RISK", "Flagged as a risk", "watch"], ["REJECT", "Rejected", "risk"]] as const).map(([key, label, tone]) => (
+                  <li key={key}>
+                    <div className="flex items-baseline justify-between gap-3">
+                      <span className="text-sm text-ink-soft">{label}</span>
+                      <span className="text-sm font-medium tabular-nums text-ink">{data.qc[key] ?? 0}</span>
+                    </div>
+                    <Meter value={data.qc[key] ?? 0} max={reviewed} tone={tone} label={label} className="mt-1.5" />
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-sm text-ink-muted">No check-ins have been reviewed yet.</p>
+            )}
+          </Panel>
+          <Panel>
+            <PanelHeader title="Grower quality" subtitle="Share of finished trays that passed" />
+            {data.growerQuality.length > 0 ? (
+              <ul className="space-y-3">
+                {data.growerQuality.slice(0, 8).map((g) => (
+                  <li key={g.id}>
+                    <div className="flex items-baseline justify-between gap-3">
+                      <Link href={`/admin/growers/${g.id}`} className="text-sm font-medium text-ink hover:underline" data-i18n-ignore>
+                        {g.name}
+                      </Link>
+                      <span className="text-sm tabular-nums text-ink-soft">{`${Math.round(g.quality * 100)}%`}</span>
+                    </div>
+                    <Meter value={Math.round(g.quality * 100)} label={`${g.name} quality`} className="mt-1.5" />
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-sm text-ink-muted">No trays have finished yet.</p>
+            )}
+          </Panel>
+        </div>
+      ) : null}
+      {data.ratingCount > 0 && tab === "quality" ? (
+        <p className="mt-4 text-sm text-ink-soft">{`Restaurants rate deliveries ${data.rating?.toFixed(1)} out of 5 on average (${data.ratingCount} ${data.ratingCount === 1 ? "rating" : "ratings"}).`}</p>
+      ) : null}
+    </>
   );
 }

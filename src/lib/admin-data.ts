@@ -1,6 +1,8 @@
 import { subWeeks } from "date-fns";
 import { prisma } from "@/lib/prisma";
-import { qcPassPercent, weeklyTotals, type PipelineCounts } from "@/lib/admin";
+import { isLate, qcPassPercent, weeklyTotals, type PipelineCounts } from "@/lib/admin";
+import type { KpiSnapshot } from "@/lib/kpi";
+import { OrderStatus } from "@prisma/client";
 
 // Server-only reads for the admin portal. Like the grower and restaurant reads they do not
 // swallow errors, so a failed query reaches the error page and its retry instead of looking
@@ -299,4 +301,123 @@ export async function getAdminSettlements() {
     const paidOut = growers.reduce((sum, g) => sum + g.amount, 0);
     return { order, growers, paidOut, share: order.totalPrice - paidOut };
   });
+}
+
+// ── KPI scorecard ───────────────────────────────────────────────────────────
+
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+// The seven KPIs, computed from live data. Two are honestly flagged rather than faked where the
+// product does not yet track what the KPI needs: grower acceptance (there is no accept/reject
+// step) and, until there is data, QC pass and on-time delivery, which come back null rather
+// than a misleading 0% or 100%.
+export async function getKpiSnapshot(): Promise<KpiSnapshot> {
+  const now = new Date();
+  const sevenDaysAgo = new Date(now.getTime() - 7 * DAY_MS);
+  const thirtyDaysAgo = new Date(now.getTime() - 30 * DAY_MS);
+
+  const [
+    deliveredLastWeek,
+    reviewedCheckIns,
+    deliveredDeliveries,
+    activeGrowerCount,
+    fulfilledOrdersLast30d,
+    restaurantsWithOldOrder,
+  ] = await Promise.all([
+    prisma.delivery.findMany({
+      where: { status: "DELIVERED", deliveredAt: { gte: sevenDaysAgo } },
+      include: { order: { select: { quantityKg: true } } },
+    }),
+    prisma.checkIn.findMany({
+      where: { qcResult: { not: null } },
+      select: { qcResult: true },
+    }),
+    prisma.delivery.findMany({
+      where: { status: "DELIVERED", deliveredAt: { not: null } },
+      include: { order: { select: { deliveryDate: true } } },
+    }),
+    prisma.grower.count({ where: { isActive: true } }),
+    prisma.order.aggregate({
+      _sum: { totalPrice: true },
+      where: {
+        createdAt: { gte: thirtyDaysAgo },
+        status: { notIn: [OrderStatus.PENDING_PAYMENT, OrderStatus.CANCELLED] },
+      },
+    }),
+    prisma.restaurant.findMany({
+      where: { isActive: true, orders: { some: { createdAt: { lt: thirtyDaysAgo } } } },
+      select: {
+        id: true,
+        orders: { where: { createdAt: { gte: thirtyDaysAgo } }, select: { id: true }, take: 1 },
+      },
+    }),
+  ]);
+
+  const eightWeeks = await prisma.delivery.findMany({
+    where: { status: "DELIVERED", deliveredAt: { gte: new Date(now.getTime() - 56 * DAY_MS) } },
+    select: { deliveredAt: true, order: { select: { quantityKg: true } } },
+  });
+  const weeklyKg = weeklyTotals(eightWeeks.map((d) => ({ at: d.deliveredAt, value: d.order.quantityKg })), now, 8).map((w) => w.value);
+  const kgDeliveredPerWeek = deliveredLastWeek.reduce((sum, d) => sum + d.order.quantityKg, 0);
+
+  const qcPassCount = reviewedCheckIns.filter((c) => c.qcResult === "PASS").length;
+  const qcPassRate = reviewedCheckIns.length > 0 ? qcPassCount / reviewedCheckIns.length : null;
+
+  const onTimeCount = deliveredDeliveries.filter((d) => d.deliveredAt && !isLate({ status: "DELIVERED", deliveredAt: d.deliveredAt }, d.order.deliveryDate)).length;
+  const onTimeDeliveryRate = deliveredDeliveries.length > 0 ? onTimeCount / deliveredDeliveries.length : null;
+
+  const churnedCount = restaurantsWithOldOrder.filter((r) => r.orders.length === 0).length;
+  const restaurantChurnRate =
+    restaurantsWithOldOrder.length > 0 ? churnedCount / restaurantsWithOldOrder.length : null;
+
+  return {
+    kgDeliveredPerWeek: { value: kgDeliveredPerWeek, weeks: weeklyKg },
+    qcPassRate: { value: qcPassRate, sampleSize: reviewedCheckIns.length },
+    onTimeDeliveryRate: { value: onTimeDeliveryRate, sampleSize: deliveredDeliveries.length },
+    activeCertifiedGrowers: { value: activeGrowerCount },
+    growerAcceptanceRate: {
+      value: null,
+      note: "Not trackable yet. The product has no accept or reject step for allocated tray tasks.",
+    },
+    mrr: { value: fulfilledOrdersLast30d._sum.totalPrice || 0 },
+    restaurantChurnRate: { value: restaurantChurnRate, cohortSize: restaurantsWithOldOrder.length },
+  };
+}
+
+// ── Analytics ───────────────────────────────────────────────────────────────
+
+export async function getAdminAnalytics(now: Date = new Date()) {
+  const since = subWeeks(now, 12);
+  const paidWhere = { status: { notIn: ["PENDING_PAYMENT", "CANCELLED"] as OrderStatus[] } };
+  const [orders, payouts, deliveries, byCrop, restaurantTotals, qcCounts, growers, ratings] = await Promise.all([
+    prisma.order.findMany({ where: { createdAt: { gte: since }, ...paidWhere }, select: { createdAt: true, totalPrice: true, quantityKg: true } }),
+    prisma.payout.findMany({ where: { status: "PAID", paidAt: { gte: since } }, select: { paidAt: true, amount: true } }),
+    prisma.delivery.findMany({ where: { status: "DELIVERED", deliveredAt: { gte: since } }, select: { deliveredAt: true, order: { select: { quantityKg: true } } } }),
+    prisma.order.groupBy({ by: ["cropType"], _sum: { totalPrice: true, quantityKg: true }, _count: true, where: paidWhere }),
+    prisma.order.groupBy({ by: ["restaurantId"], _sum: { totalPrice: true }, _count: true, where: paidWhere, orderBy: { _sum: { totalPrice: "desc" } }, take: 5 }),
+    prisma.checkIn.groupBy({ by: ["qcResult"], _count: true, where: { qcResult: { not: null } } }),
+    prisma.grower.findMany({ where: { isActive: true }, select: { id: true, qualityScore: true, user: { select: { name: true } }, tasks: { select: { batches: { where: { status: { in: ["HARVESTED", "REJECTED"] } }, select: { id: true } } } } } }),
+    prisma.feedback.aggregate({ _avg: { rating: true }, _count: true }),
+  ]);
+  const names = await prisma.restaurant.findMany({ where: { id: { in: restaurantTotals.map((r) => r.restaurantId) } }, select: { id: true, businessName: true } });
+  const nameOf = new Map(names.map((n) => [n.id, n.businessName]));
+  const revenue = weeklyTotals(orders.map((o) => ({ at: o.createdAt, value: o.totalPrice })), now, 12);
+  const paidOut = weeklyTotals(payouts.map((p) => ({ at: p.paidAt, value: p.amount })), now, 12);
+
+  return {
+    revenue,
+    payouts: paidOut,
+    orders: weeklyTotals(orders.map((o) => ({ at: o.createdAt, value: 1 })), now, 12),
+    orderedKg: weeklyTotals(orders.map((o) => ({ at: o.createdAt, value: o.quantityKg })), now, 12),
+    deliveredKg: weeklyTotals(deliveries.map((d) => ({ at: d.deliveredAt, value: d.order.quantityKg })), now, 12),
+    crops: byCrop.map((c) => ({ cropType: c.cropType, revenue: c._sum.totalPrice ?? 0, kg: c._sum.quantityKg ?? 0, orders: c._count })).sort((a, b) => b.revenue - a.revenue),
+    topRestaurants: restaurantTotals.map((r) => ({ id: r.restaurantId, name: nameOf.get(r.restaurantId) ?? "Restaurant", revenue: r._sum.totalPrice ?? 0, orders: r._count })),
+    qc: Object.fromEntries(qcCounts.map((q) => [q.qcResult ?? "NONE", q._count])) as Record<string, number>,
+    growerQuality: growers
+      .map((g) => ({ id: g.id, name: g.user.name ?? "Grower", quality: g.qualityScore, finished: g.tasks.reduce((sum, t) => sum + t.batches.length, 0) }))
+      .filter((g) => g.finished > 0)
+      .sort((a, b) => b.quality - a.quality),
+    rating: ratings._avg.rating,
+    ratingCount: ratings._count,
+  };
 }
