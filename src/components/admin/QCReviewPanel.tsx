@@ -1,5 +1,3 @@
-import { FeedbackForm } from "@/components/restaurant/FeedbackForm";
-
 export function QCReviewPanel({ batchId, checkInId }: { batchId: string; checkInId: string }) {
   return (
     <div className="glass p-5">
@@ -9,7 +7,6 @@ export function QCReviewPanel({ batchId, checkInId }: { batchId: string; checkIn
         <input type="hidden" name="checkInId" value={checkInId} />
         <p className="text-sm text-text-muted">Use the API panel or route handler for PASS, RISK, and REJECT decisions.</p>
       </form>
-      <div className="hidden"><FeedbackForm orderId={batchId} /></div>
     </div>
   );
 }
