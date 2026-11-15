@@ -752,6 +752,7 @@ export const translations: Record<string, TranslationEntry> = {
   "Days to harvest": { kn: "ಕೊಯ್ಲಿಗೆ ದಿನಗಳು", hi: "कटाई तक के दिन" },
   "Digital, hub & delivery checks": { kn: "ಡಿಜಿಟಲ್, ಹಬ್ ಮತ್ತು ವಿತರಣಾ ಪರಿಶೀಲನೆಗಳು", hi: "डिजिटल, हब और डिलीवरी जांच" },
   "Farm-to-fork, door to door.": { kn: "ಜಮೀನಿನಿಂದ ತಟ್ಟೆಗೆ, ಬಾಗಿಲಿಂದ ಬಾಗಿಲಿಗೆ.", hi: "खेत से थाली तक, दरवाज़े से दरवाज़े तक।" },
+  "Add": { kn: "ಸೇರಿಸಿ", hi: "जोड़ें" },
   "Active orders": { kn: "ಸಕ್ರಿಯ ಆರ್ಡರ್‌ಗಳು", hi: "सक्रिय ऑर्डर" },
   "Being grown or on the way": { kn: "ಬೆಳೆಯುತ್ತಿದೆ ಅಥವಾ ದಾರಿಯಲ್ಲಿದೆ", hi: "उग रहे हैं या रास्ते में" },
   "Nothing in progress": { kn: "ಯಾವುದೂ ಪ್ರಗತಿಯಲ್ಲಿಲ್ಲ", hi: "कुछ भी प्रगति में नहीं" },

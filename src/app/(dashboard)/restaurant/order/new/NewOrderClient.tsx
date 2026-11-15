@@ -281,25 +281,22 @@ export function NewOrderClient({ initialCart, initialRecurrence }: { initialCart
           </Panel>
         }
       >
-        <ul className="grid gap-4 min-[520px]:grid-cols-2">
+        <ul className="grid gap-3 xl:grid-cols-2">
           {CROP_TYPES.map((crop) => {
             const item = cart.find((c) => c.cropType === crop);
             return (
               <li key={crop}>
-                <Panel padding="none" className="flex h-full flex-col overflow-hidden">
-                  <div className="relative h-36 bg-inset">
-                    <Image src={CROP_IMAGES[crop]} alt={CROP_DISPLAY_NAMES[crop]} fill sizes="(min-width: 1024px) 25vw, 50vw" className="object-cover" />
-                    <span className="absolute right-3 top-3 rounded-full bg-panel-solid/90 px-2.5 py-1 text-micro font-medium text-ink shadow-panel">{`${CROP_CYCLE_DAYS[crop]} days to grow`}</span>
+                <Panel padding="none" className="flex h-full overflow-hidden">
+                  <div className="relative w-28 shrink-0 bg-inset sm:w-36">
+                    <Image src={CROP_IMAGES[crop]} alt={CROP_DISPLAY_NAMES[crop]} fill sizes="144px" className="object-cover" />
                   </div>
-                  <div className="flex flex-1 flex-col p-4">
-                    <div className="flex items-baseline justify-between gap-2">
-                      <h2 className="text-base font-medium text-ink">{CROP_DISPLAY_NAMES[crop]}</h2>
-                      <p className="shrink-0 text-base font-medium tabular-nums text-ink">
-                        {rupees(CROP_PRICE_PER_KG[crop])}
-                        <span className="text-micro font-normal text-ink-muted"> /kg</span>
-                      </p>
-                    </div>
-                    <p className="mt-1 flex-1 text-micro text-ink-muted">Grown to order, harvested fresh and delivered on your date.</p>
+                  <div className="flex min-w-0 flex-1 flex-col p-3 sm:p-4">
+                    <h2 className="text-base font-medium text-ink">{CROP_DISPLAY_NAMES[crop]}</h2>
+                    <p className="text-sm tabular-nums text-ink-soft">
+                      {rupees(CROP_PRICE_PER_KG[crop])}
+                      <span className="text-micro text-ink-muted"> /kg</span>
+                    </p>
+                    <p className="mt-1 flex-1 text-micro text-ink-muted">{`${CROP_CYCLE_DAYS[crop]} days to grow`}</p>
 
                     {item ? (
                       <div className="mt-3 flex items-center justify-between rounded-full border border-hairline bg-inset/50 p-1">
@@ -308,17 +305,17 @@ export function NewOrderClient({ initialCart, initialRecurrence }: { initialCart
                           data-no-global-loading
                           onClick={() => change(crop, -QUANTITY_STEP_KG)}
                           aria-label={`Remove half a kilo of ${CROP_DISPLAY_NAMES[crop]}`}
-                          className="flex h-9 w-9 items-center justify-center rounded-full bg-panel-solid text-ink shadow-panel transition-transform active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50"
+                          className="flex h-8 w-8 items-center justify-center rounded-full bg-panel-solid text-ink shadow-panel transition-transform active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50"
                         >
                           <Minus className="h-4 w-4" />
                         </button>
-                        <span aria-live="polite" className="text-sm font-medium tabular-nums text-ink">{`${item.quantityKg} kg`}</span>
+                        <span aria-live="polite" className="px-1 text-sm font-medium tabular-nums text-ink">{`${item.quantityKg} kg`}</span>
                         <button
                           type="button"
                           data-no-global-loading
                           onClick={() => change(crop, QUANTITY_STEP_KG)}
                           aria-label={`Add half a kilo of ${CROP_DISPLAY_NAMES[crop]}`}
-                          className="flex h-9 w-9 items-center justify-center rounded-full bg-panel-solid text-ink shadow-panel transition-transform active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50"
+                          className="flex h-8 w-8 items-center justify-center rounded-full bg-panel-solid text-ink shadow-panel transition-transform active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50"
                         >
                           <Plus className="h-4 w-4" />
                         </button>
@@ -328,10 +325,11 @@ export function NewOrderClient({ initialCart, initialRecurrence }: { initialCart
                         type="button"
                         data-no-global-loading
                         onClick={() => change(crop, QUANTITY_STEP_KG)}
-                        className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-full border border-hairline bg-panel/70 py-2 text-sm font-medium text-ink transition-colors hover:bg-inset/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50"
+                        aria-label={`Add ${CROP_DISPLAY_NAMES[crop]}`}
+                        className="mt-3 inline-flex w-full items-center justify-center gap-1.5 rounded-full border border-hairline bg-panel/70 py-1.5 text-sm font-medium text-ink transition-colors hover:bg-inset/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50"
                       >
                         <Plus className="h-4 w-4" aria-hidden="true" />
-                        {`Add ${CROP_DISPLAY_NAMES[crop]}`}
+                        Add
                       </button>
                     )}
                   </div>
