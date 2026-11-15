@@ -219,3 +219,38 @@ export function checkAllocation(assignments: Record<string, number>, candidates:
   const overCapacity = candidates.filter((c) => (assignments[c.id] ?? 0) > c.free).map((c) => c.id);
   return { assigned, remaining: total - assigned, overCapacity, ok: assigned === total && overCapacity.length === 0 };
 }
+
+// ── QC review ───────────────────────────────────────────────────────────────
+
+export const QC_REASONS = ["Mould or fungus", "Uneven germination", "Pale or yellow stems", "Too short", "Sparse coverage", "Pests or damage"] as const;
+
+/**
+ * The note that goes to the grower with a verdict: the chosen reasons, then anything typed.
+ * (The action has always accepted notes; the old screen never sent any.)
+ */
+export function composeQcNotes(reasons: string[], text: string) {
+  const known = QC_REASONS.filter((reason) => reasons.includes(reason));
+  const head = known.join(", ");
+  const extra = text.trim();
+  if (head && extra) return `${head}. ${extra}`;
+  return head || extra;
+}
+
+export type QcDecision = "PASS" | "RISK" | "REJECT";
+
+/** A reject must say why: the grower reads this note to fix the next tray. */
+export function decisionError(result: QcDecision, notes: string) {
+  return result === "REJECT" && notes.trim() === "" ? "Choose a reason or write a note so the grower knows what to fix." : null;
+}
+
+/** The decision a keyboard key stands for (P pass, R risk, X reject), or null. */
+export function decisionForKey(key: string): QcDecision | null {
+  const k = key.toLowerCase();
+  return k === "p" ? "PASS" : k === "r" ? "RISK" : k === "x" ? "REJECT" : null;
+}
+
+/** The index to show after the current one is gone from a queue of `length`. */
+export function nextIndex(current: number, length: number, direction: 1 | -1 = 1) {
+  if (length <= 0) return -1;
+  return (current + direction + length) % length;
+}

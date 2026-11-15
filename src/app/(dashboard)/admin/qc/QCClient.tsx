@@ -1,232 +1,159 @@
 "use client";
 
-import { useState } from "react";
-import Image from "next/image";
-import { GlassCard } from "@/components/shared/GlassCard";
-import {
-  CheckCircle2,
-  XCircle,
-  AlertTriangle,
-  Loader2,
-  Image as ImageIcon,
-} from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { CheckCircle2, ExternalLink } from "lucide-react";
+import { toast } from "sonner";
 import { processQCCheckIn } from "@/actions/qc.actions";
-import type { QCResult } from "@prisma/client";
+import { QCReview, type ReviewItem } from "@/components/admin/QCReview";
+import { EmptyState } from "@/components/shared/EmptyState";
+import { DetailLayout } from "@/components/ui/detail-layout";
+import { controlClass } from "@/components/ui/field";
+import { Panel } from "@/components/ui/panel";
+import { cropName, decisionForKey, nextIndex, waitingFor, type QcDecision } from "@/lib/admin";
+import { cn } from "@/lib/utils";
 
-type CheckInItem = {
-  id: string;
+export interface QueueItem extends ReviewItem {
   day: number;
-  imageTopUrl: string | null;
-  imageSideUrl: string | null;
-  notes: string | null;
-};
+  /** ISO string. */
+  waitingSince: string;
+}
 
-type QCBatchItem = {
-  id: string;
-  trayNumber: number;
-  currentDay: number;
-  createdAt: Date;
-  task: {
-    cropType: string;
-    grower: {
-      user: {
-        name: string | null;
-      };
-    };
-  };
-  checkIns: CheckInItem[];
-};
+// Master-detail QC: the queue on the left, the review panel on the right. P, R and X decide,
+// J and K move through the queue, and after a pass or reject the next tray opens by itself.
+export function QCClient({ queue: initial }: { queue: QueueItem[] }) {
+  const router = useRouter();
+  const [queue, setQueue] = useState(initial);
+  const [crop, setCrop] = useState("all");
+  const [grower, setGrower] = useState("all");
+  const [openId, setOpenId] = useState<string | null>(initial[0]?.batchId ?? null);
+  const [busy, setBusy] = useState(false);
 
-export function QCClient({ initialQueue }: { initialQueue: QCBatchItem[] }) {
-  const [queue, setQueue] = useState(initialQueue);
-  const [processingId, setProcessingId] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [lightboxSrc, setLightboxSrc] = useState<string | null>(null);
+  const crops = useMemo(() => Array.from(new Set(queue.map((q) => q.cropType))), [queue]);
+  const growers = useMemo(() => Array.from(new Set(queue.map((q) => q.growerName))).sort(), [queue]);
+  const shown = queue.filter((q) => (crop === "all" || q.cropType === crop) && (grower === "all" || q.growerName === grower));
+  const open = shown.find((q) => q.batchId === openId) ?? shown[0] ?? null;
 
-  // QC is submitted via the latest check-in's ID
-  const handleQC = async (batch: QCBatchItem, result: QCResult) => {
-    const latestCheckIn = batch.checkIns[0];
-    if (!latestCheckIn) {
-      setError("No check-in found for this batch");
-      return;
-    }
-    setProcessingId(batch.id);
-    setError(null);
-
-    const res = await processQCCheckIn(latestCheckIn.id, result);
-
-    if (res?.error) {
-      setError(res.error);
-      setProcessingId(null);
-    } else {
-      if (result !== "RISK") {
-        // Remove from queue on PASS or REJECT
-        setQueue((prev) => prev.filter((item) => item.id !== batch.id));
+  async function decide(result: QcDecision, notes: string, checkInId: string) {
+    if (!open) return false;
+    setBusy(true);
+    try {
+      const res = await processQCCheckIn(checkInId, result, notes || undefined);
+      if (res && "error" in res && res.error) {
+        toast.error(res.error);
+        return false;
       }
-      setProcessingId(null);
+      if (result === "RISK") {
+        // Stays in the queue, now carrying its flag, so it is not forgotten.
+        setQueue((current) => current.map((q) => (q.batchId === open.batchId ? { ...q, checkIns: q.checkIns.map((c) => (c.id === checkInId ? { ...c, qcResult: "RISK", qcNotes: notes || null } : c)) } : q)));
+        toast.success("Flagged as a risk", { description: "It stays in the queue for another look." });
+      } else {
+        const at = shown.findIndex((q) => q.batchId === open.batchId);
+        const rest = shown.filter((q) => q.batchId !== open.batchId);
+        setQueue((current) => current.filter((q) => q.batchId !== open.batchId));
+        setOpenId(rest.length > 0 ? rest[Math.min(at, rest.length - 1)].batchId : null);
+        toast.success(result === "PASS" ? "Tray passed" : "Tray rejected", { description: result === "REJECT" ? "The grower has been sent your reason." : undefined });
+        router.refresh();
+      }
+      return true;
+    } finally {
+      setBusy(false);
     }
-  };
+  }
+
+  // Keyboard: the shortcuts live on the review's own buttons, so the handler just clicks them.
+  const panelRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    function onKey(event: KeyboardEvent) {
+      if (event.metaKey || event.ctrlKey || event.altKey) return;
+      const target = event.target as HTMLElement;
+      if (target.closest("input, textarea, select, [contenteditable=true]")) return;
+      const result = decisionForKey(event.key);
+      if (result) {
+        panelRef.current?.querySelector<HTMLButtonElement>(`[aria-keyshortcuts="${result === "PASS" ? "P" : result === "RISK" ? "R" : "X"}"]`)?.click();
+        event.preventDefault();
+      } else if (event.key === "j" || event.key === "k") {
+        const at = shown.findIndex((q) => q.batchId === open?.batchId);
+        const next = nextIndex(at, shown.length, event.key === "j" ? 1 : -1);
+        if (next >= 0) setOpenId(shown[next].batchId);
+      }
+    }
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [shown, open]);
 
   if (queue.length === 0) {
-    return (
-      <GlassCard>
-        <div className="text-center py-16">
-          <CheckCircle2 className="w-12 h-12 text-sprout-300 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-text-primary mb-1">
-            QC queue clear
-          </h3>
-          <p className="text-sm text-text-muted">
-            No batches pending quality review
-          </p>
-        </div>
-      </GlassCard>
-    );
+    return <EmptyState icon={CheckCircle2} title="The QC queue is clear" description="No trays are waiting for review." />;
   }
 
   return (
-    <>
-      {/* Lightbox */}
-      {lightboxSrc && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
-          onClick={() => setLightboxSrc(null)}
-        >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={lightboxSrc}
-            alt="QC image zoom"
-            className="max-w-full max-h-[85vh] rounded-2xl shadow-2xl object-contain"
-          />
-        </div>
-      )}
-
-      <div className="space-y-4">
-        {error && (
-          <div className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-500">
-            {error}
+    <DetailLayout
+      asidePosition="left"
+      aside={
+        <Panel padding="none" className="overflow-hidden lg:sticky lg:top-24">
+          <div className="flex flex-wrap items-center gap-2 border-b border-hairline/70 p-3">
+            <select aria-label="Crop" value={crop} onChange={(e) => setCrop(e.target.value)} className={cn(controlClass, "!w-auto flex-1 !py-2 text-sm")}>
+              <option value="all">All crops</option>
+              {crops.map((c) => (
+                <option key={c} value={c}>
+                  {cropName(c)}
+                </option>
+              ))}
+            </select>
+            <select aria-label="Grower" value={grower} onChange={(e) => setGrower(e.target.value)} className={cn(controlClass, "!w-auto flex-1 !py-2 text-sm")}>
+              <option value="all">All growers</option>
+              {growers.map((g) => (
+                <option key={g} value={g}>
+                  {g}
+                </option>
+              ))}
+            </select>
           </div>
+          <p className="px-4 py-2 text-micro text-ink-muted">{`${shown.length} ${shown.length === 1 ? "tray" : "trays"} waiting`}</p>
+          <ul className="max-h-[60vh] divide-y divide-hairline/70 overflow-y-auto">
+            {shown.map((q) => {
+              const active = open?.batchId === q.batchId;
+              const flagged = q.checkIns[0]?.qcResult === "RISK";
+              return (
+                <li key={q.batchId}>
+                  <button
+                    type="button"
+                    data-no-global-loading
+                    aria-pressed={active}
+                    onClick={() => setOpenId(q.batchId)}
+                    className={cn("block w-full px-4 py-3 text-left transition-colors hover:bg-inset/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand/50", active && "bg-leaf-soft/60")}
+                  >
+                    <span className="flex items-baseline justify-between gap-2">
+                      <span className="text-sm font-medium text-ink">{q.growerName}</span>
+                      <span className="text-micro text-ink-muted">{waitingFor(new Date(q.waitingSince))}</span>
+                    </span>
+                    <span className="block text-micro text-ink-muted">{`${cropName(q.cropType)} · Tray ${q.trayNumber} · Day ${q.day}`}</span>
+                    {flagged ? <span className="mt-1 inline-block rounded-full bg-watch-soft px-2 py-0.5 text-micro font-medium text-watch">Risk flagged</span> : null}
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        </Panel>
+      }
+    >
+      <Panel>
+        {open ? (
+          <div ref={panelRef}>
+            <QCReview key={open.batchId} item={open} onDecide={decide} busy={busy} />
+            <div className="mt-4 flex flex-wrap items-center justify-between gap-2 text-micro text-ink-muted">
+              <span>Shortcuts: P pass, R risk, X reject, J and K move through the queue.</span>
+              <Link href={`/admin/qc/${open.batchId}`} className="inline-flex items-center gap-1 font-medium text-ink-soft hover:text-ink">
+                Open this tray
+                <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
+              </Link>
+            </div>
+          </div>
+        ) : (
+          <p className="text-sm text-ink-muted">No trays match these filters.</p>
         )}
-
-        {queue.map((batch) => {
-          const latestCheckIn = batch.checkIns[0];
-          return (
-            <GlassCard key={batch.id}>
-              <div className="mb-4 flex flex-col gap-2 min-[420px]:flex-row min-[420px]:items-start min-[420px]:justify-between">
-                <div className="min-w-0">
-                  <p className="text-sm font-bold text-text-primary">
-                    {batch.task.grower.user.name || "Unknown Grower"}
-                  </p>
-                  <p className="text-xs text-text-muted mt-0.5">
-                    {batch.task.cropType} · Tray #{batch.trayNumber} · Day{" "}
-                    {batch.currentDay}
-                  </p>
-                </div>
-                <p className="shrink-0 text-xs text-text-muted">
-                  {new Date(batch.createdAt).toLocaleDateString("en-IN", {
-                    month: "short",
-                    day: "numeric",
-                  })}
-                </p>
-              </div>
-
-              {/* Images */}
-              {latestCheckIn && (
-                <div className="mb-4 grid gap-3 min-[420px]:grid-cols-2">
-                  {latestCheckIn.imageTopUrl ? (
-                    <button
-                      onClick={() => setLightboxSrc(latestCheckIn.imageTopUrl!)}
-                      className="relative aspect-video rounded-xl overflow-hidden border border-white/40 bg-gray-100 hover:opacity-90 transition-opacity"
-                    >
-                      <Image
-                        src={latestCheckIn.imageTopUrl}
-                        alt="Top view"
-                        fill
-                        className="object-cover"
-                        unoptimized
-                      />
-                      <span className="absolute bottom-1.5 left-1.5 text-[10px] font-semibold text-white bg-black/50 px-1.5 py-0.5 rounded-md">
-                        Top View
-                      </span>
-                    </button>
-                  ) : (
-                    <div className="aspect-video rounded-xl border border-dashed border-gray-200 bg-gray-50 flex flex-col items-center justify-center gap-1">
-                      <ImageIcon className="w-6 h-6 text-gray-300" />
-                      <span className="text-[10px] text-gray-400">No top view</span>
-                    </div>
-                  )}
-                  {latestCheckIn.imageSideUrl ? (
-                    <button
-                      onClick={() => setLightboxSrc(latestCheckIn.imageSideUrl!)}
-                      className="relative aspect-video rounded-xl overflow-hidden border border-white/40 bg-gray-100 hover:opacity-90 transition-opacity"
-                    >
-                      <Image
-                        src={latestCheckIn.imageSideUrl}
-                        alt="Side view"
-                        fill
-                        className="object-cover"
-                        unoptimized
-                      />
-                      <span className="absolute bottom-1.5 left-1.5 text-[10px] font-semibold text-white bg-black/50 px-1.5 py-0.5 rounded-md">
-                        Side View
-                      </span>
-                    </button>
-                  ) : (
-                    <div className="aspect-video rounded-xl border border-dashed border-gray-200 bg-gray-50 flex flex-col items-center justify-center gap-1">
-                      <ImageIcon className="w-6 h-6 text-gray-300" />
-                      <span className="text-[10px] text-gray-400">No side view</span>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {latestCheckIn?.notes && (
-                <p className="text-sm text-text-secondary mb-4 bg-white/50 rounded-xl p-3 border border-white/40">
-                  &ldquo;{latestCheckIn.notes}&rdquo;
-                </p>
-              )}
-
-              <div className="grid gap-3 min-[420px]:grid-cols-3">
-                <button
-                  disabled={processingId === batch.id}
-                  onClick={() => handleQC(batch, "PASS")}
-                  className="flex items-center justify-center gap-2 rounded-xl bg-sprout-800 py-2 text-sm font-semibold text-white transition-all hover:bg-sprout-900 disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  {processingId === batch.id ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                  ) : (
-                    <CheckCircle2 className="w-4 h-4" />
-                  )}
-                  Pass
-                </button>
-                <button
-                  disabled={processingId === batch.id}
-                  onClick={() => handleQC(batch, "RISK")}
-                  className="flex items-center justify-center gap-2 rounded-xl bg-amber-500 py-2 text-sm font-semibold text-white transition-all hover:bg-amber-600 disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  {processingId === batch.id ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                  ) : (
-                    <AlertTriangle className="w-4 h-4" />
-                  )}
-                  Risk
-                </button>
-                <button
-                  disabled={processingId === batch.id}
-                  onClick={() => handleQC(batch, "REJECT")}
-                  className="flex items-center justify-center gap-2 rounded-xl bg-red-500 py-2 text-sm font-semibold text-white transition-all hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  {processingId === batch.id ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                  ) : (
-                    <XCircle className="w-4 h-4" />
-                  )}
-                  Reject
-                </button>
-              </div>
-            </GlassCard>
-          );
-        })}
-      </div>
-    </>
+      </Panel>
+    </DetailLayout>
   );
 }

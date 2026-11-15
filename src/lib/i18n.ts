@@ -752,6 +752,43 @@ export const translations: Record<string, TranslationEntry> = {
   "Days to harvest": { kn: "ಕೊಯ್ಲಿಗೆ ದಿನಗಳು", hi: "कटाई तक के दिन" },
   "Digital, hub & delivery checks": { kn: "ಡಿಜಿಟಲ್, ಹಬ್ ಮತ್ತು ವಿತರಣಾ ಪರಿಶೀಲನೆಗಳು", hi: "डिजिटल, हब और डिलीवरी जांच" },
   "Farm-to-fork, door to door.": { kn: "ಜಮೀನಿನಿಂದ ತಟ್ಟೆಗೆ, ಬಾಗಿಲಿಂದ ಬಾಗಿಲಿಗೆ.", hi: "खेत से थाली तक, दरवाज़े से दरवाज़े तक।" },
+  "QC review": { kn: "QC ಪರಿಶೀಲನೆ", hi: "QC समीक्षा" },
+  "Review each tray's photos and decide: pass it, flag a risk, or reject it with a reason.": { kn: "ಪ್ರತಿ ಟ್ರೇಯ ಫೋಟೋಗಳನ್ನು ಪರಿಶೀಲಿಸಿ ನಿರ್ಧರಿಸಿ: ತೇರ್ಗಡೆ ಮಾಡಿ, ಅಪಾಯ ಗುರುತಿಸಿ ಅಥವಾ ಕಾರಣದೊಂದಿಗೆ ತಿರಸ್ಕರಿಸಿ.", hi: "हर ट्रे की फोटो देखकर तय करें: पास करें, जोखिम चिह्नित करें, या कारण के साथ अस्वीकार करें।" },
+  "All crops": { kn: "ಎಲ್ಲಾ ಬೆಳೆಗಳು", hi: "सभी फसलें" },
+  "All growers": { kn: "ಎಲ್ಲಾ ಬೆಳೆಗಾರರು", hi: "सभी उत्पादक" },
+  "Crop": { kn: "ಬೆಳೆ", hi: "फसल" },
+  "Check-in days": { kn: "ಚೆಕ್-ಇನ್ ದಿನಗಳು", hi: "चेक-इन के दिन" },
+  "Decision for the latest check-in": { kn: "ಇತ್ತೀಚಿನ ಚೆಕ್-ಇನ್‌ಗೆ ನಿರ್ಧಾರ", hi: "नवीनतम चेक-इन के लिए निर्णय" },
+  "Enlarge top view": { kn: "ಮೇಲಿನ ನೋಟವನ್ನು ದೊಡ್ಡದಾಗಿಸಿ", hi: "ऊपर का दृश्य बड़ा करें" },
+  "Enlarge side view": { kn: "ಪಕ್ಕದ ನೋಟವನ್ನು ದೊಡ್ಡದಾಗಿಸಿ", hi: "बगल का दृश्य बड़ा करें" },
+  "Flag as risk": { kn: "ಅಪಾಯವೆಂದು ಗುರುತಿಸಿ", hi: "जोखिम चिह्नित करें" },
+  "Grower's note": { kn: "ಬೆಳೆಗಾರರ ಟಿಪ್ಪಣಿ", hi: "उत्पादक का नोट" },
+  "Earlier review:": { kn: "ಹಿಂದಿನ ಪರಿಶೀಲನೆ:", hi: "पहले की समीक्षा:" },
+  "Mould or fungus": { kn: "ಅಚ್ಚು ಅಥವಾ ಶಿಲೀಂಧ್ರ", hi: "फफूंद" },
+  "Uneven germination": { kn: "ಅಸಮ ಮೊಳಕೆ", hi: "असमान अंकुरण" },
+  "Pale or yellow stems": { kn: "ಮಸುಕಾದ ಅಥವಾ ಹಳದಿ ಕಾಂಡಗಳು", hi: "पीले या फीके तने" },
+  "Too short": { kn: "ತುಂಬಾ ಕುಳ್ಳಗಿದೆ", hi: "बहुत छोटा" },
+  "Sparse coverage": { kn: "ವಿರಳ ಹರಡುವಿಕೆ", hi: "कम घनत्व" },
+  "Pests or damage": { kn: "ಕೀಟ ಅಥವಾ ಹಾನಿ", hi: "कीट या क्षति" },
+  "Reasons": { kn: "ಕಾರಣಗಳು", hi: "कारण" },
+  "Note to the grower": { kn: "ಬೆಳೆಗಾರರಿಗೆ ಟಿಪ್ಪಣಿ", hi: "उत्पादक के लिए नोट" },
+  "Note to the grower (shown with the result)": { kn: "ಬೆಳೆಗಾರರಿಗೆ ಟಿಪ್ಪಣಿ (ಫಲಿತಾಂಶದೊಂದಿಗೆ ತೋರಿಸಲಾಗುತ್ತದೆ)", hi: "उत्पादक के लिए नोट (नतीजे के साथ दिखाया जाएगा)" },
+  "Choose a reason or write a note so the grower knows what to fix.": { kn: "ಬೆಳೆಗಾರರಿಗೆ ಏನು ಸರಿಪಡಿಸಬೇಕೆಂದು ತಿಳಿಯಲು ಕಾರಣ ಆರಿಸಿ ಅಥವಾ ಟಿಪ್ಪಣಿ ಬರೆಯಿರಿ.", hi: "कारण चुनें या नोट लिखें ताकि उत्पादक जान सके कि क्या सुधारना है।" },
+  "Shortcuts: P pass, R risk, X reject, J and K move through the queue.": { kn: "ಶಾರ್ಟ್‌ಕಟ್‌ಗಳು: P ತೇರ್ಗಡೆ, R ಅಪಾಯ, X ತಿರಸ್ಕಾರ, J ಮತ್ತು K ಸರತಿಯಲ್ಲಿ ಚಲಿಸುತ್ತವೆ.", hi: "शॉर्टकट: P पास, R जोखिम, X अस्वीकार, J और K कतार में आगे-पीछे।" },
+  "Open this tray": { kn: "ಈ ಟ್ರೇ ತೆರೆಯಿರಿ", hi: "यह ट्रे खोलें" },
+  "Risk flagged": { kn: "ಅಪಾಯ ಗುರುತಿಸಲಾಗಿದೆ", hi: "जोखिम चिह्नित" },
+  "No photo": { kn: "ಫೋಟೋ ಇಲ್ಲ", hi: "कोई फोटो नहीं" },
+  "This tray has no check-ins yet.": { kn: "ಈ ಟ್ರೇಗೆ ಇನ್ನೂ ಚೆಕ್-ಇನ್‌ಗಳಿಲ್ಲ.", hi: "इस ट्रे का अभी कोई चेक-इन नहीं।" },
+  "This tray has already been reviewed, so there is nothing to decide.": { kn: "ಈ ಟ್ರೇಯನ್ನು ಈಗಾಗಲೇ ಪರಿಶೀಲಿಸಲಾಗಿದೆ, ಆದ್ದರಿಂದ ನಿರ್ಧರಿಸಲು ಏನೂ ಇಲ್ಲ.", hi: "इस ट्रे की समीक्षा हो चुकी है, इसलिए तय करने को कुछ नहीं।" },
+  "The QC queue is clear": { kn: "QC ಸರತಿ ಖಾಲಿಯಾಗಿದೆ", hi: "QC कतार खाली है" },
+  "No trays are waiting for review.": { kn: "ಯಾವುದೇ ಟ್ರೇ ಪರಿಶೀಲನೆಗಾಗಿ ಕಾಯುತ್ತಿಲ್ಲ.", hi: "कोई ट्रे समीक्षा की प्रतीक्षा में नहीं।" },
+  "No trays match these filters.": { kn: "ಯಾವುದೇ ಟ್ರೇ ಈ ಫಿಲ್ಟರ್‌ಗಳಿಗೆ ಹೊಂದಿಕೆಯಾಗುತ್ತಿಲ್ಲ.", hi: "कोई ट्रे इन फ़िल्टर से मेल नहीं खाती।" },
+  "Review tray": { kn: "ಟ್ರೇ ಪರಿಶೀಲಿಸಿ", hi: "ट्रे की समीक्षा करें" },
+  "Flagged as a risk": { kn: "ಅಪಾಯವೆಂದು ಗುರುತಿಸಲಾಗಿದೆ", hi: "जोखिम के रूप में चिह्नित" },
+  "It stays in the queue for another look.": { kn: "ಮತ್ತೊಮ್ಮೆ ನೋಡಲು ಇದು ಸರತಿಯಲ್ಲಿಯೇ ಇರುತ್ತದೆ.", hi: "दोबारा देखने के लिए यह कतार में रहेगी।" },
+  "Tray passed": { kn: "ಟ್ರೇ ತೇರ್ಗಡೆಯಾಗಿದೆ", hi: "ट्रे पास हुई" },
+  "Tray rejected": { kn: "ಟ್ರೇ ತಿರಸ್ಕರಿಸಲಾಗಿದೆ", hi: "ट्रे अस्वीकार हुई" },
+  "The grower has been sent your reason.": { kn: "ನಿಮ್ಮ ಕಾರಣವನ್ನು ಬೆಳೆಗಾರರಿಗೆ ಕಳುಹಿಸಲಾಗಿದೆ.", hi: "आपका कारण उत्पादक को भेज दिया गया है।" },
   "For": { kn: "ಇವರಿಗೆ", hi: "के लिए" },
   "Mark all delivered": { kn: "ಎಲ್ಲವನ್ನೂ ತಲುಪಿದೆ ಎಂದು ಗುರುತಿಸಿ", hi: "सभी डिलीवर चिह्नित करें" },
   "Mark seeds delivered": { kn: "ಬೀಜಗಳು ತಲುಪಿವೆ ಎಂದು ಗುರುತಿಸಿ", hi: "बीज डिलीवर चिह्नित करें" },
@@ -1246,6 +1283,29 @@ const MONTH_SHORT = {
 const MONTH_SHORT_EN = MONTHS.map((month) => month.slice(0, 3));
 
 const regexTranslations = [
+  {
+    pattern: /^(.+) · Tray (\d+) · Day (\d+)$/,
+    replace: (language: Exclude<LanguageCode, "en">, crop: string, tray: string, day: string) =>
+      language === "kn" ? `${translateToken(crop, language)} · ಟ್ರೇ ${tray} · ದಿನ ${day}` : `${translateToken(crop, language)} · ट्रे ${tray} · दिन ${day}`,
+  },
+  {
+    pattern: /^(.+) · Tray (\d+)$/,
+    replace: (language: Exclude<LanguageCode, "en">, crop: string, tray: string) =>
+      language === "kn" ? `${translateToken(crop, language)} · ಟ್ರೇ ${tray}` : `${translateToken(crop, language)} · ट्रे ${tray}`,
+  },
+  {
+    pattern: /^(\d+) trays? waiting$/,
+    replace: (language: Exclude<LanguageCode, "en">, n: string) => (language === "kn" ? `${n} ಟ್ರೇಗಳು ಕಾಯುತ್ತಿವೆ` : `${n} ट्रे प्रतीक्षा में`),
+  },
+  {
+    pattern: /^Tray (\d+), day (\d+)$/,
+    replace: (language: Exclude<LanguageCode, "en">, tray: string, day: string) => (language === "kn" ? `ಟ್ರೇ ${tray}, ದಿನ ${day}` : `ट्रे ${tray}, दिन ${day}`),
+  },
+  {
+    pattern: /^(Top|Side) view, day (\d+)$/,
+    replace: (language: Exclude<LanguageCode, "en">, view: string, day: string) =>
+      language === "kn" ? `${view === "Top" ? "ಮೇಲಿನ" : "ಪಕ್ಕದ"} ನೋಟ, ದಿನ ${day}` : `${view === "Top" ? "ऊपर का" : "बगल का"} दृश्य, दिन ${day}`,
+  },
   {
     pattern: /^Allocated (\d+) (hour|day)s? ago$/,
     replace: (language: Exclude<LanguageCode, "en">, n: string, unit: string) =>

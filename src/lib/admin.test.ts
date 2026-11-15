@@ -5,7 +5,7 @@ import { describe, expect, it, vi } from "vitest";
 vi.mock("@/lib/prisma", () => ({ prisma: {} }));
 
 import { calculateProductionPlan } from "@/lib/business";
-import { checkAllocation, daysUntil, haversineKm, pipelineSentence, proposeAllocation, scoreCandidates, type GrowerInput, planOrder, qcPassPercent, sortByUrgency, urgencyOf, waitingFor, weeklyTotals } from "./admin";
+import { checkAllocation, composeQcNotes, daysUntil, decisionError, decisionForKey, nextIndex, haversineKm, pipelineSentence, proposeAllocation, scoreCandidates, type GrowerInput, planOrder, qcPassPercent, sortByUrgency, urgencyOf, waitingFor, weeklyTotals } from "./admin";
 
 const NOW = new Date(2026, 10, 15, 14, 0);
 const inDays = (n: number) => new Date(2026, 10, 15 + n);
@@ -208,5 +208,33 @@ describe("checkAllocation", () => {
 
   it("will not send more trays than the plan needs", () => {
     expect(checkAllocation({ a: 10, b: 5 }, candidates, 13).ok).toBe(false);
+  });
+});
+
+describe("QC notes and decisions", () => {
+  it("puts the chosen reasons first, then what was typed", () => {
+    expect(composeQcNotes(["Pale or yellow stems", "Mould or fungus"], "Left edge")).toBe("Mould or fungus, Pale or yellow stems. Left edge");
+    expect(composeQcNotes(["Too short"], "")).toBe("Too short");
+    expect(composeQcNotes([], "  Only text ")).toBe("Only text");
+    expect(composeQcNotes(["Made up"], "")).toBe("");
+  });
+
+  it("requires a reason to reject, and nothing else", () => {
+    expect(decisionError("REJECT", "")).toMatch(/reason/);
+    expect(decisionError("REJECT", "  ")).toMatch(/reason/);
+    expect(decisionError("REJECT", "Mould")).toBeNull();
+    expect(decisionError("PASS", "")).toBeNull();
+    expect(decisionError("RISK", "")).toBeNull();
+  });
+
+  it("maps P, R and X to the decisions, in either case", () => {
+    expect([decisionForKey("p"), decisionForKey("R"), decisionForKey("x"), decisionForKey("z")]).toEqual(["PASS", "RISK", "REJECT", null]);
+  });
+
+  it("steps through the queue and wraps round", () => {
+    expect(nextIndex(0, 3)).toBe(1);
+    expect(nextIndex(2, 3)).toBe(0);
+    expect(nextIndex(0, 3, -1)).toBe(2);
+    expect(nextIndex(0, 0)).toBe(-1);
   });
 });

@@ -1,57 +1,42 @@
+import { PageHeader } from "@/components/ui/page-header";
 import { prisma } from "@/lib/prisma";
-import { CheckCircle2 } from "lucide-react";
-import { QCClient } from "./QCClient";
-
-async function getQCQueue() {
-  try {
-    // Fetch batches that are QC_PENDING — this is the correct approach
-    // (checkin API sets batch status to QC_PENDING on final day)
-    return await prisma.batch.findMany({
-      where: { status: "QC_PENDING" },
-      include: {
-        task: {
-          include: {
-            grower: { include: { user: { select: { name: true } } } },
-          },
-        },
-        checkIns: {
-          orderBy: { day: "desc" },
-          take: 1, // most recent check-in
-        },
-      },
-      orderBy: { createdAt: "asc" },
-      take: 30,
-    });
-  } catch {
-    return [];
-  }
-}
+import { QCClient, type QueueItem } from "./QCClient";
 
 export default async function QCReviewPage() {
-  const queue = await getQCQueue();
+  const batches = await prisma.batch.findMany({
+    where: { status: "QC_PENDING" },
+    include: {
+      task: { select: { cropType: true, grower: { select: { user: { select: { name: true } } } } } },
+      checkIns: { orderBy: { createdAt: "desc" } },
+    },
+    orderBy: { createdAt: "asc" },
+    take: 100,
+  });
+
+  const queue: QueueItem[] = batches.map((b) => ({
+    batchId: b.id,
+    trayNumber: b.trayNumber,
+    cropType: b.task.cropType,
+    growerName: b.task.grower.user.name ?? "Grower",
+    reviewable: true,
+    day: b.currentDay,
+    waitingSince: (b.checkIns[0]?.createdAt ?? b.createdAt).toISOString(),
+    checkIns: b.checkIns.map((c) => ({
+      id: c.id,
+      day: c.day,
+      imageTopUrl: c.imageTopUrl,
+      imageSideUrl: c.imageSideUrl,
+      notes: c.notes,
+      qcResult: c.qcResult,
+      qcNotes: c.qcNotes,
+      createdAt: c.createdAt.toISOString(),
+    })),
+  }));
 
   return (
-    <div>
-      <div className="mb-6 sm:mb-8">
-        <div className="flex items-center gap-2 sm:gap-3 mb-1">
-          <CheckCircle2 className="w-6 h-6 sm:w-7 sm:h-7 text-sprout-700 flex-shrink-0" />
-          <h1 className="text-2xl sm:text-3xl font-black text-text-primary tracking-tight">
-            QC Review
-          </h1>
-        </div>
-        <p className="text-sm sm:text-base text-text-secondary">
-          Review grower check-in photos and approve quality ·{" "}
-          <span
-            className={`font-semibold ${
-              queue.length > 0 ? "text-amber-600" : "text-sprout-700"
-            }`}
-          >
-            {queue.length} pending
-          </span>
-        </p>
-      </div>
-
-      <QCClient initialQueue={queue} />
-    </div>
+    <>
+      <PageHeader title="QC review" subtitle="Review each tray's photos and decide: pass it, flag a risk, or reject it with a reason." />
+      <QCClient queue={queue} />
+    </>
   );
 }
