@@ -58,8 +58,9 @@ export async function getGrowerTask(userId: string, taskId: string) {
     include: {
       batches: {
         include: {
-          // The whole check-in history, for the photo gallery and QC notes.
-          checkIns: { orderBy: { day: "asc" } },
+          // The whole history, newest first: the gallery shows it that way and the task
+          // maths reads the latest check-in from the front.
+          checkIns: { orderBy: { createdAt: "desc" } },
           payout: { select: { amount: true, status: true } },
         },
         orderBy: { trayNumber: "asc" },

@@ -752,6 +752,19 @@ export const translations: Record<string, TranslationEntry> = {
   "Days to harvest": { kn: "ಕೊಯ್ಲಿಗೆ ದಿನಗಳು", hi: "कटाई तक के दिन" },
   "Digital, hub & delivery checks": { kn: "ಡಿಜಿಟಲ್, ಹಬ್ ಮತ್ತು ವಿತರಣಾ ಪರಿಶೀಲನೆಗಳು", hi: "डिजिटल, हब और डिलीवरी जांच" },
   "Farm-to-fork, door to door.": { kn: "ಜಮೀನಿನಿಂದ ತಟ್ಟೆಗೆ, ಬಾಗಿಲಿಂದ ಬಾಗಿಲಿಗೆ.", hi: "खेत से थाली तक, दरवाज़े से दरवाज़े तक।" },
+  "Breadcrumb": { kn: "ಬ್ರೆಡ್‌ಕ್ರಂಬ್", hi: "ब्रेडक्रंब" },
+  "Check-in photos": { kn: "ಚೆಕ್-ಇನ್ ಫೋಟೋಗಳು", hi: "चेक-इन फोटो" },
+  "Day by day": { kn: "ದಿನದಿನದ ಯೋಜನೆ", hi: "दिन-प्रतिदिन योजना" },
+  "Done": { kn: "ಮುಗಿದಿದೆ", hi: "पूरा" },
+  "Each tray is checked and paid on its own": { kn: "ಪ್ರತಿ ಟ್ರೇಯನ್ನು ಪ್ರತ್ಯೇಕವಾಗಿ ಪರಿಶೀಲಿಸಿ ಪಾವತಿಸಲಾಗುತ್ತದೆ", hi: "हर ट्रे की जांच और भुगतान अलग से होता है" },
+  "Harvest": { kn: "ಕೊಯ್ಲು", hi: "कटाई" },
+  "Sown": { kn: "ಬಿತ್ತಿದ್ದು", hi: "बोया" },
+  "Newest first, with the quality review beside each one": { kn: "ಹೊಸದು ಮೊದಲು, ಪ್ರತಿಯೊಂದರ ಪಕ್ಕದಲ್ಲಿ ಗುಣಮಟ್ಟ ಪರಿಶೀಲನೆ", hi: "नया पहले, हर एक के साथ गुणवत्ता समीक्षा" },
+  "Reviewer note:": { kn: "ಪರಿಶೀಲಕರ ಟಿಪ್ಪಣಿ:", hi: "समीक्षक का नोट:" },
+  "Today": { kn: "ಇಂದು", hi: "आज" },
+  "grown": { kn: "ಬೆಳೆದಿದೆ", hi: "उगा" },
+  "No check-ins yet. Your photos will be listed here after your first check-in.": { kn: "ಇನ್ನೂ ಚೆಕ್-ಇನ್‌ಗಳಿಲ್ಲ. ನಿಮ್ಮ ಮೊದಲ ಚೆಕ್-ಇನ್ ನಂತರ ಫೋಟೋಗಳು ಇಲ್ಲಿ ಪಟ್ಟಿಯಾಗುತ್ತವೆ.", hi: "अभी कोई चेक-इन नहीं। पहले चेक-इन के बाद आपकी फोटो यहां सूचीबद्ध होंगी।" },
+  "No reason was recorded. Ask the team for details.": { kn: "ಯಾವುದೇ ಕಾರಣವನ್ನು ದಾಖಲಿಸಿಲ್ಲ. ವಿವರಗಳಿಗಾಗಿ ತಂಡವನ್ನು ಕೇಳಿ.", hi: "कोई कारण दर्ज नहीं हुआ। विवरण के लिए टीम से पूछें।" },
   "My tasks": { kn: "ನನ್ನ ಕೆಲಸಗಳು", hi: "मेरे काम" },
   "Filter tasks": { kn: "ಕೆಲಸಗಳನ್ನು ಫಿಲ್ಟರ್ ಮಾಡಿ", hi: "काम फ़िल्टर करें" },
   "Your growing tasks will be listed here.": { kn: "ನಿಮ್ಮ ಬೆಳೆಸುವ ಕೆಲಸಗಳು ಇಲ್ಲಿ ಪಟ್ಟಿಯಾಗುತ್ತವೆ.", hi: "आपके उगाने के काम यहां सूचीबद्ध होंगे।" },
@@ -966,6 +979,28 @@ const MONTH_SHORT = {
 const MONTH_SHORT_EN = MONTHS.map((month) => month.slice(0, 3));
 
 const regexTranslations = [
+  {
+    pattern: /^Tray (\d+)$/,
+    replace: (language: Exclude<LanguageCode, "en">, value: string) =>
+      language === "kn" ? `ಟ್ರೇ ${value}` : `ट्रे ${value}`,
+  },
+  {
+    pattern: /^Day (\d+), tray (\d+)$/,
+    replace: (language: Exclude<LanguageCode, "en">, day: string, tray: string) =>
+      language === "kn" ? `ದಿನ ${day}, ಟ್ರೇ ${tray}` : `दिन ${day}, ट्रे ${tray}`,
+  },
+  {
+    pattern: /^Tray (\d+), day (\d+), (top|side) view$/,
+    replace: (language: Exclude<LanguageCode, "en">, tray: string, day: string, view: string) =>
+      language === "kn"
+        ? `ಟ್ರೇ ${tray}, ದಿನ ${day}, ${view === "top" ? "ಮೇಲಿನ" : "ಪಕ್ಕದ"} ನೋಟ`
+        : `ट्रे ${tray}, दिन ${day}, ${view === "top" ? "ऊपर से" : "बगल से"} दृश्य`,
+  },
+  {
+    pattern: /^Tray (\d+) did not pass quality control$/,
+    replace: (language: Exclude<LanguageCode, "en">, value: string) =>
+      language === "kn" ? `ಟ್ರೇ ${value} ಗುಣಮಟ್ಟ ಪರಿಶೀಲನೆಯಲ್ಲಿ ತೇರ್ಗಡೆಯಾಗಲಿಲ್ಲ` : `ट्रे ${value} गुणवत्ता जांच में पास नहीं हुई`,
+  },
   {
     pattern: new RegExp(`^(${WEEKDAYS.join("|")}), (\\d{1,2}) (${MONTHS.join("|")})$`),
     replace: (language: Exclude<LanguageCode, "en">, weekday: string, day: string, month: string) =>
