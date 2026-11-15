@@ -752,6 +752,34 @@ export const translations: Record<string, TranslationEntry> = {
   "Days to harvest": { kn: "ಕೊಯ್ಲಿಗೆ ದಿನಗಳು", hi: "कटाई तक के दिन" },
   "Digital, hub & delivery checks": { kn: "ಡಿಜಿಟಲ್, ಹಬ್ ಮತ್ತು ವಿತರಣಾ ಪರಿಶೀಲನೆಗಳು", hi: "डिजिटल, हब और डिलीवरी जांच" },
   "Farm-to-fork, door to door.": { kn: "ಜಮೀನಿನಿಂದ ತಟ್ಟೆಗೆ, ಬಾಗಿಲಿಂದ ಬಾಗಿಲಿಗೆ.", hi: "खेत से थाली तक, दरवाज़े से दरवाज़े तक।" },
+  "Across all growers": { kn: "ಎಲ್ಲಾ ಬೆಳೆಗಾರರಲ್ಲಿ", hi: "सभी उत्पादकों में" },
+  "Below the 90% target": { kn: "90% ಗುರಿಗಿಂತ ಕಡಿಮೆ", hi: "90% लक्ष्य से कम" },
+  "By overall score": { kn: "ಒಟ್ಟಾರೆ ಅಂಕದ ಪ್ರಕಾರ", hi: "कुल स्कोर के अनुसार" },
+  "Deliveries on the road": { kn: "ರಸ್ತೆಯಲ್ಲಿರುವ ವಿತರಣೆಗಳು", hi: "रास्ते में डिलीवरी" },
+  "Delivery on the road": { kn: "ರಸ್ತೆಯಲ್ಲಿರುವ ವಿತರಣೆ", hi: "रास्ते में डिलीवरी" },
+  "From paid orders": { kn: "ಪಾವತಿಸಿದ ಆರ್ಡರ್‌ಗಳಿಂದ", hi: "भुगतान किए गए ऑर्डर से" },
+  "Kilos ordered and kilos delivered each week": { kn: "ಪ್ರತಿ ವಾರ ಆರ್ಡರ್ ಮಾಡಿದ ಮತ್ತು ತಲುಪಿಸಿದ ಕಿಲೋಗಳು", hi: "हर सप्ताह ऑर्डर किए और डिलीवर किए गए किलो" },
+  "Nothing waiting": { kn: "ಯಾವುದೂ ಕಾಯುತ್ತಿಲ್ಲ", hi: "कुछ भी इंतज़ार में नहीं" },
+  "Ordered": { kn: "ಆರ್ಡರ್ ಮಾಡಿದ್ದು", hi: "ऑर्डर किया" },
+  "QC pass rate": { kn: "QC ತೇರ್ಗಡೆ ಪ್ರಮಾಣ", hi: "QC पास दर" },
+  "On target": { kn: "ಗುರಿಯಲ್ಲಿದೆ", hi: "लक्ष्य पर" },
+  "No trays reviewed yet": { kn: "ಇನ್ನೂ ಯಾವುದೇ ಟ್ರೇ ಪರಿಶೀಲಿಸಿಲ್ಲ", hi: "अभी कोई ट्रे नहीं जांची गई" },
+  "Recent orders": { kn: "ಇತ್ತೀಚಿನ ಆರ್ಡರ್‌ಗಳು", hi: "हाल के ऑर्डर" },
+  "The latest six, newest first": { kn: "ಇತ್ತೀಚಿನ ಆರು, ಹೊಸದು ಮೊದಲು", hi: "नवीनतम छह, नया पहले" },
+  "No orders yet.": { kn: "ಇನ್ನೂ ಆರ್ಡರ್‌ಗಳಿಲ್ಲ.", hi: "अभी कोई ऑर्डर नहीं।" },
+  "Revenue": { kn: "ಆದಾಯ", hi: "राजस्व" },
+  "Top growers": { kn: "ಅತ್ಯುತ್ತಮ ಬೆಳೆಗಾರರು", hi: "शीर्ष उत्पादक" },
+  "No active growers yet.": { kn: "ಇನ್ನೂ ಸಕ್ರಿಯ ಬೆಳೆಗಾರರಿಲ್ಲ.", hi: "अभी कोई सक्रिय उत्पादक नहीं।" },
+  "Trays growing": { kn: "ಬೆಳೆಯುತ್ತಿರುವ ಟ್ರೇಗಳು", hi: "उग रही ट्रे" },
+  "Updates sent to you": { kn: "ನಿಮಗೆ ಕಳುಹಿಸಿದ ಅಪ್‌ಡೇಟ್‌ಗಳು", hi: "आपको भेजे गए अपडेट" },
+  "Nothing new. Pickup requests and QC alerts appear here.": { kn: "ಹೊಸದೇನೂ ಇಲ್ಲ. ಪಿಕಪ್ ವಿನಂತಿಗಳು ಮತ್ತು QC ಎಚ್ಚರಿಕೆಗಳು ಇಲ್ಲಿ ಕಾಣಿಸುತ್ತವೆ.", hi: "कुछ नया नहीं। पिकअप अनुरोध और QC अलर्ट यहां दिखेंगे।" },
+  "Weekly volume": { kn: "ವಾರದ ಪ್ರಮಾಣ", hi: "साप्ताहिक मात्रा" },
+  "orders need a plan": { kn: "ಆರ್ಡರ್‌ಗಳಿಗೆ ಯೋಜನೆ ಬೇಕು", hi: "ऑर्डर को योजना चाहिए" },
+  "plans need growers": { kn: "ಯೋಜನೆಗಳಿಗೆ ಬೆಳೆಗಾರರು ಬೇಕು", hi: "योजनाओं को उत्पादक चाहिए" },
+  "tasks need supplies": { kn: "ಕೆಲಸಗಳಿಗೆ ಸರಬರಾಜು ಬೇಕು", hi: "कामों को सामग्री चाहिए" },
+  "trays to review": { kn: "ಪರಿಶೀಲಿಸಬೇಕಾದ ಟ್ರೇಗಳು", hi: "जांचने वाली ट्रे" },
+  "payouts pending": { kn: "ಬಾಕಿ ಇರುವ ಪಾವತಿಗಳು", hi: "लंबित भुगतान" },
+  "Everything is up to date. Nothing is waiting for you.": { kn: "ಎಲ್ಲವೂ ನವೀಕೃತವಾಗಿದೆ. ನಿಮಗಾಗಿ ಯಾವುದೂ ಕಾಯುತ್ತಿಲ್ಲ.", hi: "सब कुछ अद्यतन है। आपके लिए कुछ भी इंतज़ार में नहीं है।" },
   "Add": { kn: "ಸೇರಿಸಿ", hi: "जोड़ें" },
   "Active orders": { kn: "ಸಕ್ರಿಯ ಆರ್ಡರ್‌ಗಳು", hi: "सक्रिय ऑर्डर" },
   "Being grown or on the way": { kn: "ಬೆಳೆಯುತ್ತಿದೆ ಅಥವಾ ದಾರಿಯಲ್ಲಿದೆ", hi: "उग रहे हैं या रास्ते में" },
@@ -1172,6 +1200,50 @@ const MONTH_SHORT = {
 const MONTH_SHORT_EN = MONTHS.map((month) => month.slice(0, 3));
 
 const regexTranslations = [
+  {
+    pattern: /^(\d+) orders? needs? a plan$/,
+    replace: (language: Exclude<LanguageCode, "en">, n: string) => (language === "kn" ? `${n} ಆರ್ಡರ್‌ಗಳಿಗೆ ಯೋಜನೆ ಬೇಕು` : `${n} ऑर्डर को योजना चाहिए`),
+  },
+  {
+    pattern: /^(\d+) plans? needs? growers$/,
+    replace: (language: Exclude<LanguageCode, "en">, n: string) => (language === "kn" ? `${n} ಯೋಜನೆಗಳಿಗೆ ಬೆಳೆಗಾರರು ಬೇಕು` : `${n} योजनाओं को उत्पादक चाहिए`),
+  },
+  {
+    pattern: /^(\d+) tasks? (?:is|are) waiting for supplies$/,
+    replace: (language: Exclude<LanguageCode, "en">, n: string) => (language === "kn" ? `${n} ಕೆಲಸಗಳು ಸರಬರಾಜಿಗಾಗಿ ಕಾಯುತ್ತಿವೆ` : `${n} काम सामग्री की प्रतीक्षा में हैं`),
+  },
+  {
+    pattern: /^(\d+) trays? (?:is|are) waiting for QC$/,
+    replace: (language: Exclude<LanguageCode, "en">, n: string) => (language === "kn" ? `${n} ಟ್ರೇಗಳು QC ಗಾಗಿ ಕಾಯುತ್ತಿವೆ` : `${n} ट्रे QC की प्रतीक्षा में हैं`),
+  },
+  {
+    pattern: /^(\d+) payouts? (?:is|are) pending$/,
+    replace: (language: Exclude<LanguageCode, "en">, n: string) => (language === "kn" ? `${n} ಪಾವತಿಗಳು ಬಾಕಿ ಇವೆ` : `${n} भुगतान लंबित हैं`),
+  },
+  {
+    pattern: /^(\d+) orders in total$/,
+    replace: (language: Exclude<LanguageCode, "en">, n: string) => (language === "kn" ? `ಒಟ್ಟು ${n} ಆರ್ಡರ್‌ಗಳು` : `कुल ${n} ऑर्डर`),
+  },
+  {
+    pattern: /^(\d+) registered$/,
+    replace: (language: Exclude<LanguageCode, "en">, n: string) => (language === "kn" ? `${n} ನೋಂದಾಯಿತರು` : `${n} पंजीकृत`),
+  },
+  {
+    pattern: /^Kilos ordered and delivered per week for the last (\d+) weeks\. Ordered ([\d.]+) kg, delivered ([\d.]+) kg\.$/,
+    replace: (language: Exclude<LanguageCode, "en">, weeks: string, a: string, b: string) =>
+      language === "kn"
+        ? `ಕಳೆದ ${weeks} ವಾರಗಳ ಪ್ರತಿ ವಾರ ಆರ್ಡರ್ ಮಾಡಿದ ಮತ್ತು ತಲುಪಿಸಿದ ಕಿಲೋಗಳು. ಆರ್ಡರ್ ${a} ಕೆಜಿ, ತಲುಪಿಸಿದ್ದು ${b} ಕೆಜಿ.`
+        : `पिछले ${weeks} सप्ताह में हर सप्ताह ऑर्डर और डिलीवर किए गए किलो। ऑर्डर ${a} किलो, डिलीवर ${b} किलो।`,
+  },
+  {
+    pattern: /^(.+), ([\d.]+) kg · ([A-Z0-9]{8})$/,
+    replace: (language: Exclude<LanguageCode, "en">, crop: string, kg: string, ref: string) =>
+      `${translateToken(crop, language)}, ${kg} ${language === "kn" ? "ಕೆಜಿ" : "किलो"} · ${ref}`,
+  },
+  {
+    pattern: /^(.+) score$/,
+    replace: (language: Exclude<LanguageCode, "en">, who: string) => (language === "kn" ? `${who} ಅಂಕ` : `${who} का स्कोर`),
+  },
   {
     pattern: /^(₹[\d,]+) per kg$/,
     replace: (language: Exclude<LanguageCode, "en">, price: string) => (language === "kn" ? `ಪ್ರತಿ ಕೆಜಿಗೆ ${price}` : `${price} प्रति किलो`),

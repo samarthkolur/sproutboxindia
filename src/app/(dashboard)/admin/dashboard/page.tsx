@@ -1,332 +1,175 @@
-import { StatCard } from "@/components/shared/StatCard";
-import { GlassCard } from "@/components/shared/GlassCard";
-import { StatusBadge } from "@/components/shared/StatusBadge";
-import { AdminDashboardClient } from "./client";
-import {
-  getAdminKPIs,
-  getAdminRecentOrders,
-  getTopGrowers,
-  getAdminPendingCounts,
-} from "@/actions/dashboard.actions";
 import Link from "next/link";
-import {
-  Package,
-  Sprout,
-  CheckCircle2,
-  Truck,
-  IndianRupee,
-  Users,
-  ClipboardList,
-  Target,
-  ShieldCheck,
-  Trophy,
-  Medal,
-  ChevronRight,
-  ArrowRight,
-} from "lucide-react";
+import { format, formatDistanceToNow } from "date-fns";
+import { ArrowRight, BellRing, CheckCircle2, IndianRupee, Package, Sprout, Truck, Users } from "lucide-react";
+import { auth } from "@/lib/auth";
+import { KgChartCard } from "@/components/admin/KgChartCard";
+import { Meter } from "@/components/ui/meter";
+import { PageHeader } from "@/components/ui/page-header";
+import { Panel, PanelHeader } from "@/components/ui/panel";
+import { StatTile } from "@/components/ui/stat-tile";
+import { StatusChip } from "@/components/ui/status-chip";
+import { PIPELINE_STEPS, cropName, pipelineClauses, rupees, shortId } from "@/lib/admin";
+import { getAdminOverview } from "@/lib/admin-data";
+import { greetingFor } from "@/lib/grower";
+import { cn } from "@/lib/utils";
 
-export default async function AdminDashboard() {
-  const [kpis, recentOrders, topGrowers, pending] = await Promise.all([
-    getAdminKPIs(),
-    getAdminRecentOrders(5),
-    getTopGrowers(5),
-    getAdminPendingCounts(),
-  ]);
-
-  const pendingActions = [
-    {
-      label: "Orders awaiting plan",
-      count: pending.ordersNoPlan,
-      color: "bg-amber-500",
-      icon: ClipboardList,
-      href: "/admin/demand",
-    },
-    {
-      label: "Plans to allocate",
-      count: pending.allocatePending,
-      color: "bg-blue-500",
-      icon: Target,
-      href: "/admin/allocate",
-    },
-    {
-      label: "Seeds to dispatch",
-      count: pending.dispatchPending,
-      color: "bg-orange-500",
-      icon: Truck,
-      href: "/admin/dispatch",
-    },
-    {
-      label: "QC reviews pending",
-      count: pending.qcPending,
-      color: "bg-purple-500",
-      icon: ShieldCheck,
-      href: "/admin/qc",
-    },
-  ];
-
-  // Weekly production data — computed from real order data when available
-  const weeklyProduction = [65, 78, 85, 92, 88, 105, 98, 112].map((v, i) => ({
-    label: `W${i + 7}`,
-    value: v,
-    tooltip: `${v} kg`,
-  }));
-  const totalProduction = weeklyProduction.reduce((s, d) => s + d.value, 0);
-
-  const formatCurrency = (n: number) => {
-    if (n >= 100000) return `${(n / 100000).toFixed(1)}L`;
-    if (n >= 1000) return `${(n / 1000).toFixed(1)}K`;
-    return n.toString();
-  };
-
+// Each clause is its own text node, so each can be translated on its own.
+function PipelineSubtitle({ clauses }: { clauses: string[] }) {
+  if (clauses.length === 0) return <>Everything is up to date. Nothing is waiting for you.</>;
   return (
-    <AdminDashboardClient>
-      {/* Header */}
-      <div className="mb-6 sm:mb-8">
-        <h1 className="text-2xl sm:text-3xl font-black text-text-primary tracking-tight">
-          Command Center
-        </h1>
-        <p className="text-sm sm:text-base text-text-secondary mt-1">
-          Platform overview and operations at a glance
-        </p>
-      </div>
-
-      {/* KPI Grid */}
-      <div className="mb-8 grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 xl:grid-cols-6">
-        <StatCard
-          label="Active Orders"
-          value={kpis.activeOrders}
-          change={`${kpis.orderCount} total`}
-          icon={<Package className="w-[18px] h-[18px] text-sprout-700" strokeWidth={2} />}
-        />
-        <StatCard
-          label="Total Trays"
-          value={kpis.totalTrays}
-          change="+12 this week"
-          icon={<Sprout className="w-[18px] h-[18px] text-sprout-700" strokeWidth={2} />}
-        />
-        <StatCard
-          label="QC Pass Rate"
-          value={`${kpis.qcRate}%`}
-          change={kpis.qcRate >= 90 ? "On target" : "Below target"}
-          changeType={kpis.qcRate >= 90 ? "positive" : "negative"}
-          icon={<CheckCircle2 className="w-[18px] h-[18px] text-sprout-700" strokeWidth={2} />}
-        />
-        <StatCard
-          label="Deliveries"
-          value={kpis.deliveryCount}
-          change="In transit"
-          changeType="neutral"
-          icon={<Truck className="w-[18px] h-[18px] text-sprout-700" strokeWidth={2} />}
-        />
-        <StatCard
-          label="Revenue"
-          value={`₹${formatCurrency(kpis.totalRevenue)}`}
-          change="+18%"
-          icon={<IndianRupee className="w-[18px] h-[18px] text-sprout-700" strokeWidth={2} />}
-        />
-        <StatCard
-          label="Growers"
-          value={kpis.activeGrowers}
-          change={`${kpis.growerCount} registered`}
-          icon={<Users className="w-[18px] h-[18px] text-sprout-700" strokeWidth={2} />}
-        />
-      </div>
-
-      {/* Pending Actions */}
-      <div className="mb-6 sm:mb-8 grid gap-3 sm:gap-4 grid-cols-1 min-[420px]:grid-cols-2 lg:grid-cols-4">
-        {pendingActions.map((action) => {
-          const Icon = action.icon;
-          return (
-            <Link key={action.label} href={action.href}>
-              <div className="glass-card p-4 hover:bg-white/50 transition-all cursor-pointer group row-hover">
-                <div className="flex items-center gap-3">
-                  <div
-                    className={`w-10 h-10 ${action.color} rounded-xl flex items-center justify-center text-white shadow-lg`}
-                  >
-                    {action.count > 0 ? (
-                      <span className="text-lg font-bold">{action.count}</span>
-                    ) : (
-                      <Icon className="w-5 h-5" />
-                    )}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-text-secondary group-hover:text-sprout-800 transition-colors leading-tight">
-                      {action.label}
-                    </p>
-                  </div>
-                  <ChevronRight className="w-4 h-4 text-text-muted opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
-                </div>
-              </div>
-            </Link>
-          );
-        })}
-      </div>
-
-      <div className="grid gap-5 sm:gap-6 lg:grid-cols-3">
-        {/* Recent Orders — 2 cols */}
-        <div className="lg:col-span-2 space-y-6">
-          <GlassCard>
-            <div className="mb-5 flex flex-col gap-2 min-[420px]:flex-row min-[420px]:items-center min-[420px]:justify-between">
-              <h2 className="text-lg font-bold text-text-primary">Recent Orders</h2>
-              <Link
-                href="/admin/demand"
-                className="inline-flex items-center gap-1 text-xs font-semibold text-sprout-600 hover:text-sprout-800 transition-colors"
-              >
-                Demand Engine
-                <ArrowRight className="w-3.5 h-3.5" />
-              </Link>
-            </div>
-
-            {recentOrders.length > 0 ? (
-              <div className="space-y-3">
-                {recentOrders.map((order) => (
-                  <div
-                    key={order.id}
-                    className="flex flex-col gap-3 rounded-xl border border-white/40 bg-white/50 p-4 row-hover cursor-pointer group min-[520px]:flex-row min-[520px]:items-center min-[520px]:gap-4"
-                  >
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <h3 className="text-sm font-semibold text-text-primary">
-                          {order.id}
-                        </h3>
-                        <StatusBadge
-                          status={
-                            order.status === "in-production"
-                              ? "growing"
-                              : order.status === "confirmed"
-                                ? "active"
-                                : order.status === "pending-payment"
-                                  ? "pending"
-                                  : (order.status as "active")
-                          }
-                        />
-                      </div>
-                      <p className="text-xs text-text-muted">
-                        {order.restaurant} — {order.cropType} × {order.quantityKg}kg
-                      </p>
-                    </div>
-                    <div className="flex-shrink-0 min-[520px]:text-right">
-                      <p className="text-sm font-bold text-text-primary">
-                        ₹{order.totalPrice.toLocaleString("en-IN")}
-                      </p>
-                      <p className="text-[11px] text-text-muted">{order.date}</p>
-                    </div>
-                    <ChevronRight className="hidden h-4 w-4 flex-shrink-0 text-text-muted transition-all group-hover:text-sprout-800 min-[520px]:block" />
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-10">
-                <Package className="w-10 h-10 text-text-muted/30 mx-auto mb-3" />
-                <p className="text-sm text-text-muted">No orders yet</p>
-              </div>
-            )}
-          </GlassCard>
-
-          {/* Production Volume Chart */}
-          <GlassCard>
-            <div className="mb-4 flex flex-col gap-1 min-[420px]:flex-row min-[420px]:items-center min-[420px]:justify-between">
-              <h2 className="text-lg font-bold text-text-primary">Weekly Production</h2>
-              <span className="text-xs text-text-muted">Last 8 weeks</span>
-            </div>
-            <AdminWeeklyChart data={weeklyProduction} />
-            <div className="mt-3 flex flex-col gap-1 border-t border-white/30 pt-3 min-[420px]:flex-row min-[420px]:items-center min-[420px]:justify-between">
-              <span className="text-sm text-text-muted">Total output (8 weeks)</span>
-              <span className="text-lg font-black text-sprout-800">{totalProduction} kg</span>
-            </div>
-          </GlassCard>
-        </div>
-
-        {/* Grower Leaderboard — 1 col */}
-        <div>
-          <GlassCard>
-            <div className="flex items-center gap-2 mb-5">
-              <Trophy className="w-5 h-5 text-amber-500" />
-              <h2 className="text-lg font-bold text-text-primary">Top Growers</h2>
-            </div>
-            {topGrowers.length > 0 ? (
-              <div className="space-y-3">
-                {topGrowers.map((grower, i) => {
-                  const rankStyles = [
-                    "bg-amber-100 text-amber-700",
-                    "bg-gray-100 text-gray-600",
-                    "bg-orange-100 text-orange-700",
-                  ];
-                  const RankIcon = i < 3 ? (i === 0 ? Trophy : Medal) : null;
-
-                  return (
-                    <div
-                      key={grower.name}
-                      className="flex items-center gap-3 rounded-xl border border-white/40 bg-white/50 p-3 row-hover"
-                    >
-                      <span
-                        className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${
-                          rankStyles[i] || "bg-sprout-50 text-text-muted"
-                        }`}
-                      >
-                        {RankIcon ? (
-                          <RankIcon className="w-3.5 h-3.5" />
-                        ) : (
-                          i + 1
-                        )}
-                      </span>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-text-primary truncate">
-                          {grower.name}
-                        </p>
-                        <p className="text-[11px] text-text-muted">
-                          {grower.city} · {grower.trays} tasks
-                        </p>
-                      </div>
-                      <div className="shrink-0 text-right">
-                        <p className="text-sm font-bold text-sprout-800">{grower.score}</p>
-                        <p className="text-[10px] text-text-muted">score</p>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            ) : (
-              <div className="text-center py-10">
-                <Users className="w-10 h-10 text-text-muted/30 mx-auto mb-3" />
-                <p className="text-sm text-text-muted">No active growers</p>
-              </div>
-            )}
-          </GlassCard>
-        </div>
-      </div>
-    </AdminDashboardClient>
+    <>
+      {clauses.map((clause, index) => (
+        <span key={clause}>
+          <span>{clause}</span>
+          <span aria-hidden="true">{index < clauses.length - 1 ? ", " : "."}</span>
+        </span>
+      ))}
+    </>
   );
 }
 
-// Wrapper for the chart since it uses MiniBarChart (client component)
-function AdminWeeklyChart({
-  data,
-}: {
-  data: { label: string; value: number; tooltip: string }[];
-}) {
+export default async function AdminDashboard() {
+  const session = await auth();
+  const now = new Date();
+  const data = await getAdminOverview(session?.user?.id ?? "", now);
+  const { pipeline } = data;
+
   return (
-    <div className="flex h-28 sm:h-36 items-end gap-1 sm:gap-2">
-      {data.map((item, i) => (
-        <div
-          key={i}
-          className="flex-1 flex flex-col items-center justify-end h-full group relative"
-        >
-          {/* Tooltip */}
-          <div className="absolute -top-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10">
-            <div className="bg-text-primary text-white text-[10px] font-semibold px-2 py-1 rounded-lg whitespace-nowrap shadow-lg">
-              {item.tooltip}
-            </div>
-          </div>
-          <div
-            className="w-full bg-gradient-to-t from-sprout-700 to-sprout-400 rounded-lg hover:opacity-80 hover:shadow-lg hover:shadow-sprout-500/20 transition-all"
-            style={{ height: `${(item.value / 120) * 100}%` }}
-          />
-          <p className="text-[10px] text-text-muted mt-1.5 font-medium">
-            {item.label}
-          </p>
+    <>
+      <PageHeader eyebrow={format(now, "EEEE, d MMMM")} title={greetingFor(now)} subtitle={<PipelineSubtitle clauses={pipelineClauses(pipeline)} />} />
+
+      {/* The pipeline, in order: each step is a count and a link to its page. */}
+      <nav aria-label="Pipeline" className="mb-4">
+        <ol className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+          {PIPELINE_STEPS.map((step, index) => {
+            const count = pipeline[step.key];
+            return (
+              <li key={step.key}>
+                <Link
+                  href={step.href}
+                  className={cn(
+                    "group flex h-full flex-col rounded-tile border border-white/50 p-4 shadow-panel transition-transform hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50",
+                    count > 0 ? "bg-watch-soft/80" : "bg-panel/55"
+                  )}
+                >
+                  <span className="flex items-center justify-between text-sm text-ink-soft">
+                    <span>{`${index + 1}. ${step.label}`}</span>
+                    <ArrowRight className="h-4 w-4 text-ink-muted transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
+                  </span>
+                  <span className="mt-2 text-3xl font-light leading-none tabular-nums text-ink">{count}</span>
+                  <span className="mt-2 text-micro text-ink-muted">{count > 0 ? step.caption : "Nothing waiting"}</span>
+                </Link>
+              </li>
+            );
+          })}
+        </ol>
+      </nav>
+
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
+        <StatTile label="Active orders" icon={<Package />} value={data.activeOrders} caption={`${data.orderTotals} orders in total`} />
+        <StatTile label="Revenue" icon={<IndianRupee />} value={rupees(data.revenue)} caption="From paid orders" />
+        <StatTile label="Trays growing" icon={<Sprout />} value={data.traysGrowing} caption="Across all growers" />
+        <StatTile
+          label="QC pass rate"
+          icon={<CheckCircle2 />}
+          value={data.qcRate === null ? "—" : `${data.qcRate}%`}
+          tone={data.qcRate === null ? "neutral" : data.qcRate >= 90 ? "good" : "watch"}
+          caption={data.qcRate === null ? "No trays reviewed yet" : data.qcRate >= 90 ? "On target" : "Below the 90% target"}
+          href="/admin/kpis"
+        />
+        <StatTile label="Growers" icon={<Users />} value={data.activeGrowers} caption={`${data.growers} registered`} href="/admin/growers" />
+        <StatTile label="In transit" icon={<Truck />} value={data.inTransit} caption={data.inTransit === 1 ? "Delivery on the road" : "Deliveries on the road"} href="/admin/deliveries" />
+      </div>
+
+      <div className="mt-4 grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,24rem)] lg:gap-5">
+        <div className="min-w-0 space-y-4">
+          <KgChartCard ordered={data.weeks.orderedKg} delivered={data.weeks.deliveredKg} />
+
+          <Panel>
+            <PanelHeader title="Recent orders" subtitle="The latest six, newest first" />
+            {data.recentOrders.length > 0 ? (
+              <ul className="divide-y divide-hairline/70">
+                {data.recentOrders.map((order) => (
+                  <li key={order.id} className="relative flex flex-wrap items-center justify-between gap-3 py-3 first:pt-0 last:pb-0">
+                    <div className="min-w-0">
+                      <Link
+                        href={`/admin/restaurants/${order.restaurant.id}`}
+                        className="text-sm font-medium text-ink after:absolute after:inset-0 focus-visible:outline-none focus-visible:after:ring-2 focus-visible:after:ring-brand/50"
+                      >
+                        {order.restaurant.businessName}
+                      </Link>
+                      <p className="mt-0.5 text-micro text-ink-muted">{`${cropName(order.cropType)}, ${order.quantityKg} kg · ${shortId(order.id)}`}</p>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <StatusChip status={order.status} />
+                      <span className="w-20 text-right text-sm font-medium tabular-nums text-ink">{rupees(order.totalPrice)}</span>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-sm text-ink-muted">No orders yet.</p>
+            )}
+          </Panel>
         </div>
-      ))}
-    </div>
+
+        <div className="min-w-0 space-y-4">
+          <Panel>
+            <PanelHeader
+              title="Top growers"
+              subtitle="By overall score"
+              actions={
+                <Link href="/admin/growers" className="inline-flex items-center gap-1 text-sm text-ink-soft hover:text-ink">
+                  View all
+                  <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                </Link>
+              }
+            />
+            {data.topGrowers.length > 0 ? (
+              <ul className="space-y-3">
+                {data.topGrowers.map((grower) => (
+                  <li key={grower.id} className="relative">
+                    <div className="flex items-baseline justify-between gap-3">
+                      <Link href={`/admin/growers/${grower.id}`} className="text-sm font-medium text-ink after:absolute after:inset-0 focus-visible:outline-none focus-visible:after:ring-2 focus-visible:after:ring-brand/50">
+                        {grower.name}
+                      </Link>
+                      <span className="text-sm tabular-nums text-ink-soft">{`${Math.round(grower.score * 100)}%`}</span>
+                    </div>
+                    <p className="mb-1.5 text-micro text-ink-muted">{`${grower.city} · ${grower.trays} trays`}</p>
+                    <Meter value={Math.round(grower.score * 100)} label={`${grower.name} score`} />
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-sm text-ink-muted">No active growers yet.</p>
+            )}
+          </Panel>
+
+          <Panel>
+            <PanelHeader title="Recent activity" subtitle="Updates sent to you" />
+            {data.activity.length > 0 ? (
+              <ul className="space-y-4">
+                {data.activity.map((item) => (
+                  <li key={item.id} className="flex gap-3">
+                    <span aria-hidden="true" className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-leaf-soft text-ink-soft">
+                      <BellRing className="h-4 w-4" />
+                    </span>
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium text-ink">{item.title}</p>
+                      <p className="text-sm text-ink-soft">{item.message}</p>
+                      <time data-i18n-ignore dateTime={item.createdAt.toISOString()} className="text-micro text-ink-muted">
+                        {formatDistanceToNow(item.createdAt, { addSuffix: true })}
+                      </time>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-sm text-ink-muted">Nothing new. Pickup requests and QC alerts appear here.</p>
+            )}
+          </Panel>
+        </div>
+      </div>
+    </>
   );
 }

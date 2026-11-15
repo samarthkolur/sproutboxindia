@@ -5,7 +5,7 @@ import { describe, expect, it, vi } from "vitest";
 vi.mock("@/lib/prisma", () => ({ prisma: {} }));
 
 import { calculateProductionPlan } from "@/lib/business";
-import { daysUntil, planOrder, sortByUrgency, urgencyOf, waitingFor } from "./admin";
+import { daysUntil, pipelineSentence, planOrder, qcPassPercent, sortByUrgency, urgencyOf, waitingFor, weeklyTotals } from "./admin";
 
 const NOW = new Date(2026, 10, 15, 14, 0);
 const inDays = (n: number) => new Date(2026, 10, 15 + n);
@@ -75,5 +75,45 @@ describe("waitingFor", () => {
     expect(waitingFor(ago(5), NOW)).toBe("5 hours ago");
     expect(waitingFor(ago(24), NOW)).toBe("1 day ago");
     expect(waitingFor(ago(72), NOW)).toBe("3 days ago");
+  });
+});
+
+describe("weeklyTotals", () => {
+  const daysAgo = (n: number) => new Date(NOW.getTime() - n * 86400000);
+
+  it("sums each real 7-day window, oldest first, the last ending now", () => {
+    const rows = [
+      { at: daysAgo(1), value: 5 },
+      { at: daysAgo(6), value: 3 },
+      { at: daysAgo(9), value: 4 },
+      { at: daysAgo(40), value: 99 },
+      { at: null, value: 7 },
+    ];
+    expect(weeklyTotals(rows, NOW, 4).map((w) => w.value)).toEqual([0, 0, 4, 8]);
+  });
+
+  it("returns one labelled window per week asked for", () => {
+    const weeks = weeklyTotals([], NOW, 8);
+    expect(weeks).toHaveLength(8);
+    expect(weeks[7].label).toMatch(/^\d{1,2} [A-Z][a-z]{2}$/);
+  });
+});
+
+describe("pipelineSentence", () => {
+  const none = { demand: 0, allocate: 0, dispatch: 0, qc: 0, payout: 0 };
+  it("says nothing is waiting when the pipeline is empty", () => {
+    expect(pipelineSentence(none)).toMatch(/up to date/);
+  });
+  it("lists what is waiting, in pipeline order", () => {
+    expect(pipelineSentence({ ...none, demand: 5, qc: 1 })).toBe("5 orders need a plan, 1 tray is waiting for QC.");
+    expect(pipelineSentence({ ...none, allocate: 1, dispatch: 2, payout: 3 })).toBe("1 plan needs growers, 2 tasks are waiting for supplies, 3 payouts are pending.");
+  });
+});
+
+describe("qcPassPercent", () => {
+  it("is a whole percent of the reviewed trays, and null before any review", () => {
+    expect(qcPassPercent(37, 42)).toBe(88);
+    expect(qcPassPercent(0, 0)).toBeNull();
+    expect(qcPassPercent(0, 5)).toBe(0);
   });
 });

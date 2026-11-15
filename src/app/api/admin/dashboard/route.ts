@@ -1,6 +1,6 @@
 import { auth } from "@/lib/auth";
 import { fail, ok, parseError } from "@/lib/api";
-import { getAdminKPIs, getAdminPendingCounts } from "@/actions/dashboard.actions";
+import { getAdminOverview } from "@/lib/admin-data";
 
 export const dynamic = "force-dynamic";
 
@@ -10,9 +10,7 @@ export async function GET() {
     if (!session?.user || session.user.role !== "ADMIN") {
       return fail("Unauthorized", "UNAUTHORIZED", 401);
     }
-
-    const [kpis, pending] = await Promise.all([getAdminKPIs(), getAdminPendingCounts()]);
-    return ok({ kpis, pending });
+    return ok(await getAdminOverview(session.user.id));
   } catch (error) {
     return parseError(error);
   }

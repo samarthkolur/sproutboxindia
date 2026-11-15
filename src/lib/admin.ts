@@ -1,4 +1,4 @@
-import { addDays } from "date-fns";
+import { addDays, format } from "date-fns";
 import {
   CROP_CYCLE_DAYS,
   CROP_DISPLAY_NAMES,
@@ -67,4 +67,61 @@ export function urgencyOf(deliveryDate: Date, now: Date = new Date()): { level: 
 
 export function sortByUrgency<T extends { deliveryDate: Date }>(items: T[]) {
   return [...items].sort((a, b) => a.deliveryDate.getTime() - b.deliveryDate.getTime());
+}
+
+// ── Dashboard ───────────────────────────────────────────────────────────────
+
+export interface WeekTotal {
+  label: string;
+  value: number;
+}
+
+/** Sums of `value` per real 7-day window, oldest first; the last window ends now. */
+export function weeklyTotals(rows: { at: Date | null; value: number }[], now: Date = new Date(), weeks = 12): WeekTotal[] {
+  const out: WeekTotal[] = [];
+  for (let i = weeks - 1; i >= 0; i--) {
+    const end = addDays(now, -7 * i);
+    const start = addDays(end, -7);
+    const value = rows.filter((row) => row.at && row.at > start && row.at <= end).reduce((sum, row) => sum + row.value, 0);
+    out.push({ label: format(start, "d MMM"), value });
+  }
+  return out;
+}
+
+export interface PipelineCounts {
+  demand: number;
+  allocate: number;
+  dispatch: number;
+  qc: number;
+  payout: number;
+}
+
+/** What is waiting at each step, as short clauses. Empty when the pipeline is clear. */
+export function pipelineClauses(counts: PipelineCounts) {
+  const clauses: string[] = [];
+  if (counts.demand > 0) clauses.push(counts.demand === 1 ? "1 order needs a plan" : `${counts.demand} orders need a plan`);
+  if (counts.allocate > 0) clauses.push(counts.allocate === 1 ? "1 plan needs growers" : `${counts.allocate} plans need growers`);
+  if (counts.dispatch > 0) clauses.push(counts.dispatch === 1 ? "1 task is waiting for supplies" : `${counts.dispatch} tasks are waiting for supplies`);
+  if (counts.qc > 0) clauses.push(counts.qc === 1 ? "1 tray is waiting for QC" : `${counts.qc} trays are waiting for QC`);
+  if (counts.payout > 0) clauses.push(counts.payout === 1 ? "1 payout is pending" : `${counts.payout} payouts are pending`);
+  return clauses;
+}
+
+/** The one line under the greeting: what is waiting, or that nothing is. */
+export function pipelineSentence(counts: PipelineCounts) {
+  const clauses = pipelineClauses(counts);
+  return clauses.length === 0 ? "Everything is up to date. Nothing is waiting for you." : `${clauses.join(", ")}.`;
+}
+
+export const PIPELINE_STEPS = [
+  { key: "demand", label: "Demand", href: "/admin/demand", caption: "orders need a plan" },
+  { key: "allocate", label: "Allocate", href: "/admin/allocate", caption: "plans need growers" },
+  { key: "dispatch", label: "Dispatch", href: "/admin/dispatch", caption: "tasks need supplies" },
+  { key: "qc", label: "QC", href: "/admin/qc", caption: "trays to review" },
+  { key: "payout", label: "Payout", href: "/admin/payouts", caption: "payouts pending" },
+] as const;
+
+/** Share of reviewed trays that passed, as a whole percent; null before anything is reviewed. */
+export function qcPassPercent(passed: number, reviewed: number) {
+  return reviewed > 0 ? Math.round((passed / reviewed) * 100) : null;
 }
