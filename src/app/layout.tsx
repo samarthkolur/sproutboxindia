@@ -1,12 +1,20 @@
 import type { Metadata, Viewport } from "next";
+import { Noto_Sans_Devanagari, Noto_Sans_Kannada, Outfit } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import "@/app/globals.css";
 import "leaflet/dist/leaflet.css";
 import { LanguageProvider } from "@/components/i18n/LanguageProvider";
 import { FloatingLanguageToggle } from "@/components/i18n/LanguageToggle";
-import { GlobalLoadingIndicator } from "@/components/shared/GlobalLoadingIndicator";
+import { ThemeProvider, themeInitScript } from "@/components/layout/ThemeProvider";
+import { TopProgress } from "@/components/shared/TopProgress";
 import { GoogleAnalytics } from "@/components/shared/GoogleAnalytics";
 import { GoogleAnalyticsPageview } from "@/components/shared/GoogleAnalyticsPageview";
+
+// Outfit has no Kannada or Devanagari glyphs, so those scripts get their own faces
+// (non-Latin subsets are not preloaded; they load only when the text appears).
+const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit", display: "swap" });
+const notoKannada = Noto_Sans_Kannada({ subsets: ["kannada"], variable: "--font-kannada", display: "swap", preload: false });
+const notoDevanagari = Noto_Sans_Devanagari({ subsets: ["devanagari"], variable: "--font-devanagari", display: "swap", preload: false });
 
 export const metadata: Metadata = {
   title: {
@@ -37,16 +45,25 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html
+      lang="en"
+      suppressHydrationWarning
+      className={`${outfit.variable} ${notoKannada.variable} ${notoDevanagari.variable}`}
+    >
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+      </head>
       <body className="min-h-screen antialiased overflow-x-hidden">
         <GoogleAnalytics />
         <GoogleAnalyticsPageview />
         <Analytics />
-        <LanguageProvider>
-          {children}
-          <FloatingLanguageToggle />
-          <GlobalLoadingIndicator />
-        </LanguageProvider>
+        <ThemeProvider>
+          <LanguageProvider>
+            <TopProgress />
+            {children}
+            <FloatingLanguageToggle />
+          </LanguageProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

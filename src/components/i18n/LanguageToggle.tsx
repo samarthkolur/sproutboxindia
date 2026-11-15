@@ -1,5 +1,6 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import { Globe2 } from "lucide-react";
 import { languageOptions, type LanguageCode } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
@@ -12,12 +13,12 @@ export function LanguageToggle({ className }: { className?: string }) {
     <label
       data-no-global-loading
       className={cn(
-        "inline-flex h-10 items-center gap-2 rounded-xl border border-sprout-200/70 bg-white/90 px-3 text-sm font-semibold text-text-primary shadow-lg shadow-sprout-900/5 backdrop-blur-xl transition-colors hover:border-sprout-300",
+        "inline-flex h-10 items-center gap-2 rounded-full border border-hairline bg-panel/70 px-3 text-sm font-semibold text-ink transition-colors hover:border-ink-muted/50 focus-within:ring-2 focus-within:ring-brand/50",
         className
       )}
     >
-      <Globe2 className="h-4 w-4 text-sprout-800" aria-hidden="true" />
-      <span className="hidden text-xs uppercase tracking-wider text-text-muted sm:inline">
+      <Globe2 className="h-4 w-4 text-ink-soft" aria-hidden="true" />
+      <span className="hidden text-xs uppercase tracking-wider text-ink-muted sm:inline">
         Language
       </span>
       <select
@@ -25,7 +26,7 @@ export function LanguageToggle({ className }: { className?: string }) {
         aria-label="Language"
         value={language}
         onChange={(event) => setLanguage(event.target.value as LanguageCode)}
-        className="cursor-pointer bg-transparent text-sm font-bold text-sprout-900 outline-none"
+        className="cursor-pointer bg-transparent text-sm font-bold text-ink outline-none"
       >
         {languageOptions.map((option) => (
           <option key={option.code} value={option.code}>
@@ -37,7 +38,16 @@ export function LanguageToggle({ className }: { className?: string }) {
   );
 }
 
+const DASHBOARD_PREFIXES = ["/admin", "/grower", "/restaurant"];
+
+// Temporary: marketing and auth pages keep this floating toggle until they get
+// their own chrome (Phase 1). Dashboards have the toggle in the top bar.
 export function FloatingLanguageToggle() {
+  const pathname = usePathname();
+  if (DASHBOARD_PREFIXES.some((prefix) => pathname === prefix || pathname.startsWith(prefix + "/"))) {
+    return null;
+  }
+
   return (
     <div className="fixed bottom-4 right-4 z-[70] hidden lg:block">
       <LanguageToggle />
