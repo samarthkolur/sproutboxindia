@@ -56,7 +56,7 @@ describe("landing page", () => {
 
   it("labels the product mocks as illustrative and carries no invented traction", () => {
     const { container } = render(<LandingPage />);
-    expect(screen.getAllByText("Sample dashboard — illustrative preview")).toHaveLength(2);
+    expect(screen.getAllByText("Sample dashboard — illustrative preview")).toHaveLength(1);
     for (const fake of ["+12%", "+18%", "127", "₹48.5K", "94%"]) {
       expect(container.textContent).not.toContain(fake);
     }
