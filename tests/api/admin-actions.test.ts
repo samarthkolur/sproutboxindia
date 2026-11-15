@@ -31,7 +31,7 @@ import { processQCCheckIn } from "@/actions/qc.actions";
 import { getGrowerLeaderboard, updateGrowerScoresAction } from "@/actions/admin.actions";
 
 const asAdmin = () => auth.mockResolvedValue({ user: { id: "admin-1", role: "ADMIN" } });
-const touchedDb = () => Object.values(db).some((model) => Object.values(model as Record<string, { mock?: { calls: unknown[] } }>).some((fn) => (fn as { mock?: { calls: unknown[] } })?.mock?.calls?.length));
+const touchedDb = () => Object.values(db).some((model) => (typeof model === "function" ? model.mock.calls.length > 0 : Object.values(model).some((fn) => (fn as { mock: { calls: unknown[] } }).mock.calls.length > 0)));
 
 beforeEach(() => {
   auth.mockReset();
