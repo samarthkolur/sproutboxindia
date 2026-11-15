@@ -84,7 +84,8 @@ export default async function RestaurantDashboard() {
         <StatCard
           label="This Month"
           value={`₹${data.monthSpend.toLocaleString("en-IN")}`}
-          change="+12%"
+          change="Orders placed this month"
+          changeType="neutral"
           icon={<IndianRupee className="w-[18px] h-[18px] text-sprout-700" strokeWidth={2} />}
         />
         <StatCard
