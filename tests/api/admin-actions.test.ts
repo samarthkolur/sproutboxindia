@@ -37,7 +37,7 @@ beforeEach(() => {
   auth.mockReset();
   for (const model of Object.values(db)) {
     if (typeof model === "function") model.mockReset();
-    else for (const fn of Object.values(model)) fn.mockReset();
+    else for (const fn of Object.values(model as Record<string, { mockReset: () => void }>)) fn.mockReset();
   }
 });
 
