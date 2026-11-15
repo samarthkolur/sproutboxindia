@@ -831,6 +831,11 @@ export const translations: Record<string, TranslationEntry> = {
   "You place each order yourself, from the catalog": { kn: "ಪ್ರತಿ ಆರ್ಡರ್ ಅನ್ನು ನೀವೇ ಕ್ಯಾಟಲಾಗ್‌ನಿಂದ ಮಾಡುತ್ತೀರಿ", hi: "हर ऑर्डर आप खुद कैटलॉग से देते हैं" },
   "Your menu": { kn: "ನಿಮ್ಮ ಮೆನು", hi: "आपका मेन्यू" },
   "e.g. South Indian": { kn: "ಉದಾ. ದಕ್ಷಿಣ ಭಾರತೀಯ", hi: "जैसे दक्षिण भारतीय" },
+  // ── Phase 1: error pages ──
+  "This page doesn't exist": { kn: "ಈ ಪುಟ ಅಸ್ತಿತ್ವದಲ್ಲಿಲ್ಲ", hi: "यह पेज मौजूद नहीं है" },
+  "The link may be broken, or the page may have moved.": { kn: "ಲಿಂಕ್ ಮುರಿದಿರಬಹುದು, ಅಥವಾ ಪುಟ ಸ್ಥಳಾಂತರಗೊಂಡಿರಬಹುದು.", hi: "लिंक टूटा हो सकता है, या पेज हट गया हो सकता है।" },
+  // ── Phase 1: error pages ──
+  "Go to your dashboard": { kn: "ನಿಮ್ಮ ಡ್ಯಾಶ್‌ಬೋರ್ಡ್‌ಗೆ ಹೋಗಿ", hi: "अपने डैशबोर्ड पर जाएं" },
 };
 
 
