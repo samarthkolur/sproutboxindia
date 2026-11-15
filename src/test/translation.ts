@@ -11,7 +11,8 @@ const LITERAL = new Set(["SproutBox", "UPI", "FSSAI", "GST", "PIN", "QC", "kg", 
 
 function needsTranslation(text: string) {
   const value = text.replace(/\s+/g, " ").trim();
-  if (!/[A-Za-z]/.test(value)) return false; // numbers, symbols, currency
+  // Numbers, symbols, currency and units ("₹450/kg", "4 kg") read the same everywhere.
+  if (!/[A-Za-z]/.test(value.replace(/\b(kg|g|ml)\b/g, ""))) return false;
   if (LITERAL.has(value)) return false;
   if (value.includes("@") || /^\+?\d/.test(value)) return false; // emails and phone examples
   return translateText(value, "kn") === value || translateText(value, "hi") === value;
