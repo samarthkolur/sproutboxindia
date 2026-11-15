@@ -76,17 +76,42 @@ Deviations from the plan, on purpose:
 - **Each later phase** adds tests for its own pages and flows before it is pushed.
 - On this drive esbuild's binary loses its execute bit, so run `ESBUILD_BINARY_PATH=<an executable copy of esbuild> npm test`. Not needed on a normal filesystem.
 
+### Phase 1 status (done 2026-11-15)
+
+Built, tested and checked in the browser (desktop and 375px, English, Kannada and Hindi):
+the shared marketing chrome (nav, footer, mobile menu, skip link), landing page (split into six section components), About, login, register, sign-out, the grower and restaurant join wizards, a branded 404, and a themed global error page. New shared primitives: `Field`/`TextField`/`SelectField`, `ChoiceGroup`, and `components/join/*` (stepper, shell, summary, review list).
+
+Deviations from the plan, on purpose:
+- **No scroll-reveal or counter animations** on the landing page. The old reveal CSS has no reduced-motion handling, so the page is static. Every number comes from `constants.ts` (`landing/facts.ts`), and the two product mocks are labelled "illustrative".
+- **Copy softened where the product cannot back it up:** "5 km radius" and "up to 40x more nutrients" (About), "what we grow, we consume" (the plan has a 25% buffer), "auto-orders" (nothing generates repeat orders), and the old FSSAI line "account stays inactive until verified" (see finding 4).
+- **Join wizards are 6 and 5 steps** (grower gained Compliance; restaurant gained a separate Location step) and show a live summary beside the form.
+- **Language and theme toggles** moved into each chrome; the floating toggle is deleted.
+- **Deleted:** the dead onboarding forms and `StepProgress`, plus the old `layout/Navbar` and `layout/Footer`.
+
+Findings worth a decision (found while porting, not fixed here):
+1. **`sign_up` never fired on the live join pages.** Only the dead forms called `trackSignUp`, so the GA4 sign-up KPI was undercounting. Both wizards now fire it after the account is created.
+2. **Collected but not stored.** The API ignores grower `spaceType` and `lightAccess`, and restaurant `selectedCrops`, `deliveryFrequency` and `preferredDay`. The wizards still ask (the copy does not promise anything) and send them, so a schema change would pick them up. Decide with Subscriptions in Phase 3. Grower `bankAccount`/`ifsc` were dead state and are gone; only UPI is collected.
+3. **Phone is required** by the API (7+ characters) but the old forms treated it as optional, so an empty phone failed with a vague error. It is now required and validated.
+4. **FSSAI is not enforced anywhere.** Allocation ignores it; only the admin verify action exists. The wizard collects it (optional, 14 digits) and says "our team checks each number". Phase 4 should decide whether to block unverified growers from allocation.
+5. Restaurant `lat`/`lng` from the map were dropped by the old page; they are now sent.
+6. `/login?callbackUrl=` could redirect off-site; it now only follows paths on this site.
+7. `global-error.tsx` set no `data-theme`, so the new colour tokens would not have applied.
+
+### Phase 1 tests (done 2026-11-15)
+
+`tests/pages/*` render each page and drive its real flow (failed login, open-redirect guard, inline validation and focus, prefill handoff, every wizard step, FSSAI rules, `sign_up` fires only on success, duplicate email, Edit shortcuts, 404 and error pages). A shared helper (`src/test/translation.ts`) fails a test when any rendered text has no Kannada or Hindi entry, so a missed string is a failing test, not a visual bug. Also covered: `lib/validation`, `lib/join-validation` (checked against the server zod schemas so the client is never looser), form primitives, nav and footer, and a guard against importing data from a `"use client"` file into a server component (a bug jsdom cannot see; it crashed the footer in the browser).
+
 **Must not break:** GA4 events (`sign_up`, `purchase`, `checkin_submitted`, `pickup_requested` in `src/lib/gtag.ts`), middleware role routing, Stripe and UploadThing flows, every API route.
 
 ## 1. Layouts and states
 
 - [x] `src/app/layout.tsx`: Outfit, ThemeProvider, toaster, top progress bar; drop the floating language toggle (moves into the top bars)
-- [ ] `(marketing)/layout.tsx` + `loading.tsx`: becomes the **one marketing chrome** (nav with logo, anchors, Sign in, Get started, language, theme; footer), used by landing, About and join (today: three different navbars, join has none)
-- [ ] `(auth)/layout.tsx` + `loading.tsx`: centered frosted panel on the glow canvas (V3), language + theme toggles, back link
+- [x] `(marketing)/layout.tsx` + `loading.tsx`: becomes the **one marketing chrome** (nav with logo, anchors, Sign in, Get started, language, theme; footer), used by landing, About and join (today: three different navbars, join has none)
+- [x] `(auth)/layout.tsx` + `loading.tsx`: centered frosted panel on the glow canvas (V3), language + theme toggles, back link
 - [x] `(dashboard)/layout.tsx` + `loading.tsx` + `error.tsx`: `AppShell`; remove the `pt-[72px]`/`pb-28` hacks; skeletons shaped like the page; restyled error with retry and home
-- [ ] `(dashboard)/admin|grower|restaurant/layout.tsx`: stay pass-through (nav lives in `lib/nav.ts`)
-- [ ] `global-error.tsx`: tokens instead of hardcoded `#F8FAF7`
-- [ ] `not-found.tsx` (**new**): branded 404 with a role-aware link home
+- [x] `(dashboard)/admin|grower|restaurant/layout.tsx`: stay pass-through (nav lives in `lib/nav.ts`)
+- [x] `global-error.tsx`: tokens instead of hardcoded `#F8FAF7`
+- [x] `not-found.tsx` (**new**): branded 404 with a role-aware link home
 
 ---
 
@@ -97,26 +122,26 @@ Deviations from the plan, on purpose:
   - **Verdelo:** V2 (every fact has a plain caption), V3 (glow canvas), V1 (one CTA style).
   - **Fix:** split the 876-line file into section components; footer anchors (`#about`, `#for-growers`) → real ids/routes; link `/about`; emoji → lucide icons; no fake traction; respect reduced motion; one shared scroll/counter helper.
   - **Data:** none; real constants only.
-- [ ] **`/about`**
+- [x] **`/about`**
   - **Layout:** shared chrome; hero; four values as StatTile-style panels (tokens, not blue/amber/purple); story as a panel with a one-sentence lead; CTA band.
   - **Verdelo:** V2, V3. **Fix:** linked from nav and footer.
-- [ ] **`/join/grower`** (5-step wizard)
+- [x] **`/join/grower`** (6-step wizard)
   - **Layout:** inside the marketing chrome; pill stepper with labels; form panel + **live summary panel** ("Starter kit · 5 trays · earn ₹50+ per tray"); map picker in its own panel; space/light options as segmented controls.
   - **Verdelo:** V5, V2.
   - **Fix:** the live page lacks the FSSAI step and `trackSignUp` that exist only in the dead `GrowerOnboardingForm` → port both into the live form; confirm where bank/IFSC/UPI are collected; delete the dead duplicate.
   - **New:** optional FSSAI step (the API already accepts `fssaiRegNumber`).
-- [ ] **`/join/restaurant`** (4-step wizard)
+- [x] **`/join/restaurant`** (5-step wizard)
   - **Layout:** same wizard pattern; crops as selectable photo chips; delivery frequency/day as segmented controls; summary panel.
   - **Verdelo:** V5, V2. **Fix:** keep `trackSignUp`; delete the dead duplicate.
-- [ ] **`/login`**
+- [x] **`/login`**
   - **Layout:** centered panel; email/password; solid accent Sign in.
   - **Verdelo:** V1.
   - **Fix:** show a success banner for `?registered=true` (join pages append it, login ignores it); errors say what to do.
-- [ ] **`/register`**
+- [x] **`/register`**
   - **Layout:** role picker as two large selectable panels (Grower / Restaurant), then fields.
   - **Verdelo:** V2 (says what happens next, since no account is created here).
   - **Fix:** inline validation; prefill handoff unchanged.
-- [ ] **`/signout`**
+- [x] **`/signout`**
   - **Layout:** small confirmation panel; neutral solid primary (not red), cancel.
   - **Verdelo:** V1.
 
