@@ -4,7 +4,6 @@ import { Analytics } from "@vercel/analytics/next";
 import "@/app/globals.css";
 import "leaflet/dist/leaflet.css";
 import { LanguageProvider } from "@/components/i18n/LanguageProvider";
-import { FloatingLanguageToggle } from "@/components/i18n/LanguageToggle";
 import { ThemeProvider, themeInitScript } from "@/components/layout/ThemeProvider";
 import { TopProgress } from "@/components/shared/TopProgress";
 import { GoogleAnalytics } from "@/components/shared/GoogleAnalytics";
@@ -61,7 +60,6 @@ export default function RootLayout({
           <LanguageProvider>
             <TopProgress />
             {children}
-            <FloatingLanguageToggle />
           </LanguageProvider>
         </ThemeProvider>
       </body>

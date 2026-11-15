@@ -1,6 +1,5 @@
 "use client";
 
-import { usePathname } from "next/navigation";
 import { Globe2 } from "lucide-react";
 import { languageOptions, type LanguageCode } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
@@ -35,22 +34,5 @@ export function LanguageToggle({ className }: { className?: string }) {
         ))}
       </select>
     </label>
-  );
-}
-
-const DASHBOARD_PREFIXES = ["/admin", "/grower", "/restaurant"];
-
-// Temporary: marketing and auth pages keep this floating toggle until they get
-// their own chrome (Phase 1). Dashboards have the toggle in the top bar.
-export function FloatingLanguageToggle() {
-  const pathname = usePathname();
-  if (DASHBOARD_PREFIXES.some((prefix) => pathname === prefix || pathname.startsWith(prefix + "/"))) {
-    return null;
-  }
-
-  return (
-    <div className="fixed bottom-4 right-4 z-[70] hidden lg:block">
-      <LanguageToggle />
-    </div>
   );
 }

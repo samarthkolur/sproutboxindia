@@ -1,42 +1,28 @@
 import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
+import { LanguageToggle } from "@/components/i18n/LanguageToggle";
+import { ThemeToggle } from "@/components/layout/ThemeToggle";
 
-export default function AuthLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="relative flex min-h-screen items-center justify-center overflow-hidden px-4 py-10 sm:py-12">
-      {/* Background grid */}
-      <div className="absolute inset-0 bg-grid bg-grid-fade" />
-
-      {/* Animated blobs */}
-      <div className="blob blob-animated w-[600px] h-[600px] bg-sprout-200/60 -top-40 -left-40" />
-      <div className="blob blob-animated-alt w-[500px] h-[500px] bg-sprout-300/40 bottom-0 right-0" />
-      <div className="blob blob-animated w-[350px] h-[350px] bg-sprout-100/70 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
-      <div className="blob w-[200px] h-[200px] bg-sprout-400/20 top-20 right-20" />
-
-      {/* Dot pattern */}
-      <div className="absolute inset-0 bg-dots opacity-30" />
-
-      {/* Glass card */}
-      <div className="glass-strong relative z-10 w-full max-w-[460px] p-5 glow-green sm:p-10">
-        <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent rounded-[24px]" />
-        <div className="relative z-10">{children}</div>
-      </div>
-
-      {/* Bottom link back to home */}
-      <div className="absolute bottom-3 left-1/2 z-10 -translate-x-1/2 sm:bottom-6">
+    <div className="app-canvas flex min-h-screen flex-col px-4 py-4 sm:py-6">
+      <header className="mx-auto flex w-full max-w-5xl items-center justify-between gap-3">
         <Link
           href="/"
-          className="text-xs text-text-muted hover:text-sprout-800 transition-colors flex items-center gap-1.5"
+          className="inline-flex items-center gap-1.5 rounded-full px-2 py-2 text-sm text-ink-soft transition-colors hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50"
         >
-          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
-          </svg>
+          <ArrowLeft className="h-4 w-4" aria-hidden="true" />
           Back to SproutBox
         </Link>
-      </div>
+        <div className="flex items-center gap-2">
+          <LanguageToggle />
+          <ThemeToggle />
+        </div>
+      </header>
+
+      <main className="flex flex-1 items-center justify-center py-8">
+        <div className="panel w-full max-w-[460px] p-6 sm:p-9">{children}</div>
+      </main>
     </div>
   );
 }
