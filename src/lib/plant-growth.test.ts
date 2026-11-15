@@ -9,6 +9,7 @@ import {
   cameraAt,
   dayAt,
   localProgress,
+  moisture,
   plantGrowth,
   progressAtDay,
   sceneState,
@@ -66,16 +67,19 @@ describe("stages", () => {
 });
 
 describe("scene state", () => {
-  it("starts dark with the cover on and ends in full light with it gone", () => {
+  it("opens in daylight on bare seeds, so the headline is readable", () => {
     const start = sceneState(0);
+    expect(start.coverDrop).toBe(0);
     expect(start.coverLift).toBe(0);
-    expect(start.light).toBeLessThan(0.4);
-    expect(start.darkness).toBeGreaterThan(0.3);
+    expect(start.light).toBe(1);
+    expect(start.darkness).toBe(0);
+  });
 
-    const end = sceneState(1);
-    expect(end.coverLift).toBe(1);
-    expect(end.light).toBe(1);
-    expect(end.darkness).toBe(0);
+  it("puts the hood on during day 1 and is dark and covered by day 3", () => {
+    expect(sceneState(progressAtDay(1.9)).coverDrop).toBe(1);
+    const dark = sceneState(progressAtDay(3));
+    expect(dark.light).toBeLessThan(0.55);
+    expect(dark.darkness).toBeGreaterThan(0.3);
   });
 
   it("lifts the cover around day 4 and not before day 3", () => {
@@ -83,15 +87,28 @@ describe("scene state", () => {
     expect(sceneState(progressAtDay(COVER_OFF_DAY + 0.5)).coverLift).toBeGreaterThan(0.5);
   });
 
-  it("never darkens or brightens backwards", () => {
+  it("ends in full light with the cover gone", () => {
+    const end = sceneState(1);
+    expect(end.coverLift).toBe(1);
+    expect(end.light).toBe(1);
+    expect(end.darkness).toBe(0);
+  });
+
+  it("only ever lowers the hood and then lifts it, never the reverse", () => {
     let previous = sceneState(0);
     for (const p of STEPS) {
       const now = sceneState(p);
+      expect(now.coverDrop).toBeGreaterThanOrEqual(previous.coverDrop - 1e-12);
       expect(now.coverLift).toBeGreaterThanOrEqual(previous.coverLift - 1e-12);
-      expect(now.light).toBeGreaterThanOrEqual(previous.light - 1e-12);
-      expect(now.darkness).toBeLessThanOrEqual(previous.darkness + 1e-12);
       previous = now;
     }
+  });
+
+  it("gets darker while the hood is on, then brighter once it lifts", () => {
+    const light = (day: number) => sceneState(progressAtDay(day)).light;
+    expect(light(1)).toBeGreaterThan(light(2));
+    expect(light(2)).toBeGreaterThanOrEqual(light(3));
+    expect(light(5)).toBeGreaterThan(light(3));
   });
 
   it("waters during the watering days only", () => {
@@ -99,6 +116,28 @@ describe("scene state", () => {
     expect(waterPhase(progressAtDay(2))).toBe(-1);
     expect(waterPhase(progressAtDay(8.5))).toBe(-1);
     expect(waterPhase(0)).toBe(-1);
+  });
+});
+
+describe("moisture", () => {
+  it("stays within 0 to 1", () => {
+    for (const p of STEPS) {
+      expect(moisture(p)).toBeGreaterThanOrEqual(0);
+      expect(moisture(p)).toBeLessThanOrEqual(1);
+    }
+  });
+
+  it("is soaked right after a watering day and drier a day later", () => {
+    for (const day of WATER_DAYS) {
+      const justWatered = moisture(progressAtDay(day) + 0.02);
+      const nextDay = moisture(progressAtDay(day + 1) + 0.02);
+      expect(justWatered).toBeGreaterThan(0.8);
+      if (!WATER_DAYS.includes((day + 1) as never)) expect(nextDay).toBeLessThan(justWatered);
+    }
+  });
+
+  it("starts moist (the seeds are sown on damp coir)", () => {
+    expect(moisture(0)).toBeGreaterThan(0.4);
   });
 });
 

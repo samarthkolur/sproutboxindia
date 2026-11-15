@@ -60,11 +60,13 @@ export function stageAt(progress: number) {
 // ── Scene-wide state ─────────────────────────────────────────────────────────
 
 export interface SceneState {
-  /** 0 = blackout cover on, 1 = fully lifted away. */
+  /** 0 = the hood is hovering away, 1 = it is down on the tray (day 1). */
+  coverDrop: number;
+  /** 0 = blackout cover on, 1 = fully lifted away (day 4). */
   coverLift: number;
   /** 0 = dark, 1 = full daylight: drives lights, light shafts and dust. */
   light: number;
-  /** Fraction of the page overlay that darkens the background during blackout. */
+  /** How much the page darkens behind the scene while the cover is on. */
   darkness: number;
   /** 0..1 while a watering is happening, otherwise -1. */
   water: number;
@@ -80,13 +82,31 @@ export function waterPhase(progress: number) {
   return -1;
 }
 
+/**
+ * How wet the soil looks (0 dry, 1 just watered). Seeds are sown on moistened coir,
+ * and each watering day soaks it again before it slowly dries.
+ */
+export function moisture(progress: number) {
+  let wet = 0.55 * Math.exp(-(progress - progressAtDay(1)) * 4);
+  for (const day of WATER_DAYS) {
+    const start = progressAtDay(day) + 0.012;
+    if (progress >= start) wet = Math.max(wet, Math.exp(-(progress - start) * 4.5));
+  }
+  return clamp01(wet);
+}
+
 export function sceneState(progress: number): SceneState {
   const lift = progressAtDay(COVER_OFF_DAY);
+  // The scene opens in daylight on bare seeds (so the headline stays readable); the hood
+  // comes down as the story starts, and goes away again on the day the instructions say.
+  const coverDrop = smoothstep(0.015, 0.08, progress);
   const coverLift = smoothstep(lift - 0.015, lift + 0.07, progress);
+  const covered = coverDrop * (1 - coverLift);
   return {
+    coverDrop,
     coverLift,
-    light: lerp(0.28, 1, coverLift),
-    darkness: 0.5 * (1 - coverLift),
+    light: 1 - 0.5 * covered,
+    darkness: 0.4 * covered,
     water: waterPhase(progress),
   };
 }
@@ -140,6 +160,6 @@ export function cameraAt(progress: number) {
     distance: lerp(8.4, 13.2, ease),
     targetY: lerp(0.15, 1.45, ease),
     azimuth: lerp(-0.2, 0.1, ease), // radians
-    elevation: lerp(0.2, 0.12, ease),
+    elevation: lerp(0.36, 0.17, ease),
   };
 }
