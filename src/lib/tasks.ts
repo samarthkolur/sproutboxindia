@@ -41,13 +41,14 @@ export function isSameLocalDay(a: Date | string, b: Date = new Date()) {
   return new Date(a).toDateString() === b.toDateString();
 }
 
-export function getTaskState(task: TaskLike, now: Date = new Date()) {
+// Generic so callers keep their own batch type (an id, say) on `activeBatch`.
+export function getTaskState<T extends TaskLike>(task: T, now: Date = new Date()) {
   const currentDay =
     task.batches.length > 0 ? Math.max(...task.batches.map((b) => b.currentDay)) : 0;
   const totalDays = getTotalDays(task);
   const progress = Math.min(100, Math.round((currentDay / totalDays) * 100));
 
-  const activeBatch = task.batches.find((b) => !DONE_BATCH_STATUSES.includes(b.status));
+  const activeBatch = task.batches.find((b) => !DONE_BATCH_STATUSES.includes(b.status)) as T["batches"][number] | undefined;
   const lastCheckIn = activeBatch?.checkIns?.[0];
   const checkedInToday = lastCheckIn ? isSameLocalDay(lastCheckIn.createdAt, now) : false;
 

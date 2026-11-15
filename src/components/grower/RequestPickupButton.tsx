@@ -5,8 +5,9 @@ import { useRouter } from "next/navigation";
 import { Truck } from "lucide-react";
 import { toast } from "sonner";
 import { trackGrowerEngagement } from "@/lib/gtag";
+import { actionButtonClass, type ActionTone } from "./action-button";
 
-export function RequestPickupButton({ taskId, disabled }: { taskId: string; disabled?: boolean }) {
+export function RequestPickupButton({ taskId, disabled, tone = "solid" }: { taskId: string; disabled?: boolean; tone?: ActionTone }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
@@ -45,12 +46,12 @@ export function RequestPickupButton({ taskId, disabled }: { taskId: string; disa
         handleRequest();
       }}
       disabled={loading || disabled}
-      className="flex items-center gap-1.5 px-3 py-1.5 bg-sprout-600 hover:bg-sprout-700 text-white text-xs font-semibold rounded-lg shadow-sm shadow-sprout-600/20 transition-all active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none"
+      className={actionButtonClass(tone)}
     >
       {loading ? (
-        <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+        <span aria-hidden="true" className="h-4 w-4 animate-spin rounded-full border-2 border-current/30 border-t-current motion-reduce:animate-none" />
       ) : (
-        <Truck className="w-3.5 h-3.5" />
+        <Truck className="h-4 w-4" aria-hidden="true" />
       )}
       Request Pickup
     </button>

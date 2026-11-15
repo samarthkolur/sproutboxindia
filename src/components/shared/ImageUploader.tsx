@@ -39,13 +39,14 @@ export function ImageUploader({ label, endpoint, value, onChange, onUploadingCha
   }, [isUploading, onUploadingChange]);
 
   return (
-    <div className="rounded-xl border border-sprout-800/15 bg-white/60 p-4">
+    <div className="rounded-tile border border-hairline bg-panel/60 p-3">
       <div className="mb-3 flex items-center justify-between">
-        <p className="text-sm font-semibold text-text-primary">{label}</p>
+        <p className="text-sm font-medium text-ink">{label}</p>
         {preview ? (
           <button
             type="button"
-            className="rounded-lg p-1 text-text-muted hover:bg-red-50 hover:text-red-600"
+            aria-label={`Remove ${label}`}
+            className="rounded-full p-1.5 text-ink-muted transition-colors hover:bg-risk-soft hover:text-risk focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50"
             onClick={() => {
               setPreview("");
               onChange?.("");
@@ -59,27 +60,27 @@ export function ImageUploader({ label, endpoint, value, onChange, onUploadingCha
         type="button"
         disabled={isUploading}
         className={cn(
-          "flex min-h-[132px] w-full flex-col items-center justify-center rounded-xl border border-dashed border-sprout-800/20 bg-sprout-50/40 text-sm text-text-muted disabled:opacity-60",
-          preview && "border-solid bg-white"
+          "flex min-h-[132px] w-full flex-col items-center justify-center rounded-tile border border-dashed border-hairline bg-inset/40 text-sm text-ink-soft transition-colors hover:bg-inset/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50 disabled:opacity-60",
+          preview && "border-solid bg-panel-solid"
         )}
         onClick={() => inputRef.current?.click()}
       >
         {isUploading ? (
           <>
-            <Loader2 className="mb-2 h-6 w-6 animate-spin text-sprout-700" />
+            <Loader2 className="mb-2 h-6 w-6 animate-spin text-ink-muted motion-reduce:animate-none" />
             Uploading…
           </>
         ) : preview ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={preview} alt={label} className="max-h-32 rounded-lg object-cover" />
+          <img src={preview} alt={label} className="max-h-32 rounded-xl object-cover" />
         ) : (
           <>
-            <ImagePlus className="mb-2 h-6 w-6 text-sprout-700" />
+            <ImagePlus className="mb-2 h-6 w-6 text-ink-muted" />
             Upload image
           </>
         )}
       </button>
-      {error && <p className="mt-2 text-xs text-red-600">{error}</p>}
+      {error && <p role="alert" className="mt-2 text-micro font-medium text-risk">{error}</p>}
       <input
         ref={inputRef}
         type="file"
