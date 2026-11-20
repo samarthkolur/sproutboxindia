@@ -1,4 +1,5 @@
 import { GlassCard } from "@/components/shared/GlassCard";
+import { UpiForm } from "@/components/grower/UpiForm";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { UserCircle, MapPin, CreditCard, Phone, ShieldCheck, ShieldAlert } from "lucide-react";
@@ -103,6 +104,7 @@ export default async function GrowerProfilePage() {
                 <div className="min-w-0">
                   <p className="text-[11px] font-semibold text-text-muted uppercase tracking-wider">{field.label}</p>
                   <p className="break-words text-sm font-medium text-text-primary">{field.value}</p>
+                  {field.label === "UPI ID" && grower && !grower.upiId && <UpiForm />}
                 </div>
               </div>
             );

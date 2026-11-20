@@ -8,6 +8,7 @@ import { AddressMapPicker, type SelectedAddress } from "@/components/onboarding/
 import { StepProgress } from "@/components/onboarding/StepProgress";
 import { CROP_TYPES, CROP_DISPLAY_NAMES, CROP_PRICE_PER_KG, CROP_CYCLE_DAYS, type CropType } from "@/lib/constants";
 import { clearRegistrationPrefill, readRegistrationPrefill } from "@/lib/registration-prefill";
+import { trackSignUp } from "@/lib/gtag";
 
 const steps = ["Business", "Crops", "Schedule", "Review"];
 
@@ -108,6 +109,7 @@ function RestaurantOnboardingForm() {
       });
       const result = await res.json();
       if (!res.ok) throw new Error(result.error || "Registration failed");
+      trackSignUp("restaurant", { city: data.city, crops: data.selectedCrops.length });
       clearRegistrationPrefill();
       router.push("/login?registered=true");
       // eslint-disable-next-line @typescript-eslint/no-explicit-any

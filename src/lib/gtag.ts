@@ -20,6 +20,14 @@ export function event(name: string, params?: GtagEventParams) {
   window.gtag("event", name, params);
 }
 
+// Used by A/B experiments: tags all later events with the visitor's
+// variants (exp_<experiment> = <variant>). Register each exp_* key as a
+// user-scoped custom dimension in GA4 Admin to see it in reports.
+export function setUserProperties(props: Record<string, string>) {
+  if (typeof window === "undefined" || !window.gtag) return;
+  window.gtag("set", "user_properties", props);
+}
+
 // Maps to the assignment's Acquisition KPI category (Active Certified
 // Growers / restaurant partner count) — fired once a registration
 // actually completes, not on form start.

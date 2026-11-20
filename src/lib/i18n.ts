@@ -128,6 +128,12 @@ export const translations: Record<string, TranslationEntry> = {
   Payouts: { kn: "ಪಾವತಿಗಳು", hi: "भुगतान" },
   "Farm-to-fork,": { kn: "ಫಾರ್ಮ್‌ನಿಂದ ಮೇಜಿಗೆ,", hi: "खेत से थाली तक," },
   "door to door.": { kn: "ಬಾಗಿಲಿನಿಂದ ಬಾಗಿಲಿಗೆ.", hi: "घर-घर तक." },
+  // A/B experiment copy (src/lib/experiments/config.ts)
+  "Fresh microgreens,": { kn: "ತಾಜಾ ಮೈಕ್ರೋಗ್ರೀನ್‌ಗಳು,", hi: "ताज़ा माइक्रोग्रीन्स," },
+  "grown next door.": { kn: "ನಿಮ್ಮ ಪಕ್ಕದಲ್ಲೇ ಬೆಳೆದವು.", hi: "आपके पड़ोस में उगाए गए।" },
+  "Join the Network": { kn: "ನೆಟ್‌ವರ್ಕ್‌ಗೆ ಸೇರಿ", hi: "नेटवर्क से जुड़ें" },
+  Setup: { kn: "ಸೆಟಪ್", hi: "सेटअप" },
+  "Add UPI for payouts": { kn: "ಪಾವತಿಗಳಿಗಾಗಿ UPI ಸೇರಿಸಿ", hi: "भुगतान के लिए UPI जोड़ें" },
   "Now live in 3 cities": { kn: "ಈಗ 3 ನಗರಗಳಲ್ಲಿ ಲೈವ್", hi: "अब 3 शहरों में लाइव" },
   "A demand-driven, decentralized microgreen network — connecting restaurants with home-based growers for the freshest produce, delivered on schedule.": {
     kn: "ಬೇಡಿಕೆ ಆಧಾರಿತ, ವಿಕೇಂದ್ರೀಕೃತ ಮೈಕ್ರೋಗ್ರೀನ್ ಜಾಲ - ತಾಜಾ ಉತ್ಪನ್ನಗಳನ್ನು ಸಮಯಕ್ಕೆ ತಲುಪಿಸಲು ರೆಸ್ಟೋರೆಂಟ್‌ಗಳನ್ನು ಮನೆಯಲ್ಲೇ ಬೆಳೆಯುವವರೊಂದಿಗೆ ಸಂಪರ್ಕಿಸುತ್ತದೆ.",
