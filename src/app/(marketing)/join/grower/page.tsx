@@ -8,13 +8,38 @@ import { AddressMapPicker, type SelectedAddress } from "@/components/onboarding/
 import { StepProgress } from "@/components/onboarding/StepProgress";
 import { KIT_OPTIONS } from "@/lib/constants";
 import { clearRegistrationPrefill, readRegistrationPrefill } from "@/lib/registration-prefill";
+import { trackSignUp } from "@/lib/gtag";
+import { useVariant } from "@/components/experiments/ExperimentProvider";
 
-const steps = ["Personal", "Location", "Space", "Kit", "Review"];
+const CONTROL_STEPS = [
+  { id: "personal", label: "Personal" },
+  { id: "location", label: "Location" },
+  { id: "space", label: "Space" },
+  { id: "kit", label: "Kit" },
+  { id: "review", label: "Review" },
+] as const;
+
+// grower_form_length variant b: space + kit on one screen, submit from there,
+// UPI collected later from the grower profile.
+const SHORT_STEPS = [
+  { id: "personal", label: "Personal" },
+  { id: "location", label: "Location" },
+  { id: "setup", label: "Setup" },
+] as const;
+
+type StepId = (typeof CONTROL_STEPS)[number]["id"] | (typeof SHORT_STEPS)[number]["id"];
 
 function GrowerOnboardingForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const formLength = useVariant("grower_form_length");
+  const steps: readonly { id: StepId; label: string }[] =
+    formLength === "b" ? SHORT_STEPS : CONTROL_STEPS;
+  const stepIds = steps.map((s) => s.id);
+  const stepLabels = steps.map((s) => s.label);
   const [step, setStep] = useState(0);
+  const current = stepIds[step];
+  const isLastStep = step === steps.length - 1;
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [selectedAddress, setSelectedAddress] = useState<SelectedAddress | null>(null);
@@ -64,7 +89,7 @@ function GrowerOnboardingForm() {
   };
 
   const validateStep = () => {
-    if (step === 0) {
+    if (current === "personal") {
       if (!data.name.trim() || !data.email.trim() || (!hasPrefilledPassword && !data.password)) {
         setError("Please fill in all required fields.");
         return false;
@@ -76,12 +101,12 @@ function GrowerOnboardingForm() {
       }
     }
 
-    if (step === 1 && (!data.address || !data.city || !data.pincode)) {
+    if (current === "location" && (!data.address || !data.city || !data.pincode)) {
       setError("Choose a location on the map so address, city, and PIN code can be fetched.");
       return false;
     }
 
-    if (step === 2 && (!data.areaSize || Number(data.areaSize) <= 0)) {
+    if ((current === "space" || current === "setup") && (!data.areaSize || Number(data.areaSize) <= 0)) {
       setError("Enter a valid growing area greater than 0 sq ft.");
       return false;
     }
@@ -99,7 +124,7 @@ function GrowerOnboardingForm() {
   const handleSubmit = async () => {
     if (!data.areaSize || Number(data.areaSize) <= 0) {
       setError("Enter a valid growing area greater than 0 sq ft.");
-      setStep(2);
+      setStep(stepIds.findIndex((id) => id === "space" || id === "setup"));
       return;
     }
 
@@ -117,6 +142,7 @@ function GrowerOnboardingForm() {
       });
       const result = await res.json();
       if (!res.ok) throw new Error(result.error || "Registration failed");
+      trackSignUp("grower", { city: data.city, kit: data.kit, form_variant: formLength });
       clearRegistrationPrefill();
       router.push("/login?registered=true");
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -152,7 +178,7 @@ function GrowerOnboardingForm() {
             Set up your growing profile in a few steps
           </p>
 
-          <StepProgress steps={steps} currentStep={step} />
+          <StepProgress steps={stepLabels} currentStep={step} />
 
           {error && (
             <div className="bg-status-error/10 border border-status-error/20 text-status-error rounded-xl px-4 py-3 mb-4 text-sm">
@@ -161,7 +187,7 @@ function GrowerOnboardingForm() {
           )}
 
           {/* Step 0: Personal */}
-          {step === 0 && (
+          {current === "personal" && (
             <div className="space-y-4">
               <div>
                 <label className={labelClass}>Full Name</label>
@@ -185,14 +211,14 @@ function GrowerOnboardingForm() {
           )}
 
           {/* Step 1: Location */}
-          {step === 1 && (
+          {current === "location" && (
             <div className="space-y-4">
               <AddressMapPicker value={selectedAddress} onChange={updateAddress} />
             </div>
           )}
 
           {/* Step 2: Space */}
-          {step === 2 && (
+          {(current === "space" || current === "setup") && (
             <div className="space-y-4">
               <div>
                 <label className={labelClass}>Space Type</label>
@@ -238,7 +264,7 @@ function GrowerOnboardingForm() {
           )}
 
           {/* Step 3: Kit */}
-          {step === 3 && (
+          {(current === "kit" || current === "setup") && (
             <div className="space-y-4">
               <div>
                 <label className={labelClass}>Choose Your Kit</label>
@@ -266,15 +292,17 @@ function GrowerOnboardingForm() {
                   ))}
                 </div>
               </div>
-              <div>
-                <label className={labelClass}>UPI ID (for payouts)</label>
-                <input className={inputClass} value={data.upiId} onChange={(e) => update("upiId", e.target.value)} placeholder="name@upi" />
-              </div>
+              {current === "kit" && (
+                <div>
+                  <label className={labelClass}>UPI ID (for payouts)</label>
+                  <input className={inputClass} value={data.upiId} onChange={(e) => update("upiId", e.target.value)} placeholder="name@upi" />
+                </div>
+              )}
             </div>
           )}
 
           {/* Step 4: Review */}
-          {step === 4 && (
+          {current === "review" && (
             <div className="space-y-3">
               {[
                 { label: "Name", value: data.name },
@@ -308,7 +336,7 @@ function GrowerOnboardingForm() {
               </Link>
             )}
 
-            {step < steps.length - 1 ? (
+            {!isLastStep ? (
               <button
                 onClick={next}
                 className="inline-flex items-center gap-2 bg-sprout-800 text-white px-6 py-2.5 rounded-xl text-sm font-semibold hover:bg-sprout-900 transition-all active:scale-[0.98]"

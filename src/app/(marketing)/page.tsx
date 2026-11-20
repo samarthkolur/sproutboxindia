@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { BrandLogo } from "@/components/layout/BrandLogo";
+import { useExperiments, useVariant } from "@/components/experiments/ExperimentProvider";
 
 // ── Scroll Reveal Hook ──────────────────────────────────────────────────────
 function useScrollReveal() {
@@ -124,6 +125,8 @@ function MouseGlow() {
 // ── Floating Navbar ─────────────────────────────────────────────────────────
 function Navbar() {
   const [scrolled, setScrolled] = useState(false);
+  const navLabel = useVariant("nav_cta_label");
+  const { trackWithExperiments } = useExperiments();
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -162,9 +165,10 @@ function Navbar() {
             </Link>
             <Link
               href="/register"
+              onClick={() => trackWithExperiments("cta_click", { location: "nav", target: "register" })}
               className="text-sm font-medium bg-sprout-800 text-white px-4 py-2 rounded-xl hover:bg-sprout-900 transition-all hover:shadow-lg hover:shadow-sprout-800/20 active:scale-[0.98]"
             >
-              Get Started
+              {navLabel === "b" ? "Join the Network" : "Get Started"}
             </Link>
           </div>
         </div>
@@ -181,6 +185,18 @@ export default function LandingPage() {
   const section4 = useScrollReveal();
   const section5 = useScrollReveal();
   const section6 = useScrollReveal();
+  const headline = useVariant("hero_headline");
+  const ctaOrder = useVariant("hero_cta_order");
+  const { trackWithExperiments } = useExperiments();
+  const trackCta = (location: string, target: "grower" | "restaurant") =>
+    trackWithExperiments("cta_click", { location, target });
+
+  // hero_cta_order: control = grower first (primary), b = restaurant first (primary)
+  const heroCtas = [
+    { target: "grower" as const, href: "/join/grower", label: "Join as Grower" },
+    { target: "restaurant" as const, href: "/join/restaurant", label: "Partner as Restaurant" },
+  ];
+  if (ctaOrder === "b") heroCtas.reverse();
   const previewBars = [
     { day: "Mon", height: 42, opacity: 0.75 },
     { day: "Tue", height: 58, opacity: 0.82 },
@@ -223,9 +239,19 @@ export default function LandingPage() {
 
           {/* Main headline */}
           <h1 className="mb-5 text-4xl font-black leading-[1.02] tracking-tight text-text-primary animate-in fade-in slide-in-from-bottom-6 duration-1000 min-[380px]:text-5xl sm:mb-6 sm:text-6xl md:text-7xl lg:text-8xl lg:leading-[0.95]">
-            Farm-to-fork,
-            <br />
-            <span className="gradient-text-animated">door to door.</span>
+            {headline === "b" ? (
+              <>
+                Fresh microgreens,
+                <br />
+                <span className="gradient-text-animated">grown next door.</span>
+              </>
+            ) : (
+              <>
+                Farm-to-fork,
+                <br />
+                <span className="gradient-text-animated">door to door.</span>
+              </>
+            )}
           </h1>
 
           {/* Subheadline */}
@@ -237,31 +263,40 @@ export default function LandingPage() {
 
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-in fade-in slide-in-from-bottom-10 duration-1000 delay-300">
-            <Link
-              href="/join/grower"
-              className="group relative inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-sprout-800 px-6 py-3.5 text-base font-semibold text-white transition-all hover:bg-sprout-900 hover:shadow-xl hover:shadow-sprout-800/25 active:scale-[0.98] sm:w-auto sm:px-8"
-            >
-              <span>Join as Grower</span>
-              <svg
-                className="w-4 h-4 group-hover:translate-x-0.5 transition-transform"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={2.5}
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"
-                />
-              </svg>
-            </Link>
-            <Link
-              href="/join/restaurant"
-              className="inline-flex w-full items-center justify-center gap-2 rounded-2xl border-2 border-sprout-800/20 px-6 py-3.5 text-base font-semibold text-sprout-800 transition-all hover:border-sprout-800/40 hover:bg-sprout-50 active:scale-[0.98] sm:w-auto sm:px-8"
-            >
-              Partner as Restaurant
-            </Link>
+            {heroCtas.map((cta, i) =>
+              i === 0 ? (
+                <Link
+                  key={cta.target}
+                  href={cta.href}
+                  onClick={() => trackCta("hero", cta.target)}
+                  className="group relative inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-sprout-800 px-6 py-3.5 text-base font-semibold text-white transition-all hover:bg-sprout-900 hover:shadow-xl hover:shadow-sprout-800/25 active:scale-[0.98] sm:w-auto sm:px-8"
+                >
+                  <span>{cta.label}</span>
+                  <svg
+                    className="w-4 h-4 group-hover:translate-x-0.5 transition-transform"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={2.5}
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"
+                    />
+                  </svg>
+                </Link>
+              ) : (
+                <Link
+                  key={cta.target}
+                  href={cta.href}
+                  onClick={() => trackCta("hero", cta.target)}
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-2xl border-2 border-sprout-800/20 px-6 py-3.5 text-base font-semibold text-sprout-800 transition-all hover:border-sprout-800/40 hover:bg-sprout-50 active:scale-[0.98] sm:w-auto sm:px-8"
+                >
+                  {cta.label}
+                </Link>
+              )
+            )}
           </div>
 
           {/* Dashboard Preview */}
@@ -502,6 +537,7 @@ export default function LandingPage() {
 
               <Link
                 href="/join/grower"
+                onClick={() => trackCta("growers_section", "grower")}
                 className="inline-flex items-center gap-2 bg-sprout-800 text-white px-6 py-3 rounded-2xl text-sm font-semibold hover:bg-sprout-900 transition-all hover:shadow-lg hover:shadow-sprout-800/20 mt-8 active:scale-[0.98]"
               >
                 Start Growing
@@ -671,6 +707,7 @@ export default function LandingPage() {
 
               <Link
                 href="/join/restaurant"
+                onClick={() => trackCta("restaurants_section", "restaurant")}
                 className="inline-flex items-center gap-2 bg-sprout-800 text-white px-6 py-3 rounded-2xl text-sm font-semibold hover:bg-sprout-900 transition-all hover:shadow-lg hover:shadow-sprout-800/20 mt-8 active:scale-[0.98]"
               >
                 Partner With Us
@@ -774,6 +811,7 @@ export default function LandingPage() {
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                 <Link
                   href="/join/grower"
+                  onClick={() => trackCta("bottom_cta", "grower")}
                   className="group inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-sprout-800 px-6 py-3.5 text-base font-semibold text-white transition-all hover:bg-sprout-900 hover:shadow-xl hover:shadow-sprout-800/25 active:scale-[0.98] sm:w-auto sm:px-8"
                 >
                   Join as Grower
@@ -793,6 +831,7 @@ export default function LandingPage() {
                 </Link>
                 <Link
                   href="/join/restaurant"
+                  onClick={() => trackCta("bottom_cta", "restaurant")}
                   className="inline-flex w-full items-center justify-center gap-2 rounded-2xl border-2 border-sprout-800/20 px-6 py-3.5 text-base font-semibold text-sprout-800 transition-all hover:border-sprout-800/40 hover:bg-sprout-50 active:scale-[0.98] sm:w-auto sm:px-8"
                 >
                   Partner as Restaurant
@@ -848,12 +887,12 @@ export default function LandingPage() {
                   </Link>
                 </li>
                 <li>
-                  <Link href="/join/grower" className="text-sm text-text-muted hover:text-sprout-800 transition-colors">
+                  <Link href="/join/grower" onClick={() => trackCta("footer", "grower")} className="text-sm text-text-muted hover:text-sprout-800 transition-colors">
                     Grower Onboarding
                   </Link>
                 </li>
                 <li>
-                  <Link href="/join/restaurant" className="text-sm text-text-muted hover:text-sprout-800 transition-colors">
+                  <Link href="/join/restaurant" onClick={() => trackCta("footer", "restaurant")} className="text-sm text-text-muted hover:text-sprout-800 transition-colors">
                     Restaurant Onboarding
                   </Link>
                 </li>
